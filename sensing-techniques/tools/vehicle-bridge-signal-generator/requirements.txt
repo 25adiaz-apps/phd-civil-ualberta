@@ -1,0 +1,15 @@
+# Libraries of the vehicle-bridge signal generator. The recommended install is
+#   pip install -e sensing-techniques/tools/vehicle-bridge-signal-generator[dev]
+# from the repository root; this file lists the same libraries for reference.
+numpy>=1.24
+scipy>=1.10
+h5py>=3.8
+pyyaml>=6.0
+matplotlib>=3.7
+pytest>=7
+pandas
+openseespy
+jupyterlab
+ipykernel
+nbconvert
+nbclient

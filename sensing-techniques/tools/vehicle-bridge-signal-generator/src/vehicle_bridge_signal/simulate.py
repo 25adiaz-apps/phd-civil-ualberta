@@ -33,7 +33,7 @@ from .engine import EngineOrders, engine_force, firing_frequency
 from .roughness import RoughnessProfile, class_mean, classify
 from .vbi import (InputColumn, contact_inputs_from_bridge, make_trajectory, solve_coupled, solve_decoupled,
                   vehicle_response_to_contact)
-from .vehicle import G, VehicleModel, build_vehicle
+from .vehicle import build_vehicle
 
 __all__ = ["simulate", "SimulationResult", "SimulationError", "CrossingDoesNotFitError", "component_keys",
            "contact_keys", "STREAMS", "make_rng", "build_bridge", "crossing_window"]
@@ -398,12 +398,32 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
             out += sc[paths[p][1]] * y_path_out[:, p]
         return out
 
+    scfg_s = cfg["sensor"]
+    white_unit = None
+    nd = 0.0
+    if scfg_s["white_noise"]["enabled"]:
+        nd = float(scfg_s["white_noise"]["density_ug"])
+        white_unit = make_rng(seed, "white_noise").standard_normal(ns) * sensor.white_noise_sigma(1.0, grid.fs_sim)
+
     targets = cfg["snr_control"]["targets_db"]
     if snr_mode:
-        converged = not disturbance_path
+        # The sensor keeps its physical noise density and quantisation. The inputs that drive the
+        # bridge (static weight, ambient forces) are scaled so that the bridge component sits at the
+        # sensor_noise target above the white noise, and every disturbance is scaled relative to the
+        # bridge. Without white noise the bridge keeps its physical level.
+        bridge_inputs = [n for n in names if n in ("weight", "ambient")]
+        target_bridge = None
+        if white_unit is not None and nd > 0:
+            target_bridge = 10 ** (float(targets["sensor_noise"]) / 20.0) * nd * _rms(aa_only(white_unit)[oi], mask_out)
+        converged = False
         for _ in range(int(cfg["snr_control"]["max_iterations"])):
-            rms_b = _rms(bridge_total(scales), mask_out)
             change = 0.0
+            if target_bridge is not None:
+                factor = target_bridge / _rms(bridge_total(scales), mask_out)
+                for n in bridge_inputs:
+                    scales[n] *= factor
+                change = abs(factor - 1.0)
+            rms_b = _rms(bridge_total(scales), mask_out)
             for kind, p in disturbance_path.items():
                 rms_d = _rms(y_path_out[:, p], mask_out)
                 if rms_d <= 0:
@@ -418,16 +438,8 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
             warns.append("snr_controlled scaling did not converge; achieved ratios are stored in the metadata")
 
     # ---- noise (stage 3), anti-alias (4), decimation (5), jitter (6), quantisation (7) -----------
-    scfg_s = cfg["sensor"]
     noise_sim = np.zeros(ns)
-    nd = float(scfg_s["white_noise"]["density_ug"]) if scfg_s["white_noise"]["enabled"] and not snr_mode else 0.0
-    white_unit = None
-    if scfg_s["white_noise"]["enabled"]:
-        white_unit = make_rng(seed, "white_noise").standard_normal(ns) * sensor.white_noise_sigma(1.0, grid.fs_sim)
-        if snr_mode:
-            rms_b = _rms(bridge_total(scales), mask_out)
-            rms_n1 = _rms(aa_only(white_unit)[oi], mask_out)
-            nd = rms_b / (10 ** (float(targets["sensor_noise"]) / 20.0) * rms_n1)
+    if white_unit is not None:
         noise_sim += nd * white_unit
     if scfg_s["pink_noise"]["enabled"]:
         noise_sim += sensor.pink_noise(make_rng(seed, "pink_noise"), ns,
@@ -508,9 +520,10 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
     post = slice(grid.warm, ns)
     ratios = []
     for a, dof in enumerate(vehicle.axle_dofs):
-        compression = (vehicle.static_axle_loads[a] - vehicle.k_tyre[a] * (z_tot[post, dof] - u_tot[post, a])
+        static = vehicle.static_axle_loads[a] * scales["weight"]   # scaled only in snr_controlled mode
+        compression = (static - vehicle.k_tyre[a] * (z_tot[post, dof] - u_tot[post, a])
                        - vehicle.c_tyre[a] * (zd_tot[post, dof] - du_tot[post, a]))
-        ratios.append(float(compression.min() / vehicle.static_axle_loads[a]))
+        ratios.append(float(compression.min() / static))
     min_ratio = min(ratios)
     if min_ratio < 0:
         warns.append(f"wheel lift-off: contact force reaches {min_ratio:.2f} x static load (linear model "
@@ -552,6 +565,7 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
         meta[f"rms_{kind}_on"] = rms_d
         meta[f"ratio_db_bridge_to_{kind}"] = _db(rms_bridge, rms_d) if kind in names else float("nan")
         meta[f"scale_{kind}"] = scales.get(kind, 0.0)
+    meta["scale_bridge_inputs"] = scales["weight"]   # 1 in physical mode
     rms_noise = _rms(comps["noise"], mask_out)
     meta["rms_noise_on"] = rms_noise
     meta["ratio_db_bridge_to_noise"] = _db(rms_bridge, rms_noise)

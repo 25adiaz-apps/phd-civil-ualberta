@@ -142,7 +142,7 @@ def test_cli_presets_check_and_errors():
     out = _cli("check", "--config", "smoke", "--set", "crossing.sped=3")
     assert out.returncode == 2 and "Did you mean" in out.stderr
     out = _cli("simulate", "--config", "smoke")
-    assert out.returncode == 2 and "--sample" not in out.stdout and "distributions" in out.stderr
+    assert out.returncode == 2 and "--sample" in out.stderr and "crossing.speed" in out.stderr
 
 
 def test_cli_simulate_plot_and_save(tmp_path):

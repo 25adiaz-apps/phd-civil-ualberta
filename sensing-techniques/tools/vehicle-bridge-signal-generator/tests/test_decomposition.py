@@ -4,7 +4,7 @@ import pytest
 
 import vehicle_bridge_signal as vbs
 
-from conftest import quiet_overrides, rms
+from conftest import rms
 
 ALL_ON = {
     "wheel.enabled": True, "wheel.diameter_m": 0.65, "wheel.eccentricity_m": 3e-4,
@@ -178,6 +178,10 @@ def test_snr_controlled_reaches_the_targets(typical):
         assert m[f"ratio_db_bridge_to_{kind}"] == pytest.approx(targets[kind], abs=1e-6)
     assert m["ratio_db_bridge_to_white_noise"] == pytest.approx(16.0, abs=1e-6)
     assert res.identity_error() < 1e-6
+    # The sensor stays physical (same density); the bridge is scaled up, so quantisation stays small.
+    assert m["noise_density_ug"] == typical["sensor"]["white_noise"]["density_ug"]
+    assert m["scale_bridge_inputs"] > 1
+    assert m["ratio_db_bridge_to_noise"] == pytest.approx(16.0, abs=0.5)
 
 
 def test_engine_rms_target_in_physical_mode(typical):

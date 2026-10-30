@@ -204,8 +204,8 @@ def irrelevant_prefixes(cfg: Mapping) -> list[str]:
     if fixed("simulation.amplitude_mode") != "snr_controlled":
         out.append("snr_control.")
     else:
-        # The SNR targets replace the physical amplitudes of the engine and of the white noise.
-        out += ["engine.body_accel_rms", "sensor.white_noise.density_ug"]
+        # The SNR targets replace the physical amplitude of the engine.
+        out.append("engine.body_accel_rms")
         for kind in ("roughness", "engine", "wheel"):
             if fixed(f"{kind}.enabled") is False:
                 out.append(f"snr_control.targets_db.{kind}")

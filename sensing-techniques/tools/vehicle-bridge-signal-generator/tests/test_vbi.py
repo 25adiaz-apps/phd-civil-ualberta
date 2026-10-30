@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 import vehicle_bridge_signal as vbs
-from vehicle_bridge_signal.spectral import peak_in_band, welch_psd
+from vehicle_bridge_signal.spectral import welch_psd
 
 REF = Path(__file__).parent / "reference" / "yang2004_opensees_vbi_1000hz.npz"
 

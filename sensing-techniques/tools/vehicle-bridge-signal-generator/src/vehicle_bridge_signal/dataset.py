@@ -39,7 +39,7 @@ from typing import Any, Iterable
 import h5py
 import numpy as np
 
-from .config import TOOL_ROOT, ConfigError, config_to_yaml, distribution_paths, get_path, load_config, yaml_load
+from .config import TOOL_ROOT, config_to_yaml, distribution_paths, get_path, load_config, yaml_load
 from .sampling import SamplePlan, plan_dataset, scenario_for
 from .simulate import component_keys, contact_keys, simulate
 
@@ -359,7 +359,6 @@ class VBIDataset:
 
     @property
     def config(self) -> dict:
-        import yaml
         return yaml_load(self.file.attrs["config_yaml"])
 
     @property

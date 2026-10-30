@@ -26,6 +26,7 @@ Resumen; el detalle está en [`README.md`](README.md) y [`literature-review/READ
 
 - Una carpeta por materia (nombre en inglés, minúsculas y guiones) y, dentro, una subcarpeta por trabajo (p. ej. `machine-learning/assignment-3/`).
 - Si un trabajo necesita librerías extra, lleva su propio `requirements.txt` en su carpeta.
+- Las herramientas reutilizables entre proyectos van en `sensing-techniques/tools/<herramienta>/` como paquetes instalables (`pip install -e`); los proyectos las importan y guardan sus datos en su propia carpeta (p. ej. `vehicle-bridge-signal-generator`).
 - Código (variables y comentarios) en inglés; texto explicativo en español.
 - Fórmulas en LaTeX, con el significado de cada símbolo.
 - Semilla fija para cualquier dato aleatorio.

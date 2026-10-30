@@ -161,8 +161,11 @@ sensor:
     range_g: 2.0            # [g] full scale +/- range
     include_gravity: true   # the z axis reads 1 g at rest, so saturation and the quantization grid include it
 
-snr_control:                # only with simulation.amplitude_mode: snr_controlled
-  targets_db:               # 20 log10( RMS(bridge) / RMS(disturbance) ) on the on-bridge window, fs_out
+snr_control:                # only with simulation.amplitude_mode: snr_controlled. The sensor keeps its physical
+                            # noise density and quantisation; the bridge inputs (weight, ambient) are scaled so the
+                            # bridge sits sensor_noise dB above the white noise, and each disturbance is scaled
+                            # relative to the bridge. Ratios are measured on the on-bridge window, at fs_out.
+  targets_db:               # 20 log10( RMS(bridge) / RMS(disturbance) )
     roughness: {dist: uniform, low: -20.0, high: 0.0}    # [dB] [SUPUESTO]
     engine: {dist: uniform, low: -10.0, high: 10.0}      # [dB] [SUPUESTO]
     wheel: {dist: uniform, low: -10.0, high: 10.0}       # [dB] [SUPUESTO]

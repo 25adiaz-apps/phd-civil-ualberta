@@ -114,8 +114,15 @@ def _cmd_generate(args) -> int:
 def _cmd_simulate(args) -> int:
     from .config import load_config
     from .simulate import simulate
+    from .config import distribution_paths
     cfg = load_config(args.config, args.overrides)
     seed = args.seed
+    random_params = distribution_paths(cfg, relevant_only=True)
+    if random_params and not args.sample:
+        print(f"error: '{args.config}' has random parameters ({', '.join(random_params[:4])}"
+              f"{', ...' if len(random_params) > 4 else ''}). Add --sample to draw one scenario from it with --seed, "
+              "or fix them with --set.", file=sys.stderr)
+        return 2
     if args.sample:
         from .sampling import sample_scenario
         cfg, seed = sample_scenario(cfg, args.seed)

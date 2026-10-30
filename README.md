@@ -12,6 +12,9 @@ machine-learning/                 Machine Learning for Engineers (CIVE 779)
 structural-reliability/           Confiabilidad estructural
 ├── mini-project-2/               Confiabilidad de un tirante de puente atirantado (Monte Carlo)
 └── open-question/                Aproximación de primer orden de la tensión de un tirante
+sensing-techniques/               Sensing Techniques and Data Analytics (CIV E 789)
+└── tools/                        Herramientas reutilizables entre proyectos
+    └── vehicle-bridge-signal-generator/  Generador de señales vehículo-puente (drive-by) con sus componentes separadas
 literature-review/                Revisión de literatura
 ├── metodos/                      Notebook con la explicación de los métodos estudiados
 └── revision-papers/              Notebook con el resumen de cada artículo revisado
@@ -38,6 +41,7 @@ CLAUDE.md                         Contexto y convenciones del repositorio para C
 - **Nueva materia:** crear `<nombre-de-la-materia-en-ingles>/` con una carpeta por trabajo.
 - Nombres de carpetas en minúsculas y con guiones.
 - Si un trabajo necesita librerías extra, agregar un `requirements.txt` dentro de su carpeta.
+- **Herramienta reutilizable entre proyectos:** va en `sensing-techniques/tools/<herramienta>/` como paquete instalable (`pip install -e`). Los proyectos la importan y guardan sus datos en su propia carpeta. Ver [`vehicle-bridge-signal-generator`](sensing-techniques/tools/vehicle-bridge-signal-generator/README.md).
 
 ## Puesta en marcha
 
