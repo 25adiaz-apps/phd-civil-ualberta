@@ -1,0 +1,10 @@
+extends: typical_car_smartphone
+description: >-
+  Fixed scenario. Smooth class A road and an idling 4-cylinder engine (800 rpm -> firing frequency
+  26.7 Hz) at the upper end of the assumed vibration level (0.1 m/s^2 RMS at the body): the
+  engine dominates the measurement.
+roughness:
+  class: A
+engine:
+  rpm_mean: 800.0
+  body_accel_rms: 0.1

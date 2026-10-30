@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vehicle-bridge-signal"
+version = "1.0.0"
+description = "Physics-based generator of drive-by (vehicle-bridge interaction) smartphone acceleration signals with exact component labels."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Amilcar" }]
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "h5py>=3.8",
+    "pyyaml>=6.0",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+opensees = ["openseespy"]
+notebook = ["jupyterlab", "ipykernel", "nbconvert", "nbclient", "pandas"]
+dev = ["pytest>=7", "openseespy", "jupyterlab", "ipykernel", "nbconvert", "nbclient", "pandas"]
+
+[project.scripts]
+vbsig = "vehicle_bridge_signal.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+vehicle_bridge_signal = ["defaults.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "opensees: needs openseespy and a local copy of OpenSees-VBI-Simulation (set OVBI_DIR)",
+    "slow: takes more than a few seconds",
+]

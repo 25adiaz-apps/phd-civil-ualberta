@@ -1,0 +1,11 @@
+description: >-
+  Random dataset (generate_dataset), 10 000 samples with the ranges of section 6 (the package
+  defaults): quarter car, coupled interaction, physical amplitudes, roughness A-C, engine on,
+  white sensor noise, 16-bit quantisation. 500 bridges and 200 vehicles are reused across
+  crossings, and bridges/vehicles are split in three disjoint partitions (70/15/15 %) so that a
+  train/val/test split by bridge AND vehicle loses no samples (see group_split).
+dataset:
+  n_samples: 10000
+  n_bridges: 500
+  n_vehicles: 200
+  partitions: [0.7, 0.15, 0.15]

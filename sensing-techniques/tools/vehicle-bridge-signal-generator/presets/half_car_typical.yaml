@@ -1,0 +1,16 @@
+extends: typical_car_smartphone
+description: >-
+  Fixed scenario. typical_car_smartphone with a half-car (bounce + pitch, two axles 2.7 m apart,
+  phone at the centre of gravity). Two contact points: on_bridge masks and contact components are
+  stored per axle.
+vehicle:
+  model: half_car
+  half_car:
+    body_mass: 800.0
+    wheelbase: 2.7
+    cg_to_front_ratio: 0.45
+    unsprung_mass: 50.0
+    body_frequency: 1.4
+    wheel_frequency: 11.0
+    suspension_damping_ratio: 0.3
+    sensor_position: 0.0

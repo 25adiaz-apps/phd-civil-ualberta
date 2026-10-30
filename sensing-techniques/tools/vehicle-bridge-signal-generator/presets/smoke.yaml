@@ -1,0 +1,8 @@
+extends: default_dataset
+description: >-
+  Random dataset for quick checks: 50 samples of default_dataset (10 bridges, 10 vehicles).
+  Generates in a few seconds.
+dataset:
+  n_samples: 50
+  n_bridges: 10
+  n_vehicles: 10

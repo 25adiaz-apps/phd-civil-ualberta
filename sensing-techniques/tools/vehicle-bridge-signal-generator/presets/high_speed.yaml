@@ -1,0 +1,7 @@
+extends: typical_car_smartphone
+description: >-
+  Fixed scenario. typical_car_smartphone at 25 m/s (90 km/h, top of the default range): shorter
+  crossing (coarser frequency resolution), stronger roughness excitation (G_t(f) = G_d(f/v)/v) and
+  larger shift v/(2L) of the bridge frequencies.
+crossing:
+  speed: 25.0

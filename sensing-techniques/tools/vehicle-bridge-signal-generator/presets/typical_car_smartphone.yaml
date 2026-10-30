@@ -1,0 +1,35 @@
+# Fixed scenario. Base of the other fixed presets (they 'extend' it and change one aspect).
+description: >-
+  Fixed scenario (simulate). Passenger car (quarter car, 450 kg) with a smartphone crossing a 30 m
+  bridge (nominal f1 = 3.63 Hz) at 15 m/s on an ISO class B road (G_d(n0) = 64e-6 m^3), 4-cylinder
+  engine at 1500 rpm, typical smartphone accelerometer (150 ug/sqrt(Hz), 16 bits on +/-2 g).
+  Reference case for parametric studies: vary one parameter with --set / with_overrides.
+crossing:
+  speed: 15.0
+  placement: center
+bridge:
+  span: 30.0
+  f1: null
+  f1_factor: 1.0               # f1 = nominal_f1(30 m) = 3.63 Hz
+  mass_per_length: 10000.0
+  damping_ratio: 0.015
+vehicle:
+  model: quarter_car
+  quarter_car:
+    body_mass: 400.0
+    unsprung_mass: 50.0
+    body_frequency: 1.4
+    wheel_frequency: 11.0
+    suspension_damping_ratio: 0.3
+roughness:
+  class: B
+  gd_n0: null                  # fixed scenario: geometric mean of the class (64e-6 m^3)
+engine:
+  n_cylinders: 4
+  rpm_mean: 1500.0
+  body_accel_rms: 0.02
+sensor:
+  white_noise:
+    density_ug: 150.0
+dataset:
+  n_samples: 100               # a dataset of this preset repeats the scenario with different seeds

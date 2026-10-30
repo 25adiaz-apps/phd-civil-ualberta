@@ -1,0 +1,8 @@
+extends: default_dataset
+description: >-
+  Random dataset like default_dataset but with snr_controlled amplitudes: roughness, engine and
+  white sensor noise are scaled so that the bridge-to-disturbance RMS ratios on the on-bridge window
+  follow snr_control.targets_db (sensor noise 14-20 dB, i.e. the bridge 5-10 times above the noise,
+  CIV E 789 Lecture 2). Useful when the physical ratios make the bridge component unrecoverable.
+simulation:
+  amplitude_mode: snr_controlled

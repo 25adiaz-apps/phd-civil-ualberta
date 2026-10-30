@@ -1,0 +1,181 @@
+# =====================================================================================
+# vehicle_bridge_signal - default configuration (config schema v1)
+# =====================================================================================
+# Every preset or user configuration is deep-merged on top of this file, so a preset
+# only needs the keys it changes. Unknown keys are rejected (typo protection).
+#
+# A parameter can be a fixed value or a distribution (sampled independently per sample):
+#   {dist: uniform,    low: a, high: b}
+#   {dist: loguniform, low: a, high: b}                    (a > 0)
+#   {dist: normal,     mean: m, std: s, low: a, high: b}   (low/high optional truncation)
+#   {dist: choice,     values: [...], weights: [...]}      (weights optional)
+# simulate() needs every parameter fixed; generate_dataset() samples the distributions.
+# Keys marked (structural) must be fixed because they define the array shapes.
+#
+# Units: SI everywhere (m, s, kg, N, Hz). Exceptions are written in the key name
+# (*_ug: micro-g, *_g: multiples of g = 9.80665 m/s^2, *_db: decibels).
+# [SUPUESTO] = value without a confirmed source; it is configurable on purpose.
+# =====================================================================================
+
+name: defaults
+description: >-
+  Default dataset configuration with the parameter ranges of section 6 of the specification
+  (random sampling). Use a preset for fixed scenarios.
+
+simulation:
+  fs_sim: 1000.0            # [Hz] (structural) internal integration rate. Must be an integer multiple of fs_out.
+  fs_out: 200.0             # [Hz] (structural) output (smartphone) sampling rate. CIV E 789 / Mei et al. (2021).
+  n_samples_out: 2048       # [-]  (structural) samples per output signal (10.24 s at 200 Hz, power of 2).
+  warmup_s: 4.0             # [s]  (structural) simulated time before the output window, then discarded, so the
+                            #      suspension is already in steady random vibration (numerical choice).
+  tail_s: 0.5               # [s]  (structural) simulated time after the window; absorbs the edge effects of the
+                            #      zero-phase anti-alias filter (numerical choice).
+  interaction: coupled      # (structural) coupled | decoupled
+  amplitude_mode: physical  # (structural) physical | snr_controlled
+  newmark_gamma: 0.5        # [-]  (structural) Newmark average acceleration
+  newmark_beta: 0.25        # [-]  (structural)
+
+crossing:
+  speed: {dist: uniform, low: 5.0, high: 25.0}   # [m/s] constant speed. Talebi-Kalaleh & Mei (2026): 5-30 m/s.
+  approach_margin_s: 1.0    # [s] minimum time inside the output window before the first axle enters [SUPUESTO]
+  exit_margin_s: 1.0        # [s] minimum time inside the window after the last axle leaves [SUPUESTO]
+  placement: random         # (structural) random | center | fixed  (where the crossing sits in the window)
+  entry_time_s: null        # [s] entry time of the first axle, only used with placement: fixed
+  max_speed_resamples: 1000 # (structural) attempts to draw a speed whose crossing fits in the window
+
+bridge:
+  span: {dist: uniform, low: 15.0, high: 60.0}   # [m] L. Talebi-Kalaleh & Mei (2026), table 5.
+  f1: null                  # [Hz] first frequency. null -> nominal_f1(span) * f1_factor.
+  f1_factor: {dist: uniform, low: 0.7, high: 1.3}  # [-] [SUPUESTO] scatter around the nominal value.
+  nominal_f1_table:         # (structural) log-log interpolation table, Talebi-Kalaleh & Mei (2026), table 5.
+    span: [15.0, 30.0, 50.0, 100.0]   # [m]
+    f1: [8.03, 3.63, 2.05, 0.75]      # [Hz]
+  flexural_rigidity: null   # [N m^2] EI. If given, f1 is derived from EI (f1 and f1_factor must be null/ignored).
+  mass_per_length: {dist: uniform, low: 4000.0, high: 20000.0}  # [kg/m] Yang et al. (2004): 4800; NuBe B27: 19372.
+  damping_ratio: {dist: uniform, low: 0.005, high: 0.03}  # [-] per mode, drawn independently for each mode
+                            #     [SUPUESTO]. A scalar applies to every mode; a list gives one value per mode.
+  f_max: auto               # [Hz] (structural) modes with f_n <= f_max are kept. auto = min(0.45 fs_out, 40 Hz).
+  max_modes: 6              # [-]  (structural) upper limit on the number of modes.
+  n_label_modes: 3          # [-]  (structural) K: modes with their own label bridge_mode_1..K.
+
+vehicle:
+  model: quarter_car        # (structural) sprung_mass | quarter_car | half_car
+  sprung_mass:              # 1 DOF (Yang et al. 2004): mass on a spring and a damper.
+    mass: {dist: uniform, low: 250.0, high: 500.0}       # [kg] [SUPUESTO] same range as the quarter-car body mass
+    frequency: {dist: uniform, low: 1.0, high: 2.0}      # [Hz] bounce frequency sqrt(k/m)/(2 pi)
+    damping_ratio: {dist: uniform, low: 0.2, high: 0.4}  # [-] [SUPUESTO]
+    stiffness: null         # [N/m] if given, replaces frequency
+    damping: null           # [N s/m] if given, replaces damping_ratio
+  quarter_car:              # 2 DOF (default): body m_s on suspension (k_s, c_s), axle m_u on tyre (k_t, c_t).
+    body_mass: {dist: uniform, low: 250.0, high: 500.0}       # [kg] m_s. 240 kg (Smith & Wang 2008), 560 kg (LBTU 2025)
+    unsprung_mass: {dist: uniform, low: 30.0, high: 100.0}    # [kg] m_u. 36 kg and 102 kg in the same examples
+    body_frequency: {dist: uniform, low: 1.0, high: 2.0}      # [Hz] target ride frequency (reference framework ~1-3 Hz)
+    wheel_frequency: {dist: uniform, low: 8.0, high: 15.0}    # [Hz] target wheel-hop frequency (~10-15 Hz; LBTU 8.5 Hz)
+    suspension_damping_ratio: {dist: uniform, low: 0.2, high: 0.4}  # [-] c_s = 2 zeta sqrt(k_s m_s) [SUPUESTO]
+    tyre_damping: 0.0       # [N s/m] c_t. Reference benchmarks use zero tyre damping.
+    suspension_stiffness: null  # [N/m] k_s. Give k_s and k_t together to bypass the frequency targets.
+    tyre_stiffness: null        # [N/m] k_t
+    suspension_damping: null    # [N s/m] c_s, replaces suspension_damping_ratio
+    max_resamples: 1000     # (structural) attempts to draw feasible frequency targets (random mode)
+  half_car:                 # 4 DOF: body bounce + pitch, two axles (bicycle model, one side of the car).
+    body_mass: {dist: uniform, low: 500.0, high: 1000.0}      # [kg] [SUPUESTO] twice the quarter-car body range
+    dynamic_index: 1.0      # [-] I_pitch = DI * m_s * d1 * d2; DI ~ 1 for passenger cars (Gillespie 1992) [SUPUESTO]
+    wheelbase: {dist: uniform, low: 2.4, high: 3.0}           # [m] d [SUPUESTO]
+    cg_to_front_ratio: {dist: uniform, low: 0.40, high: 0.50} # [-] d1/d, d1 = CG to front axle [SUPUESTO]
+    unsprung_mass: {dist: uniform, low: 30.0, high: 100.0}    # [kg] per axle
+    body_frequency: {dist: uniform, low: 1.0, high: 2.0}      # [Hz] per-axle ride frequency target
+    wheel_frequency: {dist: uniform, low: 8.0, high: 15.0}    # [Hz] per-axle wheel-hop frequency target
+    suspension_damping_ratio: {dist: uniform, low: 0.2, high: 0.4}  # [-] [SUPUESTO]
+    tyre_damping: 0.0       # [N s/m]
+    sensor_position: 0.0    # [m] x_p, phone position measured from the CG, positive towards the front [SUPUESTO]
+    engine_position: null   # [m] engine force position from the CG (+ front). null -> over the front axle [SUPUESTO]
+    max_resamples: 1000     # (structural)
+
+roughness:
+  enabled: true
+  scope: crossing           # (structural) crossing: new profile for every crossing | bridge: one profile per bridge_id
+  class: {dist: choice, values: [A, B, C], weights: [0.3, 0.4, 0.3]}  # ISO 8608 class (A..H)
+  gd_n0: null               # [m^3] G_d(n0). null -> log-uniform inside the class limits (n0 = 0.1 cycles/m convention)
+  waviness: 2.0             # [-] w. ISO 8608 suggests 2; measured roads 1.5-3.5 (Loprencipe & Zoccali 2017)
+  n0: 0.1                   # [cycles/m] (structural) reference spatial frequency
+  n_min: 0.01               # [cycles/m] n_l (Talebi-Kalaleh & Mei 2026)
+  n_max: 10.0               # [cycles/m] n_u
+  profile_period_m: 2048.0  # [m] 1/Delta_n. Fixed so the profile does not change with speed; it is doubled
+                            #     automatically if shorter than twice the travelled distance.
+  smoothing:                # centred moving average = tyre envelopment of short wavelengths
+    enabled: true           # on by default, as in OpenSees-VBI-Simulation (5 x 0.05 m moving average)
+    length_m: 0.25          # [m] window length [SUPUESTO]
+  seed: null                # optional integer: freezes the profile independently of the simulation seed
+
+engine:
+  enabled: true
+  n_cylinders: {dist: choice, values: [3, 4, 6], weights: [0.2, 0.6, 0.2]}  # [-] four-stroke engine
+  rpm_mean: {dist: uniform, low: 700.0, high: 3000.0}   # [rpm] idle to cruise [SUPUESTO]
+  rpm_relative_std: 0.05    # [-] std of the slow rpm fluctuation relative to the mean [SUPUESTO]
+  rpm_correlation_time_s: 2.0  # [s] correlation time of the smooth rpm process (>= 0.1 s) [SUPUESTO]
+  firing_amplitude: 1.0     # [-] relative amplitude of the firing order N_cyl/2
+  double_firing_amplitude: 0.3  # [-] relative amplitude of order N_cyl [SUPUESTO]
+  half_order_amplitude: 0.1     # [-] relative amplitude of order 0.5 [SUPUESTO]
+  body_accel_rms: {dist: loguniform, low: 0.005, high: 0.1}  # [m/s^2] RMS of the true engine-induced acceleration
+                            #     at the sensor point (fs_sim, output window); sets the force amplitude [SUPUESTO]
+
+wheel:                      # wheel eccentricity / unbalance: harmonic contact displacement at f_w = v/(pi D)
+  enabled: false
+  diameter_m: {dist: uniform, low: 0.60, high: 0.75}       # [m] D [SUPUESTO] (example in the spec: 0.835 m)
+  eccentricity_m: {dist: loguniform, low: 1.0e-4, high: 5.0e-4}  # [m] amplitude [SUPUESTO]
+
+ambient:                    # background bridge vibration (traffic/wind): white-noise modal forces
+  enabled: false
+  modal_accel_rms: {dist: loguniform, low: 0.001, high: 0.01}  # [m/s^2] omega_n^2 * RMS(q_n), per mode [SUPUESTO]
+
+mount:                      # non-rigid phone holder: base-excited 1 DOF filter between body and sensor
+  enabled: false
+  frequency_hz: {dist: uniform, low: 15.0, high: 40.0}   # [Hz] [SUPUESTO]
+  damping_ratio: {dist: uniform, low: 0.05, high: 0.20}  # [-] [SUPUESTO]
+
+sensor:
+  white_noise:
+    enabled: true
+    density_ug: {dist: uniform, low: 100.0, high: 400.0}  # [ug/sqrt(Hz)] ND. iPhone XR 110 (Komarizadehasl 2024);
+                            #     MPU-6500 300 (datasheet). sigma = ND * g * sqrt(fs_sim / 2)
+  pink_noise:
+    enabled: false
+    density_at_1hz_ug: 300.0  # [ug/sqrt(Hz)] one-sided density at 1 Hz, PSD ~ 1/f [SUPUESTO]
+  bias:
+    enabled: false
+    value_m_s2: {dist: uniform, low: -0.05, high: 0.05}  # [m/s^2] constant offset [SUPUESTO]
+  drift:
+    enabled: false
+    random_walk_m_s2_per_sqrt_s: 0.001  # [m/s^2/sqrt(s)] random-walk intensity [SUPUESTO]
+  anti_alias:
+    enabled: true
+    order: 4                # [-] Butterworth order
+    cutoff_ratio: 0.4       # [-] cutoff = cutoff_ratio * fs_out
+    zero_phase: true        # true: sosfiltfilt (zero phase); false: causal sosfilt
+  jitter:
+    enabled: false
+    std_s: 2.0e-4           # [s] std of the sampling-instant error (truncated at 0.45/fs_out) [SUPUESTO]
+  quantization:
+    enabled: true
+    bits: 16                # [-] MPU-6500: 16 bits on +/-2 g (16384 LSB/g)
+    range_g: 2.0            # [g] full scale +/- range
+    include_gravity: true   # the z axis reads 1 g at rest, so saturation and the quantization grid include it
+
+snr_control:                # only with simulation.amplitude_mode: snr_controlled
+  targets_db:               # 20 log10( RMS(bridge) / RMS(disturbance) ) on the on-bridge window, fs_out
+    roughness: {dist: uniform, low: -20.0, high: 0.0}    # [dB] [SUPUESTO]
+    engine: {dist: uniform, low: -10.0, high: 10.0}      # [dB] [SUPUESTO]
+    wheel: {dist: uniform, low: -10.0, high: 10.0}       # [dB] [SUPUESTO]
+    sensor_noise: {dist: uniform, low: 13.98, high: 20.0}  # [dB] 5-10 times above noise (CIV E 789, Lecture 2)
+  max_iterations: 50        # (structural)
+
+dataset:                    # (structural) only used by generate_dataset
+  n_samples: null           # default number of samples when generate_dataset / the CLI do not give one
+  n_bridges: null           # number of distinct bridges (bridge_id). null -> one per sample
+  n_vehicles: null          # number of distinct vehicles (vehicle_id). null -> one per sample
+  partitions: null          # e.g. [0.7, 0.15, 0.15]: bridges and vehicles are split in disjoint groups and each
+                            # sample pairs a bridge and a vehicle of the same group (leak-free splits, no discards)
+  compression: gzip         # gzip | lzf | none
+  compression_level: 4      # 0-9, gzip only
+  store_contact: true       # store the contact-point components
+  store_bridge_response: true  # store the bridge midspan displacement and acceleration

@@ -5,3 +5,12 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 .vscode/
+*.egg-info/
+.pytest_cache/
+build/
+
+# Generated datasets (vehicle-bridge-signal-generator and the projects that use it)
+*.h5
+*.hdf5
+*.h5.partial
+!sensing-techniques/tools/vehicle-bridge-signal-generator/examples/*.h5

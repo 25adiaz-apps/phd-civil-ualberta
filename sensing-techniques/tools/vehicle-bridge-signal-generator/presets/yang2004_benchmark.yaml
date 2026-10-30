@@ -1,0 +1,32 @@
+description: >-
+  Fixed scenario. Benchmark of Yang, Lin & Yau (2004) as configured in OpenSees-VBI-Simulation
+  (quarter_car_simple_Yang2004): 25 m bridge, E = 2.75e10 Pa, I = 0.12 m^4 (EI = 3.3e9 N m^2),
+  m = 4800 kg/m, no damping; 1200 kg sprung mass with k = 5e5 N/m (f_v = 3.25 Hz, f_b1 = 2.08 Hz);
+  10 m/s; smooth road; no engine, noise, filter or quantisation. Used by the validation tests.
+crossing:
+  speed: 10.0
+  placement: fixed
+  entry_time_s: 1.0
+bridge:
+  span: 25.0
+  f1: null
+  flexural_rigidity: 3.3e9
+  mass_per_length: 4800.0
+  damping_ratio: 0.0
+vehicle:
+  model: sprung_mass
+  sprung_mass:
+    mass: 1200.0
+    stiffness: 5.0e5
+    damping: 0.0
+roughness:
+  enabled: false
+engine:
+  enabled: false
+sensor:
+  white_noise:
+    enabled: false
+  anti_alias:
+    enabled: false
+  quantization:
+    enabled: false

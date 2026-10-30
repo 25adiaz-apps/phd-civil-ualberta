@@ -1,0 +1,8 @@
+extends: typical_car_smartphone
+description: >-
+  Fixed scenario. typical_car_smartphone with the quietest sensor of the default range
+  (100 ug/sqrt(Hz), close to the 110 ug/sqrt(Hz) measured on an iPhone XR by Komarizadehasl et al.
+  2024). Quantisation unchanged (16 bits on +/-2 g).
+sensor:
+  white_noise:
+    density_ug: 100.0

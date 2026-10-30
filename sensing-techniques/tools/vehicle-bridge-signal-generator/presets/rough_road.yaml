@@ -1,0 +1,6 @@
+extends: typical_car_smartphone
+description: >-
+  Fixed scenario. typical_car_smartphone on a poor road: ISO class D (G_d(n0) = 1024e-6 m^3,
+  outside the A-C range of default_dataset). Shows how roughness masks the bridge response.
+roughness:
+  class: D

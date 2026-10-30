@@ -1,0 +1,15 @@
+extends: typical_car_smartphone
+description: >-
+  Fixed scenario. Same car and bridge as typical_car_smartphone but perfectly smooth pavement, no
+  engine, no sensor noise and no quantisation: the measured signal contains only the bridge paths
+  (quasi-static + dynamic part of each mode). Useful to study the bridge component alone and the
+  frequencies f_bn +/- n v/(2L) (Yang et al. 2004).
+roughness:
+  enabled: false
+engine:
+  enabled: false
+sensor:
+  white_noise:
+    enabled: false
+  quantization:
+    enabled: false

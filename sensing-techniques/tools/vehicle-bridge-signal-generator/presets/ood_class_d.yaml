@@ -1,0 +1,11 @@
+extends: default_dataset
+description: >-
+  Out-of-distribution test set: like default_dataset but every road is ISO class D (rougher than
+  the A-C training range). 1000 samples, new bridges and vehicles, no partitions (all test).
+roughness:
+  class: D
+dataset:
+  n_samples: 1000
+  n_bridges: null
+  n_vehicles: null
+  partitions: null

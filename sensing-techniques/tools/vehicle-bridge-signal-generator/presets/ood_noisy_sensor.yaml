@@ -1,0 +1,12 @@
+extends: default_dataset
+description: >-
+  Out-of-distribution test set: noisier accelerometers, 400-800 ug/sqrt(Hz) [SUPUESTO: above the
+  100-400 training range]. 1000 samples, new bridges and vehicles, no partitions.
+sensor:
+  white_noise:
+    density_ug: {dist: uniform, low: 400.0, high: 800.0}
+dataset:
+  n_samples: 1000
+  n_bridges: null
+  n_vehicles: null
+  partitions: null
