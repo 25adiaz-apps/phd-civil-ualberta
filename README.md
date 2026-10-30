@@ -1,6 +1,6 @@
-# Repositorio de estudio
+# phd-civil-ualberta
 
-Repositorio universal de estudio: trabajos de las materias del posgrado y material de la revisión de literatura.
+Repositorio general de mi doctorado en Ingeniería Civil en la University of Alberta: cursos, proyectos, revisión de literatura e investigación.
 
 ## Estructura
 
@@ -16,6 +16,8 @@ literature-review/                Revisión de literatura
 ├── metodos/                      Notebook con la explicación de los métodos estudiados
 └── revision-papers/              Notebook con el resumen de cada artículo revisado
 requirements.txt                  Librerías generales para correr los notebooks
+requirements-torch.txt            PyTorch con soporte de GPU (CUDA 13.0), opcional para deep learning
+CLAUDE.md                         Contexto y convenciones del repositorio para Claude Code
 ```
 
 ### Trabajos
@@ -39,9 +41,27 @@ requirements.txt                  Librerías generales para correr los notebooks
 
 ## Puesta en marcha
 
-```bash
+Windows (PowerShell):
+
+```powershell
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+.venv\Scripts\activate
 pip install -r requirements.txt
 jupyter lab                      # o abre los .ipynb en VS Code
+```
+
+Linux/macOS:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+jupyter lab
+```
+
+Opcional, para deep learning con GPU (instala PyTorch desde el índice de CUDA 13.0; ver [`CLAUDE.md`](CLAUDE.md)):
+
+```powershell
+pip install -r requirements-torch.txt
+python -c "import torch; print(torch.__version__, torch.version.cuda); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0)); print(torch.randn(3).cuda())"
 ```

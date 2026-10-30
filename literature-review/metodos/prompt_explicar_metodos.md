@@ -14,7 +14,7 @@ Cuando te pida que me expliques un método, sigue este flujo.
 
 ## Parte 2: Prompt para Claude Code
 
-Cuando te diga que ya terminamos con el método, dame un prompt completo para Claude Code que agregue ese método al notebook `literature-review/metodos/metodos.ipynb` de mi repositorio "assigment 3" y haga commit y push a GitHub.
+Cuando te diga que ya terminamos con el método, dame un prompt completo para Claude Code que agregue ese método al notebook `literature-review/metodos/metodos.ipynb` de mi repositorio "phd-civil-ualberta" y haga commit y push a GitHub.
 
 ### Nivel de detalle
 Nivel de detalle: conceptual. El objetivo es tener claro el concepto del método, no un tratamiento exhaustivo. Unas 10–12 celdas, máximo 3–4 gráficas, sin widgets ni deducciones salvo que yo lo pida.
