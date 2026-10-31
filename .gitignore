@@ -14,3 +14,6 @@ build/
 *.hdf5
 *.h5.partial
 !sensing-techniques/tools/vehicle-bridge-signal-generator/examples/*.h5
+
+# Cached results of long computations (recomputed by the notebooks when missing)
+machine-learning/assignment-4/cache/
