@@ -53,18 +53,27 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 
 ### Estructura del notebook (en este orden)
 
-0. **Encabezado:** título, referencia completa (autores, año, revista, DOI), el artículo en una frase e índice con enlaces a las secciones. Después, una celda de código con imports, semilla y funciones auxiliares.
+0. **Encabezado:** título, referencia completa (autores, año, revista, DOI), el artículo en una frase e índice con enlaces a las secciones.
+   - **Glosario** (justo después del índice, sin número): todos los términos técnicos y siglas que aparecen en el notebook, agrupados por tema (p. ej. monitoreo, dinámica estructural, procesamiento de señales, estadística, índices propios del artículo). Cada término lleva su definición y una breve descripción de qué es (1–2 líneas), con el nombre en inglés si la sigla viene de ahí. Si el término tiene ficha en Conceptos clave, se enlaza.
+   - Después, una celda de código con imports, semilla y funciones auxiliares.
 1. **Problema:** qué limitación o vacío existe y por qué importa.
 2. **Propósito:** qué busca el artículo y su aporte principal.
-3. **Metodología:** los conceptos y métodos en que se basa, con un esquema general del enfoque.
-4. **Procedimiento:** paso a paso lo que hicieron (modelo, datos, configuración, parámetros).
-5. **Resultados:** paso a paso lo que obtuvieron, con los valores que reportan.
-6. **Conclusiones y limitaciones:** las conclusiones principales del artículo y sus limitaciones (las que declaran los autores y las que se identifiquen al analizarlo, indicando cuáles son cuáles).
+3. **Conceptos clave:** una subsección por cada método o concepto muy importante del artículo, con una ficha que explique claramente:
+   - **Qué es:** definición, significado del nombre o las siglas y de dónde viene.
+   - **Para qué sirve.**
+   - **Por qué se usó en este artículo.**
+   - **Cuándo conviene usarlo.**
+   - **Cuándo no conviene:** limitaciones y supuestos que, si no se cumplen, lo invalidan.
+   - **Alternativas:** otros métodos que resuelven lo mismo.
+4. **Metodología:** cómo aplica el artículo esos conceptos (fórmulas, pasos, código), con un esquema general del enfoque. No repite las fichas; las enlaza.
+5. **Procedimiento:** paso a paso lo que hicieron (modelo, datos, configuración, parámetros).
+6. **Resultados:** paso a paso lo que obtuvieron, con los valores que reportan.
+7. **Conclusiones y limitaciones:** las conclusiones principales del artículo y sus limitaciones (las que declaran los autores y las que se identifiquen al analizarlo, indicando cuáles son cuáles).
 
 ### Cómo se explica
 
 - Explicaciones cortas: párrafos breves y viñetas, sin texto extenso.
-- Cada concepto o método clave se **define primero** (qué es, qué significan su nombre o sus siglas, de dónde viene) y después se explica para qué sirve y cómo se calcula. No basta con dar la sigla y los pasos del cálculo.
+- Cada concepto o método se **define antes de usarlo**: los términos, en el Glosario; los métodos o conceptos importantes, en su ficha de Conceptos clave. No basta con dar la sigla y los pasos del cálculo.
 - En Metodología, Procedimiento y Resultados, cada paso junta: qué se hizo → el concepto usado → fórmula en LaTeX (con el significado de cada símbolo y en palabras) → código con un ejemplo → gráfica o esquema → interpretación breve. Usar todos los recursos que ayuden a entender (fórmulas, código, gráficas, esquemas, tablas).
 - Citar las ecuaciones, figuras y tablas del artículo por su número (p. ej. "Ec. 5 del artículo", "Fig. 3 del artículo").
 - Las gráficas y esquemas son propios (matplotlib), no copias de las figuras del artículo. Distinguir siempre lo ilustrativo (datos sintéticos) de lo reportado por el artículo (valores tomados de sus tablas o texto).
