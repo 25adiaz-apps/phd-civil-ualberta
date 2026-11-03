@@ -16,5 +16,6 @@ Las reglas de nombres, estructura del notebook y forma de explicar están en [`C
 
 | Año | Autor principal | Carpeta | Tema |
 |---|---|---|---|
+| 2020 | Shirzad-Ghaleroudkhani (con Gül) | [2020-shirzad-ghaleroudkhani-inverse-filtering-bridge-frequency](2020-shirzad-ghaleroudkhani-inverse-filtering-bridge-frequency/2020-shirzad-ghaleroudkhani-inverse-filtering-bridge-frequency.ipynb) | Filtro inverso con la vibración fuera del puente para identificar la frecuencia fundamental del puente con teléfonos en vehículos (ensayo de laboratorio) |
 | 2024 | Talebi-Kalaleh (con Mei) | [2024-talebi-kalaleh-compressed-sensing-damage-detection](2024-talebi-kalaleh-compressed-sensing-damage-detection/2024-talebi-kalaleh-compressed-sensing-damage-detection.ipynb) | Detección de daño con compressed sensing de datos de teléfonos en vehículos: MFCC, PCA y distancia de Wasserstein |
 | 2025 | Zeng (con Mei y Gül) | [2025-zeng-mishm-multibridge-drive-by-shm](2025-zeng-mishm-multibridge-drive-by-shm/2025-zeng-mishm-multibridge-drive-by-shm.ipynb) | MISHM: detección de daño en una red de puentes comparándolos entre sí con MFCC y divergencia KL de datos de vehículos |
