@@ -64,6 +64,7 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 ### Cómo se explica
 
 - Explicaciones cortas: párrafos breves y viñetas, sin texto extenso.
+- Cada concepto o método clave se **define primero** (qué es, qué significan su nombre o sus siglas, de dónde viene) y después se explica para qué sirve y cómo se calcula. No basta con dar la sigla y los pasos del cálculo.
 - En Metodología, Procedimiento y Resultados, cada paso junta: qué se hizo → el concepto usado → fórmula en LaTeX (con el significado de cada símbolo y en palabras) → código con un ejemplo → gráfica o esquema → interpretación breve. Usar todos los recursos que ayuden a entender (fórmulas, código, gráficas, esquemas, tablas).
 - Citar las ecuaciones, figuras y tablas del artículo por su número (p. ej. "Ec. 5 del artículo", "Fig. 3 del artículo").
 - Las gráficas y esquemas son propios (matplotlib), no copias de las figuras del artículo. Distinguir siempre lo ilustrativo (datos sintéticos) de lo reportado por el artículo (valores tomados de sus tablas o texto).
