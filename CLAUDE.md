@@ -49,7 +49,9 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 4. Crear `<carpeta>.ipynb` con la estructura de abajo.
 5. Ejecutar el notebook (son ejemplos ligeros; sin cálculos largos) para que las gráficas queden guardadas.
 6. Agregar el artículo a la tabla de [`literature-review/undestanding-papers/README.md`](literature-review/undestanding-papers/README.md).
-7. Commit descriptivo y push, solo con los archivos del artículo.
+7. Commit descriptivo y push.
+
+**Sincronización con GitHub:** todo lo que cambie dentro de `literature-review/undestanding-papers/` se sube a GitHub al terminar cada tarea, con la misma estructura de carpetas que en local. Esto incluye los PDFs recién subidos que aún no tienen notebook (quedan en la raíz de la carpeta hasta procesarlos), los cambios de CLAUDE.md y los README. Los cambios pendientes de otras carpetas del repositorio no se incluyen en esos commits.
 
 ### Estructura del notebook (en este orden)
 
