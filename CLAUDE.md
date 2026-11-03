@@ -59,6 +59,7 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 3. **Metodología:** los conceptos y métodos en que se basa, con un esquema general del enfoque.
 4. **Procedimiento:** paso a paso lo que hicieron (modelo, datos, configuración, parámetros).
 5. **Resultados:** paso a paso lo que obtuvieron, con los valores que reportan.
+6. **Conclusiones y limitaciones:** las conclusiones principales del artículo y sus limitaciones (las que declaran los autores y las que se identifiquen al analizarlo, indicando cuáles son cuáles).
 
 ### Cómo se explica
 

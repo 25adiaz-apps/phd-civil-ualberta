@@ -16,3 +16,4 @@ Las reglas de nombres, estructura del notebook y forma de explicar están en [`C
 
 | Año | Autor principal | Carpeta | Tema |
 |---|---|---|---|
+| 2025 | Zeng (con Mei y Gül) | [2025-zeng-mishm-multibridge-drive-by-shm](2025-zeng-mishm-multibridge-drive-by-shm/2025-zeng-mishm-multibridge-drive-by-shm.ipynb) | MISHM: detección de daño en una red de puentes comparándolos entre sí con MFCC y divergencia KL de datos de vehículos |
