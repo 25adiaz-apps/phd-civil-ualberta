@@ -34,3 +34,39 @@ Resumen; el detalle está en [`README.md`](README.md) y [`literature-review/READ
 - Commits descriptivos y push al terminar.
 - Los datasets grandes no se suben a git.
 - Los trabajos existentes se respetan: no se modifican, mueven ni reorganizan sin que yo lo pida explícitamente.
+
+## Comprensión de artículos (`literature-review/undestanding-papers/`)
+
+Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook por artículo. (El nombre de la carpeta, `undestanding`, se mantiene tal cual.)
+
+**Las instrucciones nuevas que dé mientras trabajamos en estos notebooks se agregan a esta sección**, para tenerlas presentes en artículos futuros.
+
+### Flujo al subir un PDF nuevo
+
+1. Leer el artículo completo (todas las páginas, incluidas figuras, tablas y apéndices).
+2. Crear la carpeta `AAAA-apellido-descripcion-corta`: año, apellido del primer autor y 3–5 palabras en inglés, todo en minúsculas, con guiones y sin tildes (p. ej. `2021-mei-mode-shapes-sparse-matrix-completion`).
+3. Mover el PDF dentro de la carpeta y renombrarlo con el mismo nombre (`<carpeta>.pdf`).
+4. Crear `<carpeta>.ipynb` con la estructura de abajo.
+5. Ejecutar el notebook (son ejemplos ligeros; sin cálculos largos) para que las gráficas queden guardadas.
+6. Agregar el artículo a la tabla de [`literature-review/undestanding-papers/README.md`](literature-review/undestanding-papers/README.md).
+7. Commit descriptivo y push, solo con los archivos del artículo.
+
+### Estructura del notebook (en este orden)
+
+0. **Encabezado:** título, referencia completa (autores, año, revista, DOI), el artículo en una frase e índice con enlaces a las secciones. Después, una celda de código con imports, semilla y funciones auxiliares.
+1. **Problema:** qué limitación o vacío existe y por qué importa.
+2. **Propósito:** qué busca el artículo y su aporte principal.
+3. **Metodología:** los conceptos y métodos en que se basa, con un esquema general del enfoque.
+4. **Procedimiento:** paso a paso lo que hicieron (modelo, datos, configuración, parámetros).
+5. **Resultados:** paso a paso lo que obtuvieron, con los valores que reportan.
+
+### Cómo se explica
+
+- Explicaciones cortas: párrafos breves y viñetas, sin texto extenso.
+- En Metodología, Procedimiento y Resultados, cada paso junta: qué se hizo → el concepto usado → fórmula en LaTeX (con el significado de cada símbolo y en palabras) → código con un ejemplo → gráfica o esquema → interpretación breve. Usar todos los recursos que ayuden a entender (fórmulas, código, gráficas, esquemas, tablas).
+- Citar las ecuaciones, figuras y tablas del artículo por su número (p. ej. "Ec. 5 del artículo", "Fig. 3 del artículo").
+- Las gráficas y esquemas son propios (matplotlib), no copias de las figuras del artículo. Distinguir siempre lo ilustrativo (datos sintéticos) de lo reportado por el artículo (valores tomados de sus tablas o texto).
+- Numerar las tablas, ecuaciones y figuras del notebook en formato académico: título de tabla arriba ("**Tabla N.** ..."), pie de figura abajo ("**Figura N.** ...") y fuera de la gráfica, ecuaciones con `\tag{N}`.
+- Texto en español; código (variables y comentarios) en inglés.
+- Semilla fija para cualquier dato aleatorio.
+- Librerías comunes en `literature-review/undestanding-papers/requirements.txt`; si un artículo necesita otras, su carpeta lleva su propio `requirements.txt`.

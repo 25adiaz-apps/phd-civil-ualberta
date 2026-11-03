@@ -8,10 +8,11 @@ literature-review/
 │   ├── metodos.ipynb
 │   ├── requirements.txt      Librerías del notebook (numpy, scipy, matplotlib, EMD-signal)
 │   └── prompt_explicar_metodos.md   Instrucciones para el chat de Claude: explicar un método y generar el prompt para agregarlo al notebook
-└── revision-papers/          Resumen de cada artículo de la revisión (qué hicieron, cómo y para qué usaron cada método)
-    ├── resumenes_papers.ipynb
-    ├── figuras/              Esquemas propios de cada artículo, en PNG
-    └── requirements.txt      Librerías del notebook (numpy, matplotlib)
+├── revision-papers/          Resumen de cada artículo de la revisión (qué hicieron, cómo y para qué usaron cada método)
+│   ├── resumenes_papers.ipynb
+│   ├── figuras/              Esquemas propios de cada artículo, en PNG
+│   └── requirements.txt      Librerías del notebook (numpy, matplotlib)
+└── undestanding-papers/      Un notebook por artículo para entenderlo a fondo (ver su README.md)
 ```
 
 ## Resúmenes de artículos
