@@ -114,6 +114,7 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 - Cada método termina con **Entradas y salidas** (en negrita, sin número): **Entrada**, **Salida** y **Qué se obtiene o interpreta**.
 - Todas las celdas de código llevan la etiqueta `hide-input` en `metadata.tags` y `"jupyter": {"source_hidden": true}` en su metadata; las salidas quedan visibles.
 - **No regenerar el notebook:** insertar cada método nuevo en su lugar según el orden del mapa y dejar intacto lo demás.
+- **Un método se explica completo una sola vez**, en el primer lugar donde aparece según el orden del mapa. Donde vuelve a aparecer, solo lleva su encabezado numerado (con ancla propia) y una línea de referencia con enlace a la explicación completa. Si un método no es un nodo del mapa pero lo necesita otro, se explica justo antes del método que lo usa, con la nota "No aparece en el mapa; se explica aquí porque ...".
 - **Dos notebooks paralelos:** cada método nuevo se agrega en los DOS, el técnico (`research_map_methods.ipynb`) y el simple (`research_map_methods_simple.ipynb`), en el mismo lugar, con la misma numeración y las mismas anclas. El simple tiene el mismo formato (índice, separadores, Entradas y salidas, código oculto) y sigue estas reglas de lenguaje simple:
   - Frases cortas, una idea por frase.
   - Sin jerga. Si un término técnico es inevitable, se define en la misma frase con palabras cotidianas.
