@@ -17,3 +17,6 @@ build/
 
 # Cached results of long computations (recomputed by the notebooks when missing)
 machine-learning/assignment-4/cache/
+
+# PDF exported from the research map methods notebook (export_pdf.ps1)
+literature-review/metodos/research_map_methods.pdf

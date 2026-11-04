@@ -5,3 +5,4 @@ EMD-signal   # PyEMD (from PyEMD import EMD)
 jupyterlab
 ipykernel
 ssqueezepy   # CWT and SSWT (from ssqueezepy import cwt, ssq_cwt)
+playwright   # PDF export: nbconvert --to webpdf (then: python -m playwright install chromium)

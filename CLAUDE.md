@@ -83,3 +83,35 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 - Texto en español; código (variables y comentarios) en inglés.
 - Semilla fija para cualquier dato aleatorio.
 - Librerías comunes en `literature-review/undestanding-papers/requirements.txt`; si un artículo necesita otras, su carpeta lleva su propio `requirements.txt`.
+
+## Notebook de métodos del mapa
+
+[`literature-review/metodos/research_map_methods.ipynb`](literature-review/metodos/research_map_methods.ipynb) explica los métodos del mapa de investigación (monitoreo indirecto de puentes, drive-by), en el orden del mapa y solo con información de métodos.
+
+- **Numeración jerárquica** según el mapa; cada nivel hereda el número de su padre y los métodos van un nivel por debajo de su paso (p. ej. `2.2.2.1 Wavelet transform (SSWT)`). Niveles: `#` título del notebook, `##` nivel 1, `###` nivel 2, `####` nivel 3, `#####` método. Solo se crean los encabezados necesarios para llegar a cada método; el índice de arriba muestra solo los que existen.
+
+  ```
+  1 Bridge response separation
+    1.1 Road roughness
+    1.2 Vehicle dynamics
+  2 Modal identification
+    2.1 Natural frequencies
+      2.1.1 Signal decomposition
+      2.1.2 Bridge components
+    2.2 Mode shapes
+      2.2.1 Sparse spatial coverage
+      2.2.2 Signal decomposition
+      2.2.3 Bridge components
+      2.2.4 Build the shape along the bridge
+  3 Uncontrolled data quality
+  4 Damage detection
+    4.1 Healthy baseline
+      4.1.1 Environmental variability
+      4.1.2 Operational variability
+    4.2 Continuous monitoring
+  ```
+- **Separador:** una celda markdown con solo `---` antes de cada encabezado de nivel 1 y 2 (`##`, `###`); no entre las subsecciones internas de un método.
+- Cada método termina con **Entradas y salidas** (en negrita, sin número): **Entrada**, **Salida** y **Qué se obtiene o interpreta**.
+- Todas las celdas de código llevan la etiqueta `hide-input` en `metadata.tags` y `"jupyter": {"source_hidden": true}` en su metadata; las salidas quedan visibles.
+- **No regenerar el notebook:** insertar cada método nuevo en su lugar según el orden del mapa y dejar intacto lo demás.
+- PDF sin código: [`literature-review/metodos/export_pdf.ps1`](literature-review/metodos/export_pdf.ps1) (webpdf con playwright y chromium en el `.venv`). El PDF no se sube a git.
