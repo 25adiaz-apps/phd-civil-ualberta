@@ -4,3 +4,4 @@ matplotlib
 EMD-signal   # PyEMD (from PyEMD import EMD)
 jupyterlab
 ipykernel
+ssqueezepy   # CWT and SSWT (from ssqueezepy import cwt, ssq_cwt)
