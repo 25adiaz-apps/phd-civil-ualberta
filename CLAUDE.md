@@ -121,4 +121,5 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
   - Sin ecuaciones. Si una idea lo necesita, se describe en palabras.
   - Máximo 2 gráficas por método, muy simples, con títulos y ejes en lenguaje común. Debajo de cada una, una frase que diga qué se ve.
   - Arriba de cada método, un enlace a la sección equivalente del técnico: "Versión técnica: research_map_methods.ipynb, sección X".
-- PDF sin código: [`literature-review/metodos/export_pdf.ps1`](literature-review/metodos/export_pdf.ps1) (webpdf con playwright y chromium en el `.venv`). El PDF se sube a git: volver a exportarlo y subirlo cada vez que cambie el notebook.
+- PDF sin código: [`literature-review/metodos/export_pdf.ps1`](literature-review/metodos/export_pdf.ps1) exporta los dos notebooks (`research_map_methods.pdf` y `research_map_methods_simple.pdf`; webpdf con playwright y chromium en el `.venv`). **Cada vez que se agregue o cambie un método, se regeneran los dos PDF y se suben a GitHub** junto con los notebooks.
+- Al insertar un método antes de otros, se renumeran las figuras y ecuaciones de los que quedan después (numeración global en orden de aparición, también en las referencias "Ec. N" del texto y "Eq. N" del código).
