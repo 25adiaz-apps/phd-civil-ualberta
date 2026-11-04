@@ -88,7 +88,7 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 
 [`literature-review/metodos/research_map_methods.ipynb`](literature-review/metodos/research_map_methods.ipynb) explica los métodos del mapa de investigación (monitoreo indirecto de puentes, drive-by), en el orden del mapa y solo con información de métodos.
 
-- **Numeración jerárquica** según el mapa; cada nivel hereda el número de su padre y los métodos van un nivel por debajo de su paso (p. ej. `2.2.2.1 Wavelet transform (SSWT)`). Niveles: `#` título del notebook, `##` nivel 1, `###` nivel 2, `####` nivel 3, `#####` método. Solo se crean los encabezados necesarios para llegar a cada método; el índice de arriba muestra solo los que existen.
+- **Numeración jerárquica** según el mapa; cada nivel hereda el número de su padre y los métodos van un nivel por debajo de su paso (p. ej. `2.2.2.1 Wavelet transform (SSWT)`). Niveles: `#` título del notebook, `##` nivel 1, `###` nivel 2, `####` nivel 3, `#####` método. Solo se crean los encabezados necesarios para llegar a cada método; el índice de arriba muestra solo los que existen. Si un método cuelga de un paso de nivel 2 (p. ej. `1.1.1 Identical-axle subtraction`, bajo `1.1 Road roughness`), su encabezado es `####`.
 
   ```
   1 Bridge response separation
