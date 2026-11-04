@@ -114,4 +114,4 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 - Cada método termina con **Entradas y salidas** (en negrita, sin número): **Entrada**, **Salida** y **Qué se obtiene o interpreta**.
 - Todas las celdas de código llevan la etiqueta `hide-input` en `metadata.tags` y `"jupyter": {"source_hidden": true}` en su metadata; las salidas quedan visibles.
 - **No regenerar el notebook:** insertar cada método nuevo en su lugar según el orden del mapa y dejar intacto lo demás.
-- PDF sin código: [`literature-review/metodos/export_pdf.ps1`](literature-review/metodos/export_pdf.ps1) (webpdf con playwright y chromium en el `.venv`). El PDF no se sube a git.
+- PDF sin código: [`literature-review/metodos/export_pdf.ps1`](literature-review/metodos/export_pdf.ps1) (webpdf con playwright y chromium en el `.venv`). El PDF se sube a git: volver a exportarlo y subirlo cada vez que cambie el notebook.

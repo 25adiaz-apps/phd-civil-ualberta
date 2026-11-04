@@ -1,5 +1,5 @@
 # Export research_map_methods.ipynb to PDF with only text, equations and figures:
-# code cells tagged "hide-input" are removed. The PDF is not tracked in git (.gitignore).
+# code cells tagged "hide-input" are removed. The PDF is tracked in git: re-export it after each notebook change.
 # Requires playwright + chromium in the .venv:
 #   pip install playwright; python -m playwright install chromium
 # Usage (from any folder): powershell -ExecutionPolicy Bypass -File literature-review\metodos\export_pdf.ps1
