@@ -114,4 +114,11 @@ Objetivo: entender a fondo cada artículo que subo a esa carpeta. Un notebook po
 - Cada método termina con **Entradas y salidas** (en negrita, sin número): **Entrada**, **Salida** y **Qué se obtiene o interpreta**.
 - Todas las celdas de código llevan la etiqueta `hide-input` en `metadata.tags` y `"jupyter": {"source_hidden": true}` en su metadata; las salidas quedan visibles.
 - **No regenerar el notebook:** insertar cada método nuevo en su lugar según el orden del mapa y dejar intacto lo demás.
+- **Dos notebooks paralelos:** cada método nuevo se agrega en los DOS, el técnico (`research_map_methods.ipynb`) y el simple (`research_map_methods_simple.ipynb`), en el mismo lugar, con la misma numeración y las mismas anclas. El simple tiene el mismo formato (índice, separadores, Entradas y salidas, código oculto) y sigue estas reglas de lenguaje simple:
+  - Frases cortas, una idea por frase.
+  - Sin jerga. Si un término técnico es inevitable, se define en la misma frase con palabras cotidianas.
+  - Una analogía de la vida diaria por cada idea principal.
+  - Sin ecuaciones. Si una idea lo necesita, se describe en palabras.
+  - Máximo 2 gráficas por método, muy simples, con títulos y ejes en lenguaje común. Debajo de cada una, una frase que diga qué se ve.
+  - Arriba de cada método, un enlace a la sección equivalente del técnico: "Versión técnica: research_map_methods.ipynb, sección X".
 - PDF sin código: [`literature-review/metodos/export_pdf.ps1`](literature-review/metodos/export_pdf.ps1) (webpdf con playwright y chromium en el `.venv`). El PDF se sube a git: volver a exportarlo y subirlo cada vez que cambie el notebook.

@@ -7,6 +7,7 @@ literature-review/
 ├── metodos/                  Explicación conceptual de cada método (qué es, cómo funciona, ejemplos con código y gráficas)
 │   ├── metodos.ipynb
 │   ├── research_map_methods.ipynb   Métodos en el orden del mapa de investigación (drive-by)
+│   ├── research_map_methods_simple.ipynb   Los mismos métodos explicados en lenguaje sencillo
 │   ├── requirements.txt      Librerías de los notebooks (numpy, scipy, matplotlib, EMD-signal, ssqueezepy)
 │   └── prompt_explicar_metodos.md   Instrucciones para el chat de Claude: explicar un método y generar el prompt para agregarlo al notebook
 ├── revision-papers/          Resumen de cada artículo de la revisión (qué hicieron, cómo y para qué usaron cada método)
