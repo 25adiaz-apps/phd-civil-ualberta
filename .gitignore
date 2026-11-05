@@ -17,3 +17,7 @@ build/
 
 # Cached results of long computations (recomputed by the notebooks when missing)
 machine-learning/assignment-4/cache/
+
+# Z24 bridge raw data (10 GB) and regenerable inventory cache
+structural-reliability/bridge-z24/datos/
+structural-reliability/bridge-z24/cache/
