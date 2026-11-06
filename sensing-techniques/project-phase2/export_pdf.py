@@ -217,6 +217,9 @@ def build_css():
         font-size: {FONT_SIZE} !important;
         line-height: {LINE_HEIGHT} !important;
     }}
+    /* Fórmulas: MathJax las agranda (~117 %) para igualar la altura de la x de su fuente;
+       se dejan al mismo tamaño que el texto que las rodea. */
+    .MathJax_CHTML, .MathJax_Display .MathJax_CHTML {{ font-size: 100% !important; }}
     .jp-RenderedHTMLCommon h1 {{ font-size: {H1_SIZE} !important; }}
     .jp-RenderedHTMLCommon h2 {{ font-size: calc({H1_SIZE} * 0.82) !important; }}
     .jp-RenderedHTMLCommon h3 {{ font-size: calc({H1_SIZE} * 0.68) !important; }}
