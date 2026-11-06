@@ -39,7 +39,7 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 - **Una sección a la vez.** Agrego las celdas de una sección, explico qué hace el código y qué muestran los resultados, y espero tu revisión antes de pasar a la siguiente.
 - **Ejecución.** Antes de cada commit ejecuto `Main.ipynb` completo (`jupyter nbconvert --execute --inplace`), para que en GitHub se vean las tablas y figuras. Si algún cálculo llega a tardar varios minutos, lo aviso antes de ejecutarlo.
 - **Idioma.** Todo lo que va en `Main.ipynb` se escribe en inglés desde el principio: texto, títulos, tablas, pies de figura, rótulos de ejes y código. Las explicaciones en el chat siguen en español.
-- **Numeración académica.** Tablas, ecuaciones y figuras se numeran en orden de aparición. El título de cada tabla va arriba ("**Table N.** ..."), el pie de cada figura va abajo ("**Figure N.** ..."), ambos fuera del objeto, y las ecuaciones llevan `\tag{N}`.
+- **Numeración académica.** Todas las figuras, tablas y ecuaciones se numeran en orden de aparición, con el formato de los documentos académicos. El título de cada tabla va arriba ("**Table N.** ..."), el pie de cada figura va abajo ("**Figure N.** ..."), ambos fuera del objeto, y las ecuaciones llevan `\tag{N}`.
 - **Fórmulas.** Se escriben en LaTeX e indican el significado de cada símbolo.
 - **Sensores.** Las formas modales usan solo los 9 sensores del grupo 6 (tabla de arriba).
 - **Requisitos del enunciado.** Todos los ejes van rotulados, con leyenda cuando hay varias condiciones y título en cada figura. Las distancias de Wasserstein 1D se calculan con `scipy.stats.wasserstein_distance` y las multivariadas (Partes D y E) con `scipy.stats.wasserstein_distance_nd`.
