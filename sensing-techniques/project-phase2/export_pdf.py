@@ -32,10 +32,10 @@ PAGE_NUMBERS = True        # "1 / 20" al pie de cada página
 # --- Tipografía ---
 FONT_SIZE = "12pt"          # texto markdown
 H1_SIZE = "20pt"            # título H1 (H2, H3, H4 se escalan a partir de este)
-CODE_FONT_SIZE = "10pt"      # código de entrada
-OUTPUT_FONT_SIZE = "10pt"    # salidas de texto (print, errores...)
+CODE_FONT_SIZE = "11pt"      # código de entrada
+OUTPUT_FONT_SIZE = "11pt"    # salidas de texto (print, errores...)
 TABLE_FONT_SIZE = "10pt"     # tablas / DataFrames
-FONT_FAMILY = "'Calibri', 'Segoe UI', Arial, sans-serif"
+FONT_FAMILY = "sans-serif, 'Calibri', 'Segoe UI', Arial, sans-serif"
 CODE_FONT_FAMILY = "Consolas, 'Courier New', monospace"
 LINE_HEIGHT = "1.4"         # interlineado del texto
 
@@ -75,6 +75,10 @@ KEEP_CAPTION_WITH_FIGURE = True   # True = una grafica y su leyenda nunca quedan
                             # paginas distintas
 IMAGE_ALIGN = "center"      # alineación de gráficas/imágenes: "left", "center" o "right"
 AVOID_CELL_BREAKS = False   # True = no cortar celdas de código entre páginas
+TRUNCATE_WIDE_TABLES = True # True = una tabla de salida más ancha que la página oculta en el
+                            # PDF las columnas del medio y pone una columna "…" en su lugar,
+                            # dejando las primeras y las últimas. Cuántas se ocultan se calcula
+                            # al exportar, midiendo la tabla. El notebook no se modifica.
 EXTRA_CSS = ""              # CSS adicional para ajustes finos
 
 # --- Otros ---
@@ -410,6 +414,90 @@ CAPTION_GROUPING_JS = r"""
 """
 
 
+# Tamaños de página con nombre, en mm (ancho, alto) en vertical
+PAGE_SIZES_MM = {"letter": (215.9, 279.4), "a4": (210, 297), "legal": (215.9, 355.6), "a3": (297, 420)}
+
+
+def content_width_css():
+    """Ancho útil de la página (ancho de página menos márgenes laterales) como expresión CSS."""
+    parts = PAGE_SIZE.split()
+    if len(parts) == 1:
+        w, h = (f"{v}mm" for v in PAGE_SIZES_MM[PAGE_SIZE.lower()])
+    else:
+        w, h = parts[0], parts[1]
+    if LANDSCAPE:
+        w, h = h, w
+    m = MARGIN.split()
+    right = m[{1: 0, 2: 1, 3: 1, 4: 1}[len(m)]]
+    left = m[{1: 0, 2: 1, 3: 1, 4: 3}[len(m)]]
+    return f"calc({w} - {left} - {right})"
+
+
+TRUNCATE_TABLES_JS = r"""
+<script>
+/* Tablas más anchas que la página: oculta columnas del medio y pone "…" en su lugar.
+   Se mide con el cuerpo al ancho útil de la página, que es el que tendrá al imprimir. */
+(function () {
+  document.body.style.width = '__CONTENT_WIDTH__';
+  document.body.style.boxSizing = 'border-box';
+
+  function filas(t) { return Array.prototype.slice.call(t.rows); }
+
+  document.querySelectorAll('.jp-OutputArea-output table').forEach(function (t) {
+    /* El contenedor de la salida se estira con la tabla: el límite es el borde derecho
+       del cuerpo, que tiene el ancho útil de la página. */
+    var limite = document.body.getBoundingClientRect().right;
+    function cabe() { return t.getBoundingClientRect().right <= limite + 0.5; }
+    if (cabe()) return;
+
+    var rows = filas(t);
+    var n = rows[0].cells.length;
+    /* Solo tablas simples: todas las filas con las mismas celdas y sin celdas combinadas */
+    var simple = rows.every(function (r) {
+      return r.cells.length === n && Array.prototype.every.call(r.cells, function (c) {
+        return c.colSpan === 1 && c.rowSpan === 1;
+      });
+    });
+    if (!simple) return;
+
+    /* Columnas de índice: las <th> iniciales de la primera fila del cuerpo */
+    var cuerpo = t.tBodies[0] && t.tBodies[0].rows[0];
+    var nIdx = 0;
+    while (cuerpo && nIdx < n && cuerpo.cells[nIdx].tagName === 'TH') nIdx++;
+    var nDatos = n - nIdx;
+    if (nDatos < 3) return;
+
+    var puntos = [];
+    function quitarPuntos() { puntos.forEach(function (c) { c.remove(); }); puntos = []; }
+
+    for (var ocultas = 1; ocultas <= nDatos - 2; ocultas++) {
+      var izq = Math.ceil((nDatos - ocultas) / 2);
+      var desde = nIdx + izq, hasta = desde + ocultas;   /* columnas [desde, hasta) */
+      quitarPuntos();
+      rows.forEach(function (r) {
+        for (var j = nIdx; j < n; j++) {
+          r.cells[j].style.display = (j >= desde && j < hasta) ? 'none' : '';
+        }
+        var ref = r.cells[desde];
+        var p = document.createElement(ref.tagName === 'TH' ? 'th' : 'td');
+        /* En una fila cuyas celdas ocultas están vacías no hace falta indicar nada */
+        var vacias = true;
+        for (var k = desde; k < hasta; k++) {
+          if (r.cells[k].textContent.trim()) { vacias = false; break; }
+        }
+        p.textContent = vacias ? '' : '…';
+        p.style.textAlign = 'center';
+        r.insertBefore(p, ref);
+        puntos.push(p);
+      });
+      if (cabe()) break;
+    }
+  });
+})();
+</script>
+"""
+
+
 def _puntos_de_corte(im):
     """Dónde separar una imagen en filas de subplots.
 
@@ -582,6 +670,9 @@ def notebook_to_html(nb_paths):
     if SPLIT_FIGURE_ROWS:
         html = split_figure_rows(html)
     html = html.replace("</head>", style + "\n</head>", 1)
+    if TRUNCATE_WIDE_TABLES:
+        js = TRUNCATE_TABLES_JS.replace("__CONTENT_WIDTH__", content_width_css())
+        html = html.replace("</body>", js + "\n</body>", 1)
     if KEEP_CAPTION_WITH_FIGURE:
         html = html.replace("</body>", CAPTION_GROUPING_JS + "\n</body>", 1)
     return html
