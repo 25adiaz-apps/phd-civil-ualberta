@@ -1,6 +1,6 @@
 Project Phase 2 - Statistical Damage Detection
 CIV E 789 Sensing Techniques and Data Analytics, Fall 2026
-Group X
+Group 6
 
 Contents
 --------

@@ -12,14 +12,24 @@ project-phase2/
 ├── ProjectPhase2_Statistical_Damage_Detection_Fall2026.pdf   Enunciado
 ├── phase2_modal_parameters.json                               Datos (intact, damage1, damage2)
 ├── FORMA_DE_TRABAJO.md                                        Este archivo
-└── ProjectPhase2_GroupX/        Contenido del ZIP que se entrega
+└── ProjectPhase2_Group6/        Contenido del ZIP que se entrega
     ├── Main.ipynb               Notebook con todo el análisis (Partes A–F y nota sobre el uso de IA)
     ├── README.txt               Descripción breve del contenido (en inglés)
     ├── figures/part-a … part-e/ Figuras que genera el notebook, una carpeta por parte
     └── results/                 Tablas que genera el notebook (CSV)
 ```
 
-Se entregan dos archivos: `ProjectPhase2_GroupX.zip` (la carpeta de arriba) y `ProjectPhase2_GroupX.pdf` (el notebook exportado, con todas las salidas visibles). La `X` se cambia por el número de grupo.
+Se entregan dos archivos: `ProjectPhase2_Group6.zip` (la carpeta de arriba) y `ProjectPhase2_Group6.pdf` (el notebook exportado, con todas las salidas visibles).
+
+## Grupo 6
+
+Sensores asignados (de `metadata.sensor_assignments.group_6` del JSON) y su posición a lo largo del puente (`metadata.sensor_positions_m`):
+
+| Sensor | S2 | S4 | S6 | S9 | S12 | S15 | S18 | S21 | S24 |
+|---|---|---|---|---|---|---|---|---|---|
+| Posición (m) | 7.5 | 17.5 | 27.5 | 42.5 | 57.5 | 72.5 | 87.5 | 102.5 | 117.5 |
+
+Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el sensor Sk está en el índice k − 1.
 
 ## Cómo trabajamos
 
@@ -28,7 +38,7 @@ Se entregan dos archivos: `ProjectPhase2_GroupX.zip` (la carpeta de arriba) y `P
 - **Idioma.** El texto explicativo se escribe en español mientras trabajamos. El código (variables y comentarios) va en inglés. Al final se traduce al inglés respetando tu forma de escribir, y solo cuando lo pidas.
 - **Numeración académica.** Tablas, ecuaciones y figuras se numeran en orden de aparición. El título de cada tabla va arriba ("**Tabla N.** ..."), el pie de cada figura va abajo ("**Figura N.** ..."), ambos fuera del objeto, y las ecuaciones llevan `\tag{N}`.
 - **Fórmulas.** Se escriben en LaTeX e indican el significado de cada símbolo.
-- **Sensores.** Las formas modales usan solo los 9 sensores asignados al grupo.
+- **Sensores.** Las formas modales usan solo los 9 sensores del grupo 6 (tabla de arriba).
 - **Requisitos del enunciado.** Todos los ejes van rotulados, con leyenda cuando hay varias condiciones y título en cada figura. Las distancias de Wasserstein 1D se calculan con `scipy.stats.wasserstein_distance` y las multivariadas (Partes D y E) con `scipy.stats.wasserstein_distance_nd`.
 - **Semilla fija** para cualquier dato aleatorio.
 
