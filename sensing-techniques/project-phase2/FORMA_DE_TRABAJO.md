@@ -11,6 +11,8 @@ Este archivo guarda cómo trabajamos en el proyecto. Las instrucciones nuevas qu
 project-phase2/
 ├── ProjectPhase2_Statistical_Damage_Detection_Fall2026.pdf   Enunciado
 ├── FORMA_DE_TRABAJO.md                                        Este archivo
+├── export_pdf.py                                              Exporta Main.ipynb a ProjectPhase2_Group6.pdf
+├── ProjectPhase2_Group6.pdf                                   PDF del notebook (segundo entregable)
 └── ProjectPhase2_Group6/        Contenido del ZIP que se entrega
     ├── Main.ipynb               Notebook con todo el análisis (Partes A–F y nota sobre el uso de IA)
     ├── phase2_modal_parameters.json  Datos (intact, damage1, damage2)
