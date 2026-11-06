@@ -45,6 +45,17 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 - **Requisitos del enunciado.** Todos los ejes van rotulados, con leyenda cuando hay varias condiciones y título en cada figura. Las distancias de Wasserstein 1D se calculan con `scipy.stats.wasserstein_distance` y las multivariadas (Partes D y E) con `scipy.stats.wasserstein_distance_nd`.
 - **Semilla fija** para cualquier dato aleatorio.
 
+## Google Drive (trabajo con el compañero)
+
+- Carpeta compartida: `CIV E 789/ProjectPhase2_Group6/` ([enlace](https://drive.google.com/drive/folders/18TTWW3c4ZXOr1zfuauUzpvXo1fMnCXYG)). En este PC está montada en `G:\.shortcut-targets-by-id\19igiJAqeDixiQzelAH-aNp7HxnJjV69i\CIV E 789\ProjectPhase2_Group6`.
+- Contiene el contenido de `ProjectPhase2_Group6/` (sin `.gitkeep`) más `phase2_modal_parameters.json` junto a `Main.ipynb`, para que el notebook corra en cualquier PC.
+- Trabajamos en local y se sube al Drive solo cuando se pida. Al actualizar:
+  1. Revisar los cambios que el compañero hizo en el Drive.
+  2. Traerlos al local.
+  3. Verificar que no interfieran con lo nuestro y que estén correctos.
+  4. Unificar las versiones.
+  5. Subir la versión completa al Drive.
+
 ## GitHub
 
 - Cada cambio que se pida se sube a GitHub al terminarlo, con un commit descriptivo y push, manteniendo la misma estructura de carpetas que en local.
