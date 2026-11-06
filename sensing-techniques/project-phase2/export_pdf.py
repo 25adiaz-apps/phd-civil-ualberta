@@ -30,10 +30,10 @@ MARGIN = "2cm"              # "2cm" | "arriba+abajo lados": "2.5cm 2cm" | "arrib
 PAGE_NUMBERS = True        # "1 / 20" al pie de cada página
 
 # --- Tipografía ---
-FONT_SIZE = "12pt"          # texto markdown
+FONT_SIZE = "11pt"          # texto markdown
 H1_SIZE = "20pt"            # título H1 (H2, H3, H4 se escalan a partir de este)
-CODE_FONT_SIZE = "11pt"      # código de entrada
-OUTPUT_FONT_SIZE = "11pt"    # salidas de texto (print, errores...)
+CODE_FONT_SIZE = "10pt"      # código de entrada
+OUTPUT_FONT_SIZE = "10pt"    # salidas de texto (print, errores...)
 TABLE_FONT_SIZE = "10pt"     # tablas / DataFrames
 FONT_FAMILY = "sans-serif, 'Calibri', 'Segoe UI', Arial, sans-serif"
 CODE_FONT_FAMILY = "Consolas, 'Courier New', monospace"
