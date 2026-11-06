@@ -10,10 +10,10 @@ Este archivo guarda cómo trabajamos en el proyecto. Las instrucciones nuevas qu
 ```
 project-phase2/
 ├── ProjectPhase2_Statistical_Damage_Detection_Fall2026.pdf   Enunciado
-├── phase2_modal_parameters.json                               Datos (intact, damage1, damage2)
 ├── FORMA_DE_TRABAJO.md                                        Este archivo
 └── ProjectPhase2_Group6/        Contenido del ZIP que se entrega
     ├── Main.ipynb               Notebook con todo el análisis (Partes A–F y nota sobre el uso de IA)
+    ├── phase2_modal_parameters.json  Datos (intact, damage1, damage2)
     ├── README.txt               Descripción breve del contenido (en inglés)
     ├── figures/part-a … part-e/ Figuras que genera el notebook, una carpeta por parte
     └── results/                 Tablas que genera el notebook (CSV)
@@ -48,7 +48,7 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 ## Google Drive (trabajo con el compañero)
 
 - Carpeta compartida: `CIV E 789/ProjectPhase2_Group6/` ([enlace](https://drive.google.com/drive/folders/18TTWW3c4ZXOr1zfuauUzpvXo1fMnCXYG)). En este PC está montada en `G:\.shortcut-targets-by-id\19igiJAqeDixiQzelAH-aNp7HxnJjV69i\CIV E 789\ProjectPhase2_Group6`.
-- Contiene el contenido de `ProjectPhase2_Group6/` (sin `.gitkeep`) más `phase2_modal_parameters.json` junto a `Main.ipynb`, para que el notebook corra en cualquier PC.
+- Tiene la misma estructura que `ProjectPhase2_Group6/` en local (sin los `.gitkeep`), con `phase2_modal_parameters.json` junto a `Main.ipynb`.
 - Trabajamos en local y se sube al Drive solo cuando se pida. Al actualizar:
   1. Revisar los cambios que el compañero hizo en el Drive.
   2. Traerlos al local.
