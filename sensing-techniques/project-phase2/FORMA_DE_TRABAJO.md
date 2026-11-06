@@ -34,7 +34,7 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 ## Cómo trabajamos
 
 - **Una sección a la vez.** Agrego las celdas de una sección, explico qué hace el código y qué muestran los resultados, y espero tu revisión antes de pasar a la siguiente.
-- **Ejecución.** No ejecuto el notebook completo; te indico qué celdas cambiaron para que las corras en tu kernel.
+- **Ejecución.** Antes de cada commit ejecuto `Main.ipynb` completo (`jupyter nbconvert --execute --inplace`), para que en GitHub se vean las tablas y figuras. Si algún cálculo llega a tardar varios minutos, lo aviso antes de ejecutarlo.
 - **Idioma.** El texto explicativo se escribe en español mientras trabajamos. El código (variables y comentarios) va en inglés. Al final se traduce al inglés respetando tu forma de escribir, y solo cuando lo pidas.
 - **Numeración académica.** Tablas, ecuaciones y figuras se numeran en orden de aparición. El título de cada tabla va arriba ("**Tabla N.** ..."), el pie de cada figura va abajo ("**Figura N.** ..."), ambos fuera del objeto, y las ecuaciones llevan `\tag{N}`.
 - **Fórmulas.** Se escriben en LaTeX e indican el significado de cada símbolo.
