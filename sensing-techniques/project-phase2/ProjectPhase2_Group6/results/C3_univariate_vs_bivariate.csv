@@ -1,0 +1,7 @@
+Feature(s),Method,"False alarm rate, intact","Detection rate, damage1","Detection rate, damage2"
+f1,"z-score, |z| > 2",5% (1/20),0% (0/20),5% (1/20)
+f2,"z-score, |z| > 2",5% (1/20),0% (0/20),10% (2/20)
+f1-f2,"Mahalanobis, $D_M$ > 2.45",0% (0/20),30% (6/20),70% (14/20)
+MAC1,"z-score, |z| > 2",10% (2/20),45% (9/20),85% (17/20)
+MAC2,"z-score, |z| > 2",5% (1/20),50% (10/20),95% (19/20)
+MAC1-MAC2,"Mahalanobis, $D_M$ > 2.45",10% (2/20),75% (15/20),95% (19/20)
