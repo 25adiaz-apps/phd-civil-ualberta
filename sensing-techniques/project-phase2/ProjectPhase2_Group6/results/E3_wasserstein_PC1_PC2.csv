@@ -1,3 +1,2 @@
-Damage scenario,"W (intact, damage_k), PC1-PC2"
-damage1,4.175143130506106
-damage2,12.808907824455938
+PCA space,"W (intact, damage1)","W (intact, damage2)"
+PC1-PC2,4.175143130506106,12.808907824455938
