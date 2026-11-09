@@ -58,6 +58,25 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
   4. Unificar las versiones.
   5. Subir la versión completa al Drive.
 
+## Pendientes por hablar con el compañero
+
+Las partes A y B del compañero son todavía un borrador. La verificación se hace cuando él termine sus partes.
+
+- **ddof.** Nosotros usamos ddof = 1 en desviaciones estándar y covarianzas. Él usa ddof = 0 (`np.std`, `stats.norm.fit`), así que el mismo dato sale con dos valores (p. ej. σ de f1: 0.112 en A y 0.115 en la Table 13). Acordar un solo criterio.
+- **Parte A (revisión del 9 de noviembre de 2026):**
+  - Hay dos celdas de Colab. En Colab, la primera (`setup-colab`) falla con un `assert` y detiene "Run all" antes de la segunda (su ruta fija). Dejar una sola.
+  - A3 dice que se usó "the reference intact scenario provided", pero el JSON no trae una referencia aparte: el código usa el promedio de las 20 mediciones intactas del grupo 6, como C1. La explicación de por qué el MAC del intacto es menor que 1 (por usar solo 9 sensores) no corresponde al código.
+  - A2 y A3 dicen que la σ aumenta con el daño por la degradación del material, pero en A1 la σ de las frecuencias baja con el daño, y C1 explica la dispersión por temperatura, tráfico y errores de identificación.
+  - Sobrescribe `data` (el JSON cargado) en sus celdas; hoy no rompe nada, pero es frágil.
+  - Cálculo del MAC repetido (`compute_mac` en A3 y `calculate_MAC` en C1) e imports repetidos en cada celda.
+  - Cadenas con `\pm` sin `r''`, que dan `SyntaxWarning` en Python 3.12.
+  - Notas suyas sin resolver: "Summarize what was done in Part A.", "Please check explanation…", "NEED TO UPDATE AFTER LATER ANALYSIS".
+  - Figuras viejas en `figures/part-a/` que su código ya no genera (`mode_X_freq_dist.png`).
+- **Parte B:**
+  - Cuando esté lista, reemplazar los valores provisionales escritos a mano: `z_flagged` en `c3-comparison` (B1) y `w1_norm` en `d2-best-comparison` (B2).
+  - Confirmar los textos marcados con "Pending confirmation with the actual Part B data/results" en C3, D2 y E2.
+  - Renumerar las tablas y figuras de C–E cuando se inserten las de B.
+
 ## GitHub
 
 - Cada cambio que se pida se sube a GitHub al terminarlo, con un commit descriptivo y push, manteniendo la misma estructura de carpetas que en local.
