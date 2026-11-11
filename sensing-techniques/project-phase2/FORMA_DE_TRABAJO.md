@@ -62,7 +62,9 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 
 Las partes A y B del compañero son todavía un borrador. La verificación se hace cuando él termine sus partes.
 
-- **ddof.** Nosotros usamos ddof = 1 en desviaciones estándar y covarianzas. Él usa ddof = 0 (`np.std`, `stats.norm.fit`), así que el mismo dato sale con dos valores (p. ej. σ de f1: 0.112 en A y 0.115 en la Table 13). Acordar un solo criterio. El `z_flagged` de C3 usa el mismo criterio que B1 (`x0.std()`, ddof = 0); si se cambia, cambiarlo también ahí.
+- **ddof (unificado el 11 de noviembre de 2026; avisarle).** Todas las desviaciones estándar se calculan con ddof = 1: A2 (bandas de la Figure 4), A3 (Table 6), B1 (Table 7), B2 (Table 8), C3 (`z_flagged`), D1 y E2. Se actualizaron los números del texto que cambiaron: A3 (0.0087 → 0.0089, 0.0038 → 0.0039), B1 (2.5% → 1.7%, 50% → 48.3%), C3 (5–10 % → 0–10 %, 45–50 % → 40–50 %) y D2 (3.227 / 11.022 → 3.145 / 10.743, 44 % / 33 % → 48 % / 37 %). Excepción a propósito: los ajustes Gaussianos con `stats.norm.fit` de A1 (Figures 1–3) y A3 (Figures 5–7) siguen siendo MLE (ddof = 0), porque el enunciado pide "maximum likelihood estimation"; por eso la σ de las leyendas de las Figures 5–7 es ≈ 2.6 % menor que la de la Table 6.
+- **B1, error en el texto:** dice que los MAC detectan el daño "79.2% of the time", pero el promedio de las tasas de los MAC en la Table 7 es 70.0 % con ddof = 1 (40, 50, 55, 85, 95 y 95 %); con el ddof = 0 anterior era 70.8 %. Ya estaba mal antes del cambio de ddof.
+- **B3, argumento que ya no se sostiene:** dice que f1 queda por encima de f3 porque f1 detecta 5 % y f3 0 % ("f1 had the second highest correct damage flagged percentage at 5%"). Con ddof = 1 los dos detectan 0 % (Table 7), y B2 no desempata (f1 < f3 en damage1 y f1 > f3 en damage2). Hay que cambiar la redacción, no solo el número.
 - **Parte A (revisión del 9 de noviembre de 2026):**
   - Hay dos celdas de Colab. En Colab, la primera (`setup-colab`) falla con un `assert` y detiene "Run all" antes de la segunda (su ruta fija). Dejar una sola.
   - A3 dice que se usó "the reference intact scenario provided", pero el JSON no trae una referencia aparte: el código usa el promedio de las 20 mediciones intactas del grupo 6, como C1. La explicación de por qué el MAC del intacto es menor que 1 (por usar solo 9 sensores) no corresponde al código.
@@ -72,8 +74,7 @@ Las partes A y B del compañero son todavía un borrador. La verificación se ha
   - Cadenas con `\pm` sin `r''`, que dan `SyntaxWarning` en Python 3.12.
   - Notas suyas sin resolver: "Summarize what was done in Part A.", "Please check explanation…", "NEED TO UPDATE AFTER LATER ANALYSIS".
 - **Parte B y lo que depende de ella en C–E (revisión del 11 de noviembre de 2026; C3 y D2 ya resueltos):**
-  - **E2:** quitar la celda "**PENDING:** Compare with Part B results…" y el aviso "Pending confirmation with the actual Part B results". El texto ya coincide con los números (PC1 normalizado 0.269 en damage1 y 1.107 en damage2: menor que todas las features en damage1 y mayor solo que las frecuencias en damage2).
-  - **E2:** la normalización del PC1 usa ddof = 1 y el comentario del código dice que debe coincidir con la Parte B (ddof = 0). Se resuelve con el punto de ddof; las conclusiones no cambian.
+  - **E2:** quitar la celda "**PENDING:** Compare with Part B results…" y el aviso "Pending confirmation with the actual Part B results". El texto ya coincide con los números (PC1 normalizado 0.269 en damage1 y 1.107 en damage2: menor que todas las features en damage1, la menor es f1 con 0.352, y mayor solo que las frecuencias en damage2, la mayor es f2 con 0.984).
   - Renumerar las tablas y figuras de C–E cuando se inserten las de B.
 
 ## Pendientes de la entrega (revisión del 11 de noviembre de 2026)
