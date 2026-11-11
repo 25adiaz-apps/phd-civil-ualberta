@@ -71,9 +71,7 @@ Las partes A y B del compañero son todavía un borrador. La verificación se ha
   - Cálculo del MAC repetido (`compute_mac` en A3 y `calculate_MAC` en C1) e imports repetidos en cada celda.
   - Cadenas con `\pm` sin `r''`, que dan `SyntaxWarning` en Python 3.12.
   - Notas suyas sin resolver: "Summarize what was done in Part A.", "Please check explanation…", "NEED TO UPDATE AFTER LATER ANALYSIS".
-- **Parte B y lo que depende de ella en C–E (revisión del 11 de noviembre de 2026; C3 ya resuelto):**
-  - **D2:** `w1_norm` en `d2-best-comparison` sigue escrito a mano. f1–f3 coinciden con su B2 (Table 8), pero los MAC no: MAC1 1.566 / 5.696 (escrito) frente a 1.565 / 5.694 (B2), MAC2 2.681 / 7.899 frente a 2.768 / 8.125, MAC3 3.174 / 10.872 frente a 3.227 / 11.022 (damage1 / damage2). Afecta a la Table 18 y al texto de D2 ("3.174 and 10.872", "47 % and 35 %"; con los de B2 sería ≈ 44 % y 33 %). El orden de las 4 mejores features no cambia.
-  - **D2:** quitar los dos avisos "Pending confirmation with the actual Part B data" cuando se confirme.
+- **Parte B y lo que depende de ella en C–E (revisión del 11 de noviembre de 2026; C3 y D2 ya resueltos):**
   - **E2:** quitar la celda "**PENDING:** Compare with Part B results…" y el aviso "Pending confirmation with the actual Part B results". El texto ya coincide con los números (PC1 normalizado 0.269 en damage1 y 1.107 en damage2: menor que todas las features en damage1 y mayor solo que las frecuencias en damage2).
   - **E2:** la normalización del PC1 usa ddof = 1 y el comentario del código dice que debe coincidir con la Parte B (ddof = 0). Se resuelve con el punto de ddof; las conclusiones no cambian.
   - Renumerar las tablas y figuras de C–E cuando se inserten las de B.
