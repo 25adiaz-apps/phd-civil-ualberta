@@ -71,11 +71,15 @@ Las partes A y B del compañero son todavía un borrador. La verificación se ha
   - Cálculo del MAC repetido (`compute_mac` en A3 y `calculate_MAC` en C1) e imports repetidos en cada celda.
   - Cadenas con `\pm` sin `r''`, que dan `SyntaxWarning` en Python 3.12.
   - Notas suyas sin resolver: "Summarize what was done in Part A.", "Please check explanation…", "NEED TO UPDATE AFTER LATER ANALYSIS".
-  - Figuras viejas en `figures/part-a/` que su código ya no genera (`mode_X_freq_dist.png`).
 - **Parte B:**
   - Cuando esté lista, reemplazar los valores provisionales escritos a mano: `z_flagged` en `c3-comparison` (B1) y `w1_norm` en `d2-best-comparison` (B2).
   - Confirmar los textos marcados con "Pending confirmation with the actual Part B data/results" en C3, D2 y E2.
   - Renumerar las tablas y figuras de C–E cuando se inserten las de B.
+
+## Pendientes de la entrega (revisión del 11 de noviembre de 2026)
+
+- **Figura de E4.** El enunciado pide una figura con dos subplots (uno por escenario de daño) con la distancia de Wasserstein frente al número de PCs, k = 1…6. Hoy solo está la Table 21. Propuesta: una celda nueva después de la Table 21, guardada como `figures/part-e/E4_wasserstein_k_PCs.png` (Figure 18; no hay figuras después, así que no hay que renumerar). El README ya menciona "k components" en `part-e/`.
+- **Prefijos en los nombres de archivo de A y B.** Para igualarlos con C–E (`C1_…`, `D1_…`), cambiar el nombre del archivo en 4 celdas del compañero: `mode_X_freq_dist_3sigma.png` → `A1_…`, `mode_shapes_3x3.png` → `A2_…`, `mode_X_mac_distributions.png` y `mac_summary_statistics.csv` → `A3_…`, `univariate_zscore_detection.csv` → `B1_…`, `wasserstein_distance_grouped_bars.png` y `wasserstein_distance_summary.csv` → `B2_…`. Opcional.
 
 ## GitHub
 
