@@ -46,6 +46,7 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 - **Sensores.** Las formas modales usan solo los 9 sensores del grupo 6 (tabla de arriba).
 - **Requisitos del enunciado.** Todos los ejes van rotulados, con leyenda cuando hay varias condiciones y título en cada figura. Las distancias de Wasserstein 1D se calculan con `scipy.stats.wasserstein_distance` y las multivariadas (Partes D y E) con `scipy.stats.wasserstein_distance_nd`.
 - **Semilla fija** para cualquier dato aleatorio.
+- **No recalcular lo de A y B.** Las partes C–E usan los resultados ya obtenidos en A y B (p. ej. `mac_results` de A3, `detection_summary_df` de B1, `w1_dict` de B2); solo se calcula lo que A y B no calcularon.
 
 ## Google Drive (trabajo con el compañero)
 
@@ -86,7 +87,6 @@ Revisión del 9 de noviembre de 2026 (Parte A) y del 11–12 de noviembre de 202
 
 ## Pendientes de la entrega (revisión del 11 de noviembre de 2026)
 
-- **Figura de E4.** El enunciado pide una figura con dos subplots (uno por escenario de daño) con la distancia de Wasserstein frente al número de PCs, k = 1…6. Hoy solo está la Table 21. Propuesta: una celda nueva después de la Table 21, guardada como `figures/part-e/E4_wasserstein_k_PCs.png` (Figure 18; no hay figuras después, así que no hay que renumerar). El README ya menciona "k components" en `part-e/`.
 - **Prefijos en los nombres de archivo de A y B.** Para igualarlos con C–E (`C1_…`, `D1_…`), cambiar el nombre del archivo en 4 celdas del compañero: `mode_X_freq_dist_3sigma.png` → `A1_…`, `mode_shapes_3x3.png` → `A2_…`, `mode_X_mac_distributions.png` y `mac_summary_statistics.csv` → `A3_…`, `univariate_zscore_detection.csv` → `B1_…`, `wasserstein_distance_grouped_bars.png` y `wasserstein_distance_summary.csv` → `B2_…`. Opcional.
 
 ## GitHub
