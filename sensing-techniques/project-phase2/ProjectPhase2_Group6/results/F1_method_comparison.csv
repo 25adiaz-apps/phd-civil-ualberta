@@ -2,4 +2,4 @@ Approach,Best configuration,Dimensions,"False alarm rate, intact","Detection rat
 Single feature (B),MAC3,1,10% (2/20),55% (11/20),95% (19/20)
 Bivariate (C),MAC1-MAC2,2,10% (2/20),75% (15/20),95% (19/20)
 4D fusion (D),"f2, MAC1, MAC2, MAC3",4,5% (1/20),70% (14/20),95% (19/20)
-PCA (E),PC1-PC3,3,10% (2/20),70% (14/20),95% (19/20)
+PCA (E),PC1-PC2,2,10% (2/20),55% (11/20),95% (19/20)
