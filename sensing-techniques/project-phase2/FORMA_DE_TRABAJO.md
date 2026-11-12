@@ -92,7 +92,7 @@ Revisión del 9 de noviembre de 2026 (Parte A) y del 11–12 de noviembre de 202
 
 - **Notas del compañero** (revisadas el 12 de noviembre de 2026): la nota de texto de la sección 0 ya se eliminó; sus comentarios de código en `ai5eX0j7kYzb` y `82SEK_9oVdB_` se dejan.
 
-- **Prefijos en los nombres de archivo de A y B.** Para igualarlos con C–E (`C1_…`, `D1_…`), cambiar el nombre del archivo en 4 celdas del compañero: `mode_X_freq_dist_3sigma.png` → `A1_…`, `mode_shapes_3x3.png` → `A2_…`, `mode_X_mac_distributions.png` y `mac_summary_statistics.csv` → `A3_…`, `univariate_zscore_detection.csv` → `B1_…`, `wasserstein_distance_grouped_bars.png` y `wasserstein_distance_summary.csv` → `B2_…`. Opcional.
+- **Prefijos en los nombres de archivo de A y B.** Hecho el 12 de noviembre de 2026: los archivos de A y B llevan `A1_`, `A2_`, `A3_`, `B1_` y `B2_`, como los de C–F.
 
 ## GitHub
 
