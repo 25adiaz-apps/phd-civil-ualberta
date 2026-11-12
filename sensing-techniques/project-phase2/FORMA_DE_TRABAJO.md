@@ -87,6 +87,11 @@ Revisión del 9 de noviembre de 2026 (Parte A) y del 11–12 de noviembre de 202
 
 ## Pendientes de la entrega (revisión del 11 de noviembre de 2026)
 
+- **Notas del compañero que hay que quitar antes de generar los entregables** (encontradas el 12 de noviembre de 2026):
+  1. Sección 0 (Setup), celda de texto `25nOxOqlkbTN`, justo después de la primera celda de Colab: "Note: The above code wasnt working for me so I set up a direct path, we can tidy this up after".
+  2. Sección 0 (Setup), celda de código `ai5eX0j7kYzb` (su segunda celda de Colab, con la ruta fija `/content/drive/MyDrive/Colab Notebooks/CIV E 789/ProjectPhase2_Group6`), comentarios: "# Using the exact path you located" y "# Change the working directory to your project folder".
+  3. A1, celda de código `82SEK_9oVdB_`, comentario: "# Set your starting figure number here based on previous cells".
+
 - **Prefijos en los nombres de archivo de A y B.** Para igualarlos con C–E (`C1_…`, `D1_…`), cambiar el nombre del archivo en 4 celdas del compañero: `mode_X_freq_dist_3sigma.png` → `A1_…`, `mode_shapes_3x3.png` → `A2_…`, `mode_X_mac_distributions.png` y `mac_summary_statistics.csv` → `A3_…`, `univariate_zscore_detection.csv` → `B1_…`, `wasserstein_distance_grouped_bars.png` y `wasserstein_distance_summary.csv` → `B2_…`. Opcional.
 
 ## GitHub
