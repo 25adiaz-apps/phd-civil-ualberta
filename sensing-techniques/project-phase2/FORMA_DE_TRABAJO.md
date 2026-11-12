@@ -74,6 +74,7 @@ Revisión del 9 de noviembre de 2026 (Parte A) y del 11–12 de noviembre de 202
 5. **ddof.** A y B usan ddof = 0 (`np.std`, `stats.norm.fit`) y C–E usan ddof = 1 en desviaciones estándar y covarianzas, así que el mismo dato sale con dos valores (p. ej. σ de f1: 0.112 en A y 0.115 en la Table 15). Acordar un solo criterio. El `z_flagged` de C3 usa el mismo criterio que B1 (`x0.std()`, ddof = 0); si se cambia, cambiarlo también ahí.
 6. **B1, nivel de confianza.** Dice que |z| > 2 "corresponds to a 95% confidence level"; debería decir "approximately 95%, assuming a normal distribution", porque el 95 % exacto corresponde a 1.96.
 7. **Erratas en la Parte B.** "Wassterstein" → "Wasserstein"; "Comparitively" → "Comparatively"; "analysis'" → "analysis" (sin apóstrofo); "have the following observations" → "we have the following observations" (falta el sujeto).
+8. **B2, la distancia de Wasserstein usada como z-score.** El texto dice que con un umbral de $Z = 2$ no se detectaría daño en las frecuencias y sí en los MAC, y la Figure 8 tiene esa línea. No es correcto: la distancia de Wasserstein compara las dos distribuciones completas, no clasifica cada medición, así que no tiene un umbral de detección de 2; sirve para medir sensibilidad. Coincide numéricamente con el z-score medio solo porque aquí el daño desplaza sobre todo la media. Hay que quitar la línea de la Figure 8 y las dos frases que hablan de detectar con ese umbral.
 
 ### Otros puntos de la Parte A (código)
 
