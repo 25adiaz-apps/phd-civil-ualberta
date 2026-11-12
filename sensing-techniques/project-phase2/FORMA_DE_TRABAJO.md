@@ -70,8 +70,10 @@ Revisión del 9 de noviembre de 2026 (Parte A) y del 11–12 de noviembre de 202
 1. **A3, referencia del MAC.** El texto dice que se usó "the reference intact scenario provided", pero el JSON no trae una referencia aparte: el código usa el promedio de las 20 mediciones intactas del grupo 6, como C1. Por eso tampoco corresponde al código la explicación de por qué el MAC del intacto es menor que 1 (por usar solo 9 sensores).
 2. **A2 y A3, σ con el daño.** Dicen que la σ aumenta con el daño por la degradación del material, pero en A1 la σ de las frecuencias baja con el daño, y C1 explica la dispersión por temperatura, tráfico y errores de identificación.
 3. **Celdas de Colab.** Hay dos. En Colab, la primera (`setup-colab`) falla con un `assert` y detiene "Run all" antes de la segunda (su ruta fija). Dejar una sola.
-4. **B1, error en el texto.** Dice que los MAC detectan el daño "79.2% of the time", pero el promedio de las tasas de los MAC en la Table 7 es 70.8 % (45, 50, 55, 85, 95 y 95 %).
+4. **B1, error en el texto.** Dice que los MAC detectan el daño "79.2% of the time", pero el promedio de las tasas de los MAC en la Table 7 es 70.8 % (45, 50, 55, 85, 95 y 95 %). Además, a esa frase le falta "using MAC".
 5. **ddof.** A y B usan ddof = 0 (`np.std`, `stats.norm.fit`) y C–E usan ddof = 1 en desviaciones estándar y covarianzas, así que el mismo dato sale con dos valores (p. ej. σ de f1: 0.112 en A y 0.115 en la Table 15). Acordar un solo criterio. El `z_flagged` de C3 usa el mismo criterio que B1 (`x0.std()`, ddof = 0); si se cambia, cambiarlo también ahí.
+6. **B1, nivel de confianza.** Dice que |z| > 2 "corresponds to a 95% confidence level"; debería decir "approximately 95%, assuming a normal distribution", porque el 95 % exacto corresponde a 1.96.
+7. **Erratas en la Parte B.** "Wassterstein" → "Wasserstein"; "Comparitively" → "Comparatively"; "analysis'" → "analysis" (sin apóstrofo); "have the following observations" → "we have the following observations" (falta el sujeto).
 
 ### Otros puntos de la Parte A (código)
 
