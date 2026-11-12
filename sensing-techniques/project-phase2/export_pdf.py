@@ -52,6 +52,8 @@ COLLAPSE_SECTION_TAGS = ("collapse-section",)        # en la celda de un título
                             # También vale minimizar la sección en JupyterLab y guardar: JupyterLab
                             # lo deja en el archivo; VS Code no guarda ese estado.
 NO_INPUT = False            # True = ocultar el código, mostrar solo resultados
+HIDE_STDERR = True          # True = no exportar las salidas de stderr (avisos como SyntaxWarning);
+                            # el notebook no se modifica
 PROMPT_STYLE = "none"     # Cómo mostrar "In [1]:" / "Out [1]:"
                             #   "left"   = columna a la izquierda (estilo Jupyter, desplaza todo)
                             #   "margin" = etiqueta dentro del margen izquierdo; el contenido usa todo el ancho
@@ -647,6 +649,18 @@ def merge_notebooks(nb_paths):
 
 def notebook_to_html(nb_paths):
     nb = merge_notebooks(nb_paths)
+
+    # Avisos (stderr) fuera del PDF; solo se quitan del cuaderno en memoria
+    if HIDE_STDERR:
+        quitadas = 0
+        for cell in nb.cells:
+            if cell.cell_type == "code":
+                antes = len(cell.outputs)
+                cell.outputs = [o for o in cell.outputs
+                                if not (o.output_type == "stream" and o.get("name") == "stderr")]
+                quitadas += antes - len(cell.outputs)
+        if quitadas:
+            print(f"  {quitadas} salidas de stderr omitidas")
 
     # Las etiquetas de celda deciden qué se queda fuera. El preprocesador de nbconvert
     # trabaja sobre el cuaderno en memoria, así que el archivo no se toca.
