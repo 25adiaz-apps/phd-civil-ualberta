@@ -72,6 +72,13 @@ Se continúa con la **versión A** (`measured` + `bridge_mask`, sin perfil de la
 10. Probar en puentes no vistos (G1–G5).
 11. Conclusiones.
 
+### Prueba: la red devuelve directamente las frecuencias (pedida por el usuario; hecha fuera del notebook)
+
+- Mismos datos (p02) y entradas (versión A). Red: la bajada de la U-Net (8 niveles) + promedio en el tiempo + capa lineal → 5 frecuencias. Error: error relativo al cuadrado, solo en los modos que existen. 100 épocas.
+- **Resultado:** frecuencias muy cercanas en prueba (B1–B5) y también en los no vistos (G2–G4 casi exactas; G1 7.6 vs 7; G5 f1 1.1–1.2 vs 1.4).
+- **Control:** quitando la parte del puente de `measured` (con las componentes del archivo), las predicciones son **idénticas**. La red no usa la vibración del puente: deduce las frecuencias de otras pistas. En este dataset f1 depende casi solo del largo del puente (tabla nominal f1(L) del generador, mismo factor para B y G), y el largo se puede deducir del ancho de la máscara (L / v).
+- Para que esta prueba tenga sentido, el dataset debe romper la relación largo–frecuencia: p. ej. muchos puentes con `f1_factor` aleatorio (opción que ya tiene el generador, sin modificarlo). Pendiente de decidir con el usuario si se agrega al notebook y cómo seguir.
+
 ### Decisión abierta tras la primera corrida
 
 Cómo seguir, dado que en la primera corrida la red no obtiene ningún modo (pendiente de decidir con el usuario). Opciones propuestas:
