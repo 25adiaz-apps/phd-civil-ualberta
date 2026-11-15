@@ -8,6 +8,9 @@ Reproducibility contract
   ``(3,)`` assignment of bridges and vehicles to samples.
 * Each parameter uses its own generator, seeded with its owner's entropy plus a hash of the
   parameter path, so adding or changing one parameter does not change the draws of the others.
+* A crossing redrawn after a wheel lift-off (``dataset.wheel_lift_off: resample``) uses the keys
+  ``(2, i, attempt)`` (and ``(1, v, attempt)`` for its vehicle when vehicles are not pooled);
+  attempt 0 keeps the keys above.
 * A sample depends only on (config, base_seed, its plan entry), never on the order of execution, so
   datasets are identical for any number of worker processes.
 
@@ -29,12 +32,13 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .config import ConfigError, distribution_paths, get_path, is_distribution, load_config, set_path
+from .config import ConfigError, catalog_config, distribution_paths, get_path, is_distribution, load_config, set_path
 from .roughness import class_bounds
 from .simulate import CrossingDoesNotFitError, build_bridge, crossing_window
 from .vehicle import VehicleInfeasibleError, build_vehicle
 
-__all__ = ["SamplePlan", "plan_dataset", "scenario_for", "sample_scenario", "sample_value", "parameter_scope"]
+__all__ = ["SamplePlan", "plan_dataset", "scenario_for", "sample_scenario", "sample_value", "parameter_scope",
+           "sample_seed_for", "bridge_source"]
 
 VEHICLE_SCOPE_PREFIXES = ("vehicle.", "engine.n_cylinders", "engine.firing_amplitude", "engine.double_firing_amplitude",
                           "engine.half_order_amplitude", "wheel.diameter_m", "wheel.eccentricity_m", "mount.", "sensor.")
@@ -143,6 +147,25 @@ def _balanced(rng: np.random.Generator, n_items: int, n_groups: int) -> np.ndarr
     return rng.permutation(np.arange(n_items) % n_groups)
 
 
+def sample_seed_for(base_seed: int, index: int, attempt: int = 0) -> int:
+    """Simulation seed of sample ``index`` (``attempt`` > 0: redraw after a wheel lift-off)."""
+    key = (2, int(index)) if attempt == 0 else (2, int(index), int(attempt))
+    return int(np.random.SeedSequence(base_seed, spawn_key=key).generate_state(1, np.uint64)[0] >> 1)
+
+
+def bridge_source(cfg: dict, bridge_id: int) -> tuple[dict, str]:
+    """Configuration and name of bridge ``bridge_id`` (applies ``dataset.bridge_catalog``; the returned
+    configuration has no catalog, it describes that bridge only)."""
+    catalog = cfg["dataset"]["bridge_catalog"]
+    if catalog is None:
+        return cfg, str(bridge_id)
+    if not 0 <= bridge_id < len(catalog):
+        raise ConfigError(f"bridge_id {bridge_id} is outside dataset.bridge_catalog ({len(catalog)} entries)")
+    entry = catalog[bridge_id]
+    out = catalog_config(cfg, entry)
+    return out, str(entry.get("name", bridge_id))
+
+
 def plan_dataset(config, n_samples: int, base_seed: int = 0) -> list[SamplePlan]:
     """Assign a bridge, a vehicle, a partition and a seed to every sample."""
     cfg = load_config(config)
@@ -150,7 +173,8 @@ def plan_dataset(config, n_samples: int, base_seed: int = 0) -> list[SamplePlan]
         raise ValueError("n_samples must be >= 1")
     n = int(n_samples)
     dcfg = cfg["dataset"]
-    n_b = int(dcfg["n_bridges"] or n)
+    catalog = dcfg["bridge_catalog"]
+    n_b = len(catalog) if catalog is not None else int(dcfg["n_bridges"] or n)
     n_v = int(dcfg["n_vehicles"] or n)
     rng = np.random.default_rng(np.random.SeedSequence(base_seed, spawn_key=(3,)))
     fractions = dcfg["partitions"]
@@ -176,24 +200,33 @@ def plan_dataset(config, n_samples: int, base_seed: int = 0) -> list[SamplePlan]
         v_off += v_split[g]
     plans = []
     for i in range(n):
-        seed = int(np.random.SeedSequence(base_seed, spawn_key=(2, i)).generate_state(1, np.uint64)[0] >> 1)
-        plans.append(SamplePlan(i, int(bridge_id[i]), int(vehicle_id[i]), int(partition[i]), seed))
+        plans.append(SamplePlan(i, int(bridge_id[i]), int(vehicle_id[i]), int(partition[i]),
+                                sample_seed_for(base_seed, i)))
     return plans
 
 
-def scenario_for(config, plan: SamplePlan, base_seed: int = 0) -> tuple[dict, dict]:
-    """Fixed scenario for one plan entry. Returns ``(scenario_config, sampling_info)``."""
-    src = load_config(config)
+def scenario_for(config, plan: SamplePlan, base_seed: int = 0, lift_off_attempt: int = 0) -> tuple[dict, dict]:
+    """Fixed scenario for one plan entry. Returns ``(scenario_config, sampling_info)``.
+
+    ``lift_off_attempt`` > 0 redraws the crossing (and the vehicle when vehicles are not pooled) after a
+    wheel lift-off; ``sampling_info['sample_seed']`` is then the seed to simulate it with.
+    """
+    src, bridge_name = bridge_source(load_config(config), plan.bridge_id)
     cfg = copy.deepcopy(src)
     fs_out = float(src["simulation"]["fs_out"])
-    info = {"sample_index": plan.index, "bridge_id": plan.bridge_id, "vehicle_id": plan.vehicle_id,
-            "partition": plan.partition, "sample_seed": plan.sample_seed}
+    redo = int(lift_off_attempt)
+    seed = plan.sample_seed if redo == 0 else sample_seed_for(base_seed, plan.index, redo)
+    info = {"sample_index": plan.index, "bridge_id": plan.bridge_id, "bridge_name": bridge_name,
+            "vehicle_id": plan.vehicle_id, "partition": plan.partition, "sample_seed": seed,
+            "lift_off_resamples": redo}
+    pooled = src["dataset"]["n_vehicles"] is not None
 
     bw = _words(base_seed, 0, plan.bridge_id)
     _apply_scope(cfg, src, "bridge", bw)
     bridge, _ = build_bridge(cfg["bridge"], fs_out)
 
-    vw = _words(base_seed, 1, plan.vehicle_id)
+    redraw_vehicle = redo > 0 and not pooled
+    vw = _words(base_seed, 1, plan.vehicle_id, redo) if redraw_vehicle else _words(base_seed, 1, plan.vehicle_id)
     _apply_scope(cfg, src, "vehicle", vw)
     model = src["vehicle"]["model"]
     max_tries = int(src["vehicle"][model].get("max_resamples", 1))
@@ -209,9 +242,12 @@ def scenario_for(config, plan: SamplePlan, base_seed: int = 0) -> tuple[dict, di
     else:
         raise ConfigError(f"No feasible vehicle after {max_tries} draws of vehicle.{model}; last error: {last}")
 
-    cw = _words(base_seed, 2, plan.index)
+    cw = _words(base_seed, 2, plan.index) if redo == 0 else _words(base_seed, 2, plan.index, redo)
     _apply_scope(cfg, src, "crossing", cw)
     sim = src["simulation"]
+    if sim["n_samples_out"] == "auto":   # the window adapts to every crossing
+        info["speed_resamples"] = 0
+        return cfg, info
     window = int(sim["n_samples_out"]) / fs_out
     ccfg = src["crossing"]
     max_tries = int(ccfg["max_speed_resamples"])

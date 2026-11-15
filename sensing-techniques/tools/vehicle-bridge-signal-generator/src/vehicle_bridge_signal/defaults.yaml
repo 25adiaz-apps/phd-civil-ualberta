@@ -26,11 +26,17 @@ simulation:
   fs_sim: 1000.0            # [Hz] (structural) internal integration rate. Must be an integer multiple of fs_out.
   fs_out: 200.0             # [Hz] (structural) output (smartphone) sampling rate. CIV E 789 / Mei et al. (2021).
   n_samples_out: 2048       # [-]  (structural) samples per output signal (10.24 s at 200 Hz, power of 2).
+                            #      auto: one window per crossing that covers crossing.approach_length_m of road
+                            #      before the bridge, the crossing and crossing.exit_length_m after it (the
+                            #      length changes with speed and span; needs dataset.layout padded or ragged).
   warmup_s: 4.0             # [s]  (structural) simulated time before the output window, then discarded, so the
                             #      suspension is already in steady random vibration (numerical choice).
   tail_s: 0.5               # [s]  (structural) simulated time after the window; absorbs the edge effects of the
                             #      zero-phase anti-alias filter (numerical choice).
   interaction: coupled      # (structural) coupled | decoupled
+  vehicle_loads_bridge: true  # (structural) false: the axle weights do not load the bridge, so the bridge moves
+                            #      only by its own (ambient) vibration and the vehicle just travels over it.
+                            #      Needs interaction: decoupled.
   amplitude_mode: physical  # (structural) physical | snr_controlled
   newmark_gamma: 0.5        # [-]  (structural) Newmark average acceleration
   newmark_beta: 0.25        # [-]  (structural)
@@ -39,6 +45,10 @@ crossing:
   speed: {dist: uniform, low: 5.0, high: 25.0}   # [m/s] constant speed. Talebi-Kalaleh & Mei (2026): 5-30 m/s.
   approach_margin_s: 1.0    # [s] minimum time inside the output window before the first axle enters [SUPUESTO]
   exit_margin_s: 1.0        # [s] minimum time inside the window after the last axle leaves [SUPUESTO]
+  approach_length_m: null   # [m] (structural) road before the bridge inside the window (first axle at
+                            #     x = -approach_length_m at t = 0). Only with simulation.n_samples_out: auto.
+  exit_length_m: null       # [m] (structural) road after the bridge inside the window (last axle at
+                            #     x = L + exit_length_m at the end). Only with simulation.n_samples_out: auto.
   placement: random         # (structural) random | center | fixed  (where the crossing sits in the window)
   entry_time_s: null        # [s] entry time of the first axle, only used with placement: fixed
   max_speed_resamples: 1000 # (structural) attempts to draw a speed whose crossing fits in the window
@@ -182,3 +192,17 @@ dataset:                    # (structural) only used by generate_dataset
   compression_level: 4      # 0-9, gzip only
   store_contact: true       # store the contact-point components
   store_bridge_response: true  # store the bridge midspan displacement and acceleration
+  store_profile: false      # store, at every output sample and axle: wheel position, road displacement and
+                            # acceleration (v^2 r''), bridge displacement and point acceleration under the wheel,
+                            # plus the segment code (0 before, 1 on, 2 after the bridge)
+  layout: fixed             # fixed: every signal has n_samples_out samples | padded: zero-padded to
+                            # pad_to_samples, with valid_mask and length | ragged: signals of each sample
+                            # concatenated along time, with offsets (no padding). padded/ragged need
+                            # simulation.n_samples_out: auto.
+  pad_to_samples: null      # [-] length of the padded layout (a longer crossing stops the generation)
+  wheel_lift_off: keep      # keep: flag it in the metadata | resample: draw the crossing again (and the vehicle,
+                            # when vehicles are not pooled, n_vehicles: null) until there is no lift-off
+  max_lift_off_resamples: 100  # attempts per sample before the generation stops
+  bridge_catalog: null      # optional list of fixed bridges. Entry b applies to bridge_id b and holds dotted
+                            # overrides, e.g. {name: B1, bridge.span: 15.0, bridge.f1: 8.0, roughness.class: A}.
+                            # n_bridges must be null or equal to the number of entries.

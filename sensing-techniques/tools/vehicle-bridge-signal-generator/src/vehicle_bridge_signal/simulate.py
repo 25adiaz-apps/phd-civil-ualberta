@@ -36,7 +36,7 @@ from .vbi import (InputColumn, contact_inputs_from_bridge, make_trajectory, solv
 from .vehicle import build_vehicle
 
 __all__ = ["simulate", "SimulationResult", "SimulationError", "CrossingDoesNotFitError", "component_keys",
-           "contact_keys", "STREAMS", "make_rng", "build_bridge", "crossing_window"]
+           "contact_keys", "profile_keys", "STREAMS", "make_rng", "build_bridge", "crossing_window", "auto_window"]
 
 # Independent random streams per source, so changing one parameter (e.g. the speed) keeps the
 # realisation of the others. Never renumber: the indices are part of the reproducibility contract.
@@ -77,6 +77,15 @@ def contact_keys(n_label_modes: int) -> list[str]:
         ["bridge_higher_modes", "roughness", "engine", "wheel", "total"]
 
 
+# Quantities under each wheel at the output instants (exact values, no measurement filter).
+PROFILE_UNITS = {"position": "m", "road_displacement": "m", "road_acceleration": "m/s^2",
+                 "bridge_displacement": "m", "bridge_acceleration": "m/s^2"}
+
+
+def profile_keys() -> list[str]:
+    return list(PROFILE_UNITS)
+
+
 # --------------------------------------------------------------------------------------------
 # Scenario assembly
 # --------------------------------------------------------------------------------------------
@@ -115,6 +124,15 @@ def crossing_window(window: float, duration: float, approach: float, exit_margin
     return lo, max(lo, hi)
 
 
+def auto_window(approach_m: float, exit_m: float, span: float, wheelbase: float, speed: float,
+                fs_out: float) -> tuple[float, int]:
+    """Entry time and number of output samples of a window that starts with the first axle at
+    x = -approach_m and ends when the last axle reaches x = L + exit_m (no later)."""
+    total = (approach_m + span + wheelbase + exit_m) / speed
+    n_out = int(math.floor(total * fs_out + 1e-9)) + 1
+    return approach_m / speed, n_out
+
+
 @dataclass
 class _Grid:
     fs_sim: float
@@ -142,10 +160,9 @@ class _Grid:
         return slice(self.warm, self.warm + self.factor * self.n_out)
 
 
-def _grid(scfg: dict) -> _Grid:
+def _grid(scfg: dict, n_out: int) -> _Grid:
     fs_sim, fs_out = float(scfg["fs_sim"]), float(scfg["fs_out"])
     factor = int(round(fs_sim / fs_out))
-    n_out = int(scfg["n_samples_out"])
     warm = int(math.ceil(float(scfg["warmup_s"]) * fs_out - 1e-9)) * factor
     tail = int(math.ceil(float(scfg["tail_s"]) * fs_out - 1e-9)) * factor
     n_steps = warm + factor * n_out + tail
@@ -167,6 +184,8 @@ class SimulationResult:
     contact: dict[str, np.ndarray]                 # each (n_axles, n_out)
     on_bridge: np.ndarray                          # bool (n_out,): any axle on the bridge
     on_bridge_axles: np.ndarray                    # bool (n_axles, n_out)
+    profile: dict[str, np.ndarray]                 # each (n_axles, n_out), see PROFILE_UNITS
+    segment: np.ndarray                            # uint8 (n_out,): 0 before, 1 on, 2 after the bridge
     bridge_midspan_displacement: np.ndarray
     bridge_midspan_acceleration: np.ndarray
     metadata: dict[str, Any]
@@ -229,18 +248,28 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
     require_fixed(cfg)
     seed = _check_seed(seed)
     scfg = cfg["simulation"]
-    grid = _grid(scfg)
     warns: list[str] = []
 
-    bridge, w = build_bridge(cfg["bridge"], grid.fs_out)
+    bridge, w = build_bridge(cfg["bridge"], float(scfg["fs_out"]))
     warns += w
     vehicle = build_vehicle(cfg["vehicle"])
     speed = float(cfg["crossing"]["speed"])
     duration = (bridge.span + vehicle.wheelbase) / speed
     ccfg = cfg["crossing"]
-    lo, hi = crossing_window(grid.window, duration, float(ccfg["approach_margin_s"]), float(ccfg["exit_margin_s"]))
-    placement = ccfg["placement"]
-    if placement == "center":
+    auto = scfg["n_samples_out"] == "auto"
+    if auto:
+        entry, n_out = auto_window(float(ccfg["approach_length_m"]), float(ccfg["exit_length_m"]), bridge.span,
+                                   vehicle.wheelbase, speed, float(scfg["fs_out"]))
+        grid = _grid(scfg, n_out)
+        placement = "auto"
+    else:
+        grid = _grid(scfg, int(scfg["n_samples_out"]))
+        lo, hi = crossing_window(grid.window, duration, float(ccfg["approach_margin_s"]),
+                                 float(ccfg["exit_margin_s"]))
+        placement = ccfg["placement"]
+    if placement == "auto":
+        pass
+    elif placement == "center":
         entry = 0.5 * (lo + hi)
     elif placement == "random":
         entry = float(make_rng(seed, "crossing").uniform(lo, hi)) if hi > lo else lo
@@ -254,7 +283,8 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
     meta: dict[str, Any] = {}
 
     # ---- input columns -----------------------------------------------------------------------
-    columns = [InputColumn("weight", axle_weights=True)]
+    loads_bridge = bool(scfg["vehicle_loads_bridge"])
+    columns = [InputColumn("weight", axle_weights=loads_bridge)]
     contact_acc_input: dict[str, np.ndarray] = {}
     profile = None
     rcfg = cfg["roughness"]
@@ -529,6 +559,23 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
         warns.append(f"wheel lift-off: contact force reaches {min_ratio:.2f} x static load (linear model "
                      "keeps the wheel attached)")
 
+    # ---- quantities under each wheel at the output instants (exact, no measurement filter) --------
+    pos_out = traj.positions[oi]                                     # (n_out, na)
+    road_d = np.zeros((grid.n_out, na))
+    road_a = np.zeros((grid.n_out, na))
+    if profile is not None:
+        road_d = r[oi]
+        road_a = v * v * r2[oi]
+    phi_out = traj.phi[oi]                                           # zero off the bridge
+    profile_out = {
+        "position": pos_out.T.copy(),
+        "road_displacement": road_d.T.copy(),
+        "road_acceleration": road_a.T.copy(),
+        "bridge_displacement": np.einsum("sai,si->as", phi_out, q_tot[oi]),
+        "bridge_acceleration": np.einsum("sai,si->as", phi_out, qdd_tot[oi]),   # point acceleration
+    }
+    segment = np.where(mask_out, 1, np.where(pos_out.max(axis=1) < 0.0, 0, 2)).astype(np.uint8)
+
     for arr_name, arr in (("measured", measured), *comps.items()):
         if not np.all(np.isfinite(arr)):
             raise SimulationError(f"Non-finite values in '{arr_name}' (seed={seed})")
@@ -544,6 +591,9 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
         vehicle_mass=vehicle.total_mass, vehicle_frequencies=vf.tolist(),
         vehicle_damping_ratios=vehicle.modal_damping_ratios().tolist(), n_axles=na, wheelbase=vehicle.wheelbase,
         mass_ratio=vehicle.total_mass / bridge.total_mass, speed=v, entry_time=entry, exit_time=entry + duration,
+        vehicle_loads_bridge=loads_bridge, window_s=grid.n_out / grid.fs_out,
+        approach_length_m=float(ccfg["approach_length_m"]) if auto else float("nan"),
+        exit_length_m=float(ccfg["exit_length_m"]) if auto else float("nan"),
         crossing_duration=duration, driving_frequency=v / (2 * bridge.span),
         roughness_enabled=profile is not None, engine_enabled="engine" in names, wheel_enabled="wheel" in names,
         ambient_enabled="ambient" in names, mount_enabled=mount_sos is not None, antialias_enabled=aa_sos is not None,
@@ -594,6 +644,7 @@ def simulate(config: Any, seed: int = 0, *, return_internal: bool = False) -> Si
                         mount_sos=mount_sos, antialias_sos=aa_sos, contact_true_sim=cacc,
                         engine_force_unit=engine_unit)
     return SimulationResult(t=t_out, fs=grid.fs_out, measured=measured, components=comps, contact=contact,
-                            on_bridge=mask_out, on_bridge_axles=mask_axles, bridge_midspan_displacement=w_mid,
+                            on_bridge=mask_out, on_bridge_axles=mask_axles, profile=profile_out, segment=segment,
+                            bridge_midspan_displacement=w_mid,
                             bridge_midspan_acceleration=a_mid, metadata=meta, warnings=warns, config=cfg, seed=seed,
                             internal=internal)

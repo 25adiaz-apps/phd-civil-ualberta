@@ -92,6 +92,8 @@ vbsig simulate --config default_dataset --sample --seed 3      # sortea un escen
 vbsig presets                                                  # lista de presets
 vbsig check --config mi_config.yaml                            # valida y muestra los parámetros aleatorios
 vbsig info <proyecto>/data/vehicle_bridge_v1.h5                # resumen de un dataset
+# recortar la carretera antes/después del puente o cambiar el formato, sin volver a simular
+vbsig derive <proyecto>/data/v1_200m.h5 <proyecto>/data/v1_100m.h5 --approach-length-m 100 --exit-length-m 100 --layout padded --pad-to-samples 11000
 ```
 
 `--set clave.anidada=valor` cambia cualquier parámetro (el valor se lee como YAML) y se puede repetir. `--config` acepta el nombre de un preset o la ruta a un YAML.
@@ -140,6 +142,22 @@ bridge:
 - La validación ocurre al cargar: una clave mal escrita, un rango imposible (`low >= high`), $f_{s,\text{sim}}$ que no es múltiplo de $f_{s,\text{out}}$, una rugosidad o un motor por encima de la frecuencia de Nyquist de la simulación, etc., producen un error con un mensaje claro (y una sugerencia si la clave se parece a otra).
 - Los números en notación científica (`3.3e9`) se leen como números (PyYAML los leería como texto).
 
+### Ventana por longitudes de carretera, catálogo de puentes y largo variable
+
+Opciones generales (todas en el YAML; por defecto la herramienta se comporta como antes):
+
+| Clave | Qué hace |
+|---|---|
+| `simulation.n_samples_out: auto` + `crossing.approach_length_m`, `crossing.exit_length_m` | Una ventana por cruce: empieza con el primer eje en $x = -L_a$ y termina cuando el último eje llega a $x = L + L_e$. El largo cambia con la velocidad y el vano. |
+| `simulation.vehicle_loads_bridge: false` | El peso del vehículo no carga al puente: el puente se mueve solo por su vibración propia (`ambient`) y el vehículo la recorre. Requiere `interaction: decoupled`. |
+| `dataset.store_profile: true` | Guarda, en cada muestra y por eje: posición de la rueda, desplazamiento y aceleración de la rugosidad ($r$, $v^2r''$), desplazamiento y aceleración del punto del puente bajo la rueda ($\sum_n\phi_n(x)q_n$, $\sum_n\phi_n(x)\ddot q_n$), sin filtro de medición, y `segment` (0 antes, 1 sobre, 2 después del puente). |
+| `dataset.layout: padded` + `dataset.pad_to_samples` | Largo fijo con ceros al final, `/valid_mask` y `/length`. |
+| `dataset.layout: ragged` | Sin relleno: las muestras se concatenan en el tiempo y `/offsets` indica dónde empieza cada una. |
+| `dataset.bridge_catalog` | Lista de puentes fijos; la entrada `b` se aplica al `bridge_id` `b` con claves con punto, p. ej. `{name: B1, bridge.span: 15.0, bridge.f1: 8.0, roughness.class: A}`. Con `roughness.scope: bridge`, cada puente tiene un perfil de rugosidad fijo. |
+| `dataset.wheel_lift_off: resample` | Un cruce con despegue de rueda se vuelve a sortear (cruce y, si los vehículos no se reutilizan, vehículo); `lift_off_resamples` queda en los metadatos. |
+
+`derive_dataset` / `vbsig derive` recorta la carretera antes y después del puente y cambia el formato sin volver a simular: todas las señales de un cruce se cortan con los mismos índices, así que los cruces son exactamente los mismos (`crop_start_index` en los metadatos). `VBIDataset.signal(nombre, i)` y `sample(i)` devuelven los arreglos sin relleno en cualquier formato.
+
 ## Modelo físico en breve
 
 - **Puente:** viga de Euler-Bernoulli simplemente apoyada, superposición modal, $\phi_n = \sin(n\pi x/L)$, $f_n = n^2 f_1$, $M_n = \bar m L/2$, $EI = \bar m(2L^2f_1/\pi)^2$. Modos con $f_n \le \min(0.45f_{s,\text{out}}, 40)$ Hz (máximo 6). Amortiguamiento distinto por modo.
@@ -178,7 +196,7 @@ Reglas:
 
 ## Formato del dataset
 
-HDF5 (`h5py`), `float32`, un fragmento por muestra, compresión gzip (configurable). `schema_version = 1.0.0`.
+HDF5 (`h5py`), `float32`, un fragmento por muestra, compresión gzip (configurable). `schema_version = 1.1.0` (1.1 agrega los formatos `padded` y `ragged`, `/profile`, `/segment` y el atributo `signals`; los archivos 1.0 se siguen leyendo). Las formas de la tabla son las del formato `fixed`; los demás se describen en la sección anterior.
 
 | Ruta | Forma | Contenido |
 |---|---|---|
@@ -189,16 +207,17 @@ HDF5 (`h5py`), `float32`, un fragmento por muestra, compresión gzip (configurab
 | `/bridge/midspan_displacement`, `/bridge/midspan_acceleration` | (N, T) | respuesta del puente al centro (anti-alias y diezmado, sin ruido) |
 | `/on_bridge_mask` | (N, T) uint8 | 1 mientras algún eje está sobre el puente |
 | `/on_bridge_mask_axles` | (N, A, T) uint8 | lo mismo, por eje |
+| `/profile/<clave>`, `/segment` | (N, A, T), (N, T) | magnitudes bajo la rueda (con `dataset.store_profile`) |
 | `/metadata/<campo>` | (N,) o (N, M) | tabla por muestra (los arreglos por modo se rellenan con NaN hasta `max_modes`) |
 
 **Atributos del archivo:** `schema_version`, `config_yaml` (configuración completa resuelta), `base_seed`, `git_commit`, `git_dirty`, `package_version`, `created_utc`, `component_keys`, `contact_keys`, `fs_out`, `n_samples_out`, `n_axles`, `n_label_modes`, `vehicle_model`, `interaction`, `amplitude_mode`, `sampled_parameters`, `command`, versiones de Python, numpy y h5py.
 
 **Metadatos por muestra (principales):**
-- identificación: `sample_index`, `sample_seed`, `bridge_id`, `vehicle_id`, `partition`;
+- identificación: `sample_index`, `sample_seed`, `bridge_id`, `bridge_name`, `vehicle_id`, `partition`, `lift_off_resamples`;
 - parámetros sorteados: `param.<ruta>`, uno por cada parámetro aleatorio;
 - puente: `span`, `f1`, `mass_per_length`, `flexural_rigidity`, `n_modes`, `bridge_frequencies`, `bridge_damping_ratios`;
 - vehículo: `vehicle_model`, `vehicle_mass`, `vehicle_frequencies`, `vehicle_damping_ratios`, `vehicle_*` (rigideces, masas...), `mass_ratio`;
-- cruce: `speed`, `entry_time`, `exit_time`, `crossing_duration`, `driving_frequency` = v/(2L);
+- cruce: `speed`, `entry_time`, `exit_time`, `crossing_duration`, `driving_frequency` = v/(2L), `n_samples_out`, `window_s`, `approach_length_m`, `exit_length_m`, `vehicle_loads_bridge`;
 - rugosidad: `roughness_class`, `roughness_gd_n0`, `roughness_waviness`, `roughness_smoothing_m`;
 - motor: `engine_n_cylinders`, `engine_rpm_mean`, `engine_rpm_min/max`, `engine_firing_frequency`, `engine_body_accel_rms`; `wheel_frequency`;
 - sensor: `noise_density_ug`, `n_saturated`;
@@ -222,7 +241,7 @@ Las rutas y claves se mantendrán dentro de `schema_version` 1.x. Un cambio inco
 
 ```powershell
 cd sensing-techniques/tools/vehicle-bridge-signal-generator
-python -m pytest                                   # 134 pruebas, 2-5 min (la de OpenSees se omite sin OVBI_DIR)
+python -m pytest                                   # 149 pruebas, 2-5 min (la de OpenSees se omite sin OVBI_DIR)
 $env:OVBI_DIR = "<clon de OpenSees-VBI-Simulation>"; python -m pytest -m opensees   # prueba en vivo opcional
 ```
 

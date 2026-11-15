@@ -3,6 +3,7 @@
 Commands
 --------
 generate   generate an HDF5 dataset (or ``--preview N`` samples as a figure, without a dataset)
+derive     crop the road before/after the bridge and/or change the layout of a dataset (no simulation)
 simulate   simulate one fixed scenario, print its summary, optionally plot it / save it (.npz)
 presets    list the presets and what they are for
 info       summary of an existing dataset
@@ -19,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-COMMANDS = ("generate", "simulate", "presets", "info", "check")
+COMMANDS = ("generate", "derive", "simulate", "presets", "info", "check")
 
 
 def _add_config_args(p: argparse.ArgumentParser) -> None:
@@ -44,6 +45,17 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--preview", type=int, metavar="N", help="simulate N samples and plot them; no dataset is written")
     g.add_argument("--plot", default="vbsig_preview.png", help="figure path for --preview")
     g.add_argument("--quiet", action="store_true", help="no progress messages")
+
+    d = sub.add_parser("derive", help="crop / change the layout of an existing dataset (same crossings)")
+    d.add_argument("source", help="source .h5 dataset (schema >= 1.1)")
+    d.add_argument("out", help="output .h5 file")
+    d.add_argument("--approach-length-m", type=float, help="road kept before the bridge [m] (default: all)")
+    d.add_argument("--exit-length-m", type=float, help="road kept after the bridge [m] (default: all)")
+    d.add_argument("--layout", choices=("padded", "ragged"), help="output layout (default: same as the source)")
+    d.add_argument("--pad-to-samples", type=int, help="length of the padded layout")
+    d.add_argument("--overwrite", action="store_true", help="replace an existing output file")
+    d.add_argument("--allow-inside-tool", action="store_true", help="allow writing inside the tool folder")
+    d.add_argument("--quiet", action="store_true", help="no progress messages")
 
     s = sub.add_parser("simulate", help="simulate one fixed scenario and plot it")
     _add_config_args(s)
@@ -111,6 +123,15 @@ def _cmd_generate(args) -> int:
     return 0
 
 
+def _cmd_derive(args) -> int:
+    from .dataset import derive_dataset
+    path = derive_dataset(args.source, args.out, args.approach_length_m, args.exit_length_m, args.layout,
+                          args.pad_to_samples, overwrite=args.overwrite, allow_inside_tool=args.allow_inside_tool,
+                          progress=not args.quiet, command=" ".join(shlex.quote(a) for a in sys.argv))
+    print(f"dataset written to {path}")
+    return 0
+
+
 def _cmd_simulate(args) -> int:
     from .config import load_config
     from .simulate import simulate
@@ -165,11 +186,14 @@ def _cmd_info(args) -> int:
         a = ds.attrs
         meta = ds.metadata
         print(repr(ds))
-        for k in ("schema_version", "created_utc", "git_commit", "git_dirty", "base_seed", "vehicle_model",
-                  "interaction", "amplitude_mode", "n_axles", "generation_seconds", "workers", "command"):
+        for k in ("schema_version", "created_utc", "git_commit", "git_dirty", "base_seed", "layout", "vehicle_model",
+                  "interaction", "amplitude_mode", "n_axles", "generation_seconds", "workers", "derived_from",
+                  "crop_approach_length_m", "crop_exit_length_m", "command"):
             if k in a:
                 print(f"  {k:<20} {a[k]}")
         print(f"  {'bridges':<20} {len(np.unique(meta['bridge_id']))}   vehicles {len(np.unique(meta['vehicle_id']))}")
+        if ds.layout != "fixed":
+            print(f"  {'samples per crossing':<20} min {int(ds.lengths.min())}  max {int(ds.lengths.max())}")
         for k in ("span", "f1", "speed", "mass_ratio", "ratio_db_bridge_to_roughness", "ratio_db_bridge_to_noise"):
             if k in meta:
                 v = np.asarray(meta[k], float)
@@ -200,7 +224,7 @@ def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     args = _parser().parse_args(argv)
     from .config import ConfigError
-    handler = {"generate": _cmd_generate, "simulate": _cmd_simulate, "presets": _cmd_presets, "info": _cmd_info,
+    handler = {"generate": _cmd_generate, "derive": _cmd_derive, "simulate": _cmd_simulate, "presets": _cmd_presets, "info": _cmd_info,
                "check": _cmd_check}[args.command]
     try:
         with warnings.catch_warnings():

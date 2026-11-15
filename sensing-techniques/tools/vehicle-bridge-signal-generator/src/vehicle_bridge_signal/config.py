@@ -30,6 +30,7 @@ __all__ = [
     "list_presets",
     "find_preset",
     "with_overrides",
+    "catalog_config",
     "parse_override",
     "config_to_yaml",
     "default_config",
@@ -61,6 +62,8 @@ STRUCTURAL_PREFIXES = (
     "simulation.",
     "crossing.placement",
     "crossing.max_speed_resamples",
+    "crossing.approach_length_m",
+    "crossing.exit_length_m",
     "bridge.f_max",
     "bridge.max_modes",
     "bridge.n_label_modes",
@@ -191,7 +194,10 @@ def irrelevant_prefixes(cfg: Mapping) -> list[str]:
         out += ["bridge.f1", "bridge.f1_factor"]
     elif fixed("bridge.f1") is not None:
         out.append("bridge.f1_factor")
-    if fixed("crossing.placement") != "fixed":
+    if fixed("simulation.n_samples_out") == "auto":
+        out += ["crossing.approach_margin_s", "crossing.exit_margin_s", "crossing.placement",
+                "crossing.entry_time_s", "crossing.max_speed_resamples"]
+    elif fixed("crossing.placement") != "fixed":
         out.append("crossing.entry_time_s")
     if fixed("vehicle.quarter_car.suspension_stiffness") is not None:
         out += ["vehicle.quarter_car.body_frequency", "vehicle.quarter_car.wheel_frequency"]
@@ -491,10 +497,11 @@ def _c(kind: str, nullable: bool = False, **kw) -> dict:
 CONSTRAINTS: dict[str, dict] = {
     "simulation.fs_sim": _c("pos"),
     "simulation.fs_out": _c("pos"),
-    "simulation.n_samples_out": _c("int", min=16),
+    "simulation.n_samples_out": _c("int", min=16, allow_auto=True),
     "simulation.warmup_s": _c("nonneg"),
     "simulation.tail_s": _c("nonneg"),
     "simulation.interaction": _c("choice", values=("coupled", "decoupled")),
+    "simulation.vehicle_loads_bridge": _c("bool"),
     "simulation.amplitude_mode": _c("choice", values=("physical", "snr_controlled")),
     "simulation.newmark_gamma": _c("pos"),
     "simulation.newmark_beta": _c("pos"),
@@ -504,6 +511,8 @@ CONSTRAINTS: dict[str, dict] = {
     "crossing.placement": _c("choice", values=("random", "center", "fixed")),
     "crossing.entry_time_s": _c("nonneg", nullable=True),
     "crossing.max_speed_resamples": _c("int", min=1),
+    "crossing.approach_length_m": _c("nonneg", nullable=True),
+    "crossing.exit_length_m": _c("nonneg", nullable=True),
     "bridge.span": _c("pos"),
     "bridge.f1": _c("pos", nullable=True),
     "bridge.f1_factor": _c("pos"),
@@ -599,6 +608,11 @@ CONSTRAINTS: dict[str, dict] = {
     "dataset.compression_level": _c("int", min=0, max=9),
     "dataset.store_contact": _c("bool"),
     "dataset.store_bridge_response": _c("bool"),
+    "dataset.store_profile": _c("bool"),
+    "dataset.layout": _c("choice", values=("fixed", "padded", "ragged")),
+    "dataset.pad_to_samples": _c("int", nullable=True, min=16),
+    "dataset.wheel_lift_off": _c("choice", values=("keep", "resample")),
+    "dataset.max_lift_off_resamples": _c("int", min=1),
 }
 
 
@@ -612,6 +626,8 @@ def _check_scalar(path: str, x: Any, c: dict) -> None:
         if c["nullable"]:
             return
         raise ConfigError(f"'{path}' cannot be null")
+    if c.get("allow_auto") and x == "auto":
+        return
     if kind == "bool":
         if not isinstance(x, bool):
             raise ConfigError(f"'{path}' must be true or false, got {x!r}")
@@ -796,8 +812,18 @@ def _validate_cross_fields(cfg: Mapping) -> None:
         raise ConfigError("Give either bridge.f1 or bridge.flexural_rigidity, not both")
 
     crossing = cfg["crossing"]
-    if crossing["placement"] == "fixed" and crossing["entry_time_s"] is None:
+    auto = sim["n_samples_out"] == "auto"
+    lengths = (crossing["approach_length_m"], crossing["exit_length_m"])
+    if auto and any(x is None for x in lengths):
+        raise ConfigError("simulation.n_samples_out: auto needs crossing.approach_length_m and crossing.exit_length_m")
+    if not auto and any(x is not None for x in lengths):
+        raise ConfigError("crossing.approach_length_m / exit_length_m are only used with simulation.n_samples_out: "
+                          "auto (a fixed window uses approach_margin_s / exit_margin_s)")
+    if not auto and crossing["placement"] == "fixed" and crossing["entry_time_s"] is None:
         raise ConfigError("crossing.placement: fixed needs crossing.entry_time_s")
+    if sim["vehicle_loads_bridge"] is False and sim["interaction"] != "decoupled":
+        raise ConfigError("simulation.vehicle_loads_bridge: false needs simulation.interaction: decoupled (in the "
+                          "coupled model the tyre forces always act on the bridge)")
 
     rough = cfg["roughness"]
     n_min, n_max = _fixed_number(cfg, "roughness.n_min"), _fixed_number(cfg, "roughness.n_max")
@@ -836,8 +862,57 @@ def _validate_cross_fields(cfg: Mapping) -> None:
             raise ConfigError(f"The highest engine order can reach {f_top:.0f} Hz, above fs_sim/2 = {fs_sim / 2:g} Hz; "
                               "raise simulation.fs_sim")
 
-    parts = cfg["dataset"]["partitions"]
+    dset = cfg["dataset"]
+    parts = dset["partitions"]
     if parts is not None:
         if (not isinstance(parts, list) or len(parts) < 2
                 or not all(_is_number(p) and p > 0 for p in parts)):
             raise ConfigError("dataset.partitions must be null or a list of >= 2 positive fractions")
+    layout = dset["layout"]
+    if auto and layout == "fixed":
+        raise ConfigError("simulation.n_samples_out: auto gives a different length per crossing; use "
+                          "dataset.layout: padded or ragged")
+    if not auto and layout != "fixed":
+        raise ConfigError(f"dataset.layout: {layout} needs simulation.n_samples_out: auto")
+    if layout == "padded" and dset["pad_to_samples"] is None:
+        raise ConfigError("dataset.layout: padded needs dataset.pad_to_samples")
+    _validate_catalog(cfg)
+
+
+def _validate_catalog(cfg: Mapping) -> None:
+    catalog = cfg["dataset"]["bridge_catalog"]
+    if catalog is None:
+        return
+    if not isinstance(catalog, list) or not catalog:
+        raise ConfigError("dataset.bridge_catalog must be null or a non-empty list of mappings")
+    n_b = cfg["dataset"]["n_bridges"]
+    if n_b is not None and int(n_b) != len(catalog):
+        raise ConfigError(f"dataset.n_bridges ({n_b}) must be null or equal to the number of catalog entries "
+                          f"({len(catalog)})")
+    base = copy.deepcopy(dict(cfg))
+    base["dataset"]["bridge_catalog"] = None
+    names = []
+    for b, entry in enumerate(catalog):
+        try:
+            catalog_config(base, entry)
+        except ConfigError as exc:
+            raise ConfigError(f"dataset.bridge_catalog[{b}]: {exc}") from None
+        names.append(entry.get("name", str(b)))
+    if len(set(map(str, names))) != len(names):
+        raise ConfigError("dataset.bridge_catalog: the entry names must be unique")
+
+
+def catalog_config(cfg: Mapping, entry: Mapping) -> dict:
+    """Configuration of one bridge of ``dataset.bridge_catalog``: ``cfg`` with the entry overrides."""
+    if not isinstance(entry, Mapping):
+        raise ConfigError(f"each catalog entry must be a mapping of dotted overrides, got {entry!r}")
+    overrides = {k: v for k, v in entry.items() if k != "name"}
+    if "name" in entry and not isinstance(entry["name"], (str, int)):
+        raise ConfigError("the 'name' of a catalog entry must be a string")
+    for key in overrides:
+        if not isinstance(key, str) or key.startswith(("dataset.", "simulation.")) or key in TOP_LEVEL_FREE_KEYS:
+            raise ConfigError(f"'{key}' cannot be set per bridge (dataset.* and simulation.* are global)")
+    out = _apply_overrides(copy.deepcopy(dict(cfg)), overrides, default_config())
+    out["dataset"]["bridge_catalog"] = None
+    validate_config(out)
+    return out

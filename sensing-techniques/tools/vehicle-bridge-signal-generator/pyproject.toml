@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vehicle-bridge-signal"
-version = "1.0.0"
+version = "1.1.0"
 description = "Physics-based generator of drive-by (vehicle-bridge interaction) smartphone acceleration signals with exact component labels."
 readme = "README.md"
 requires-python = ">=3.10"
