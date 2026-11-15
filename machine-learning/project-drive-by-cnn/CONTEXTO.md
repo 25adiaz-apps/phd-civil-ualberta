@@ -27,9 +27,9 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
 |---|---|
 | Dataset | `p02-five-bridges-traffic`: puente excitado por tráfico (0.01–0.1 m/s² RMS modal), rugosidad nueva en cada viaje, 100 m antes y después. Se regenera con `python generate_p02.py` (los `.h5` no van a git). |
 | Salida (target) | `bridge_acc` **con todas sus frecuencias**, sin filtrar, multiplicado por la máscara del puente. Primera corrida así, para demostrar con resultados qué modos se recuperan. |
-| Entrada | `measured` + canal de perfil de la carretera (**pendiente de definir**, ver 5) + `bridge_mask` (1 sobre el puente). |
+| Entrada | **Versión A:** `measured` + `bridge_mask` (1 sobre el puente). La red no recibe el perfil de la carretera. |
 | División | Por puente, semilla 42: 140 / 30 / 30 viajes (entrenamiento / validación / prueba). |
-| Escala | Cada señal dividida por su desviación estándar, calculada solo con los viajes de entrenamiento (`scale_measured`, `scale_road`, `scale_target`). La máscara no se escala. |
+| Escala | Cada señal dividida por su desviación estándar, calculada solo con los viajes de entrenamiento (`scale_measured` = 0.764, `scale_target` = 0.090 m/s²). La máscara no se escala. |
 
 ## 4. Hecho
 
@@ -39,8 +39,8 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
   1. Librerías y configuración.
   2. Cargar los datos (Tabla 1, Figura 1 esquema).
   3. Mirar un viaje (Figura 2 señales; Figura 3 puente bajo la rueda vs parte del puente en el teléfono).
-  4. Entrada y salida (Tabla 2; 4.1 `road_known` suavizado, Figura 4; 4.2 target; 4.3 Figura 5).
-  5. División y escala (Tabla 3 con viajes por grupo y frecuencias de todos los modos; Ec. 2; Figura 6).
+  4. Entrada y salida, versión A (Tabla 2; 4.1 `measured` + `bridge_mask`; 4.2 target; 4.3 Figura 4).
+  5. División y escala (Tabla 3 con viajes por grupo y frecuencias de todos los modos; Ec. 1; Figura 5).
 - **Análisis hechos** (en la conversación, no en el notebook):
   - Relación puente/rugosidad dentro del carro cerca de f1: −9 (B5) a −27 dB (B1); puente/ruido: +3 (B1) a +27 dB (B5).
   - Transmisibilidad del carro T(f) (rueda → teléfono), verificada contra el simulador: no hay un corte fijo; cae a 0.1 entre 5.8 y 19 Hz según el carro (mediana 12.6 Hz). T a 20 Hz ≈ 0.02, a 27 Hz ≈ 0.006 (medianas).
@@ -49,16 +49,15 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
 
 ## 5. Pendiente
 
-### Decisión abierta: qué perfil de carretera recibe la red
+### Perfil de la carretera como entrada (decidido: versión A)
 
-El usuario rechazó el perfil suavizado (ondas > 5 m) que está ahora en la sección 4.1. Opciones discutidas:
+Se continúa con la **versión A** (`measured` + `bridge_mask`, sin perfil de la carretera). Opciones que se discutieron y quedaron fuera por ahora:
 
-1. Curvas verticales reales de diseño (parabólicas, según topografía y altura del puente): realistas, pero su contenido está por debajo de ~0.2 Hz y no excitan al carro en las frecuencias del puente.
-2. Ondulaciones artificiales (1–10 Hz, unos mm) antes y después del puente: excitan al carro en las frecuencias del puente, pero no son un diseño vial real. Requiere agregar la opción al generador y crear p03.
-3. Rugosidad de ondas largas medida con perfilómetro, con error de medición.
-4. Recomendación más reciente: entrenar dos versiones con p02 y compararlas modo por modo: (A) `measured` + máscara; (B) `measured` + perfil completo antes y después + máscara.
-
-**Cuando se decida, actualizar la sección 4.1 del notebook (y las figuras y la sección 5 que dependen de ella).**
+1. Perfil suavizado (ondas > 5 m): rechazado por el usuario.
+2. Curvas verticales reales de diseño: realistas, pero su contenido está por debajo de ~0.2 Hz y no excitan al carro en las frecuencias del puente.
+3. Ondulaciones artificiales (1–10 Hz, unos mm): no son un diseño vial real; requieren cambiar el generador y crear p03.
+4. Rugosidad de ondas largas medida con perfilómetro, con error.
+5. Versión B (`measured` + perfil completo antes y después + máscara): posible comparación posterior, solo si el usuario lo pide.
 
 ### Secciones del notebook por hacer
 
