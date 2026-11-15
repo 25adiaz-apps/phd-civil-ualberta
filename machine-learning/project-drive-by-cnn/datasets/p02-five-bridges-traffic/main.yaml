@@ -1,0 +1,14 @@
+# p02-five-bridges-traffic, main package. Same as p01 set-variable-roughness (new road profile per crossing),
+# with two changes: the bridge vibrates at traffic level and the road before/after the bridge is 100 m.
+extends: ../p01-five-bridges/p01_base.yaml
+name: p02_main
+description: >-
+  p02-five-bridges-traffic, bridge excited by traffic, new roughness profile per crossing, 100 m of road
+  before and after the bridge, main package (5 bridges x 200 crossings).
+crossing:
+  approach_length_m: 100.0
+  exit_length_m: 100.0
+roughness:
+  scope: crossing
+ambient:
+  modal_accel_rms: {dist: loguniform, low: 0.01, high: 0.1}   # [m/s^2] bridge excited by traffic (p01: 0.001-0.01)

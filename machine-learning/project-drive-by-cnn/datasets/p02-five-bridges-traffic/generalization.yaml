@@ -1,0 +1,4 @@
+# p02-five-bridges-traffic, generalization package (5 unseen bridges x 50 crossings).
+extends: [main.yaml, ../p01-five-bridges/p01_generalization.yaml]
+name: p02_generalization
+description: p02-five-bridges-traffic, generalization package (5 unseen bridges x 50 crossings).
