@@ -43,6 +43,9 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
   4. Entrada y salida, versión A (Tabla 2; 4.1 `measured` + `bridge_mask`; 4.2 target; 4.3 Figura 4).
   5. División y escala (Tabla 3 con viajes por grupo y frecuencias de todos los modos; Ec. 1; Figura 5).
   6. Construir la red: U-Net 1D, `CHANNELS = [16, 32, 64, 64, 64, 64, 64, 64]` (8 niveles, 7 reducciones a la mitad), bloques de 2 convoluciones de 9 muestras + ReLU, relleno 11 000 → 11 008. 1 041 009 parámetros. Ve ±15.3 s alrededor de cada muestra (comprobado con gradientes). Ec. 2 (convolución), Figura 6 (esquema).
+  7. Entrenar (primera corrida, versión A, target `bridge_acc` completo): error cuadrático medio solo sobre el puente (Ec. 3); Adam, lr 3e-4, lote 8, 100 épocas (~4 min); se guardan los pesos con menor error de validación (Tabla 4, Figura 7).
+     - **Resultado:** el error de validación queda en ~1.04 desde la primera época, solo ~5 % por debajo de una red que devuelve 0 (1.10), y no mejora. Desde la época ~40 la red memoriza el entrenamiento (entrenamiento baja a ~0.77, validación sube a ~1.15). Pruebas fuera del notebook: BatchNorm y otra tasa de aprendizaje dan lo mismo; con target "parte del puente en el teléfono" la validación baja a ~0.60.
+     - Posible explicación (por comprobar en la sección 8): la rugosidad desconocida sobre el puente domina al puente en el teléfono (−9 a −27 dB cerca de f1); con un error muestra por muestra, lo óptimo es devolver casi 0.
 - **Análisis hechos** (en la conversación, no en el notebook):
   - Relación puente/rugosidad dentro del carro cerca de f1: −9 (B5) a −27 dB (B1); puente/ruido: +3 (B1) a +27 dB (B5).
   - Transmisibilidad del carro T(f) (rueda → teléfono), verificada contra el simulador: no hay un corte fijo; cae a 0.1 entre 5.8 y 19 Hz según el carro (mediana 12.6 Hz). T a 20 Hz ≈ 0.02, a 27 Hz ≈ 0.006 (medianas).
@@ -63,11 +66,14 @@ Se continúa con la **versión A** (`measured` + `bridge_mask`, sin perfil de la
 
 ### Secciones del notebook por hacer
 
-7. Entrenar: error calculado solo sobre las muestras del puente.
 8. Evaluar en prueba: comparar el espectro de la salida con el de `bridge_acc` **en cada modo de la Tabla 3**, no solo f1; error por modo; también promediando los viajes de cada puente.
 9. Comparar con un método sin red.
 10. Probar en puentes no vistos (G1–G5).
 11. Conclusiones.
+
+### Decisión abierta tras la primera corrida
+
+Cómo seguir, dado que la red no aprende `bridge_acc` muestra por muestra (pendiente de decidir con el usuario, después de ver la sección 8).
 
 ### Pruebas posteriores
 
