@@ -1,0 +1,4 @@
+# Set "variable roughness", generalization package (5 unseen bridges x 50 crossings).
+extends: [main.yaml, ../p01_generalization.yaml]
+name: p01_variable_generalization
+description: p01-five-bridges, new roughness profile per crossing, generalization package (5 unseen bridges x 50 crossings).

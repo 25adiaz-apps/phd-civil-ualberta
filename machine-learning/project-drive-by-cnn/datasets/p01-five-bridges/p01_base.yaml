@@ -1,0 +1,64 @@
+# p01-five-bridges: configuration shared by both sets (see README.md).
+# Every key not listed here keeps the value of the tool's defaults.yaml.
+name: p01_base
+description: >-
+  Five fixed bridges, decoupled crossings, the vehicle does not load the bridge (the bridge moves only by its
+  ambient vibration), roughness + quarter car + white phone noise, physical amplitudes, 200 m of road before
+  and after the bridge, one new vehicle per crossing.
+
+simulation:
+  fs_out: 200.0
+  n_samples_out: auto          # one window per crossing: approach + bridge + exit
+  interaction: decoupled
+  vehicle_loads_bridge: false
+  amplitude_mode: physical
+
+crossing:
+  speed: {dist: uniform, low: 5.0, high: 25.0}
+  approach_length_m: 200.0     # the 100 m packages are crops of these crossings (vbsig derive)
+  exit_length_m: 200.0
+
+vehicle:
+  model: quarter_car           # default ranges: body 250-500 kg, wheel 30-100 kg, 1-2 Hz, 8-15 Hz, zeta 0.2-0.4
+
+roughness:
+  enabled: true
+  scope: crossing              # overridden by each set
+
+engine:
+  enabled: false
+wheel:
+  enabled: false
+mount:
+  enabled: false
+ambient:
+  enabled: true                # bridge vibration before and during the crossing
+  modal_accel_rms: {dist: loguniform, low: 0.001, high: 0.01}
+
+sensor:
+  white_noise:
+    enabled: true
+    density_ug: {dist: uniform, low: 100.0, high: 400.0}
+  pink_noise: {enabled: false}
+  bias: {enabled: false}
+  drift: {enabled: false}
+  jitter: {enabled: false}
+  quantization: {enabled: false}
+  anti_alias: {enabled: true}
+
+dataset:
+  n_samples: 1000
+  n_vehicles: null             # a new vehicle for every crossing
+  partitions: null             # no train/val/test split
+  store_contact: false
+  store_bridge_response: true
+  store_profile: true
+  layout: ragged
+  wheel_lift_off: resample
+  max_lift_off_resamples: 200
+  bridge_catalog:
+    - {name: B1, bridge.span: 15.0, bridge.f1: 8.0, bridge.mass_per_length: 5000.0, bridge.damping_ratio: 0.020, roughness.class: A}
+    - {name: B2, bridge.span: 25.0, bridge.f1: 4.5, bridge.mass_per_length: 8000.0, bridge.damping_ratio: 0.015, roughness.class: B}
+    - {name: B3, bridge.span: 35.0, bridge.f1: 3.0, bridge.mass_per_length: 12000.0, bridge.damping_ratio: 0.012, roughness.class: C}
+    - {name: B4, bridge.span: 45.0, bridge.f1: 2.3, bridge.mass_per_length: 15000.0, bridge.damping_ratio: 0.010, roughness.class: B}
+    - {name: B5, bridge.span: 60.0, bridge.f1: 1.6, bridge.mass_per_length: 20000.0, bridge.damping_ratio: 0.008, roughness.class: A}

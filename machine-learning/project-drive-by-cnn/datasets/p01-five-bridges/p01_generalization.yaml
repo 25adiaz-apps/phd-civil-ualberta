@@ -1,0 +1,11 @@
+# p01-five-bridges: generalization package (bridges the CNN never saw). Each G<k> is a "neighbour" of
+# B<k>: span, f1 and mass changed by 10-20 %, same damping ratio and roughness class.
+# Used together with a set's main.yaml (see generalization.yaml in each set).
+dataset:
+  n_samples: 250
+  bridge_catalog:
+    - {name: G1, bridge.span: 17.0, bridge.f1: 7.0, bridge.mass_per_length: 5800.0, bridge.damping_ratio: 0.020, roughness.class: A}
+    - {name: G2, bridge.span: 21.5, bridge.f1: 5.2, bridge.mass_per_length: 7000.0, bridge.damping_ratio: 0.015, roughness.class: B}
+    - {name: G3, bridge.span: 40.0, bridge.f1: 2.6, bridge.mass_per_length: 13800.0, bridge.damping_ratio: 0.012, roughness.class: C}
+    - {name: G4, bridge.span: 39.0, bridge.f1: 2.7, bridge.mass_per_length: 13000.0, bridge.damping_ratio: 0.010, roughness.class: B}
+    - {name: G5, bridge.span: 68.0, bridge.f1: 1.4, bridge.mass_per_length: 17000.0, bridge.damping_ratio: 0.008, roughness.class: A}

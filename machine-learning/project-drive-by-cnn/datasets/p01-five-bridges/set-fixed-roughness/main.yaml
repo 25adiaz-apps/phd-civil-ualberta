@@ -1,0 +1,7 @@
+# Set "fixed roughness", main package: one road profile per bridge (every crossing of a bridge drives over
+# the same road, before, on and after the bridge). G_d(n0) is drawn once per bridge inside its class.
+extends: ../p01_base.yaml
+name: p01_fixed_main
+description: p01-five-bridges, fixed roughness per bridge, main package (5 bridges x 200 crossings).
+roughness:
+  scope: bridge

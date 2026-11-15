@@ -1,0 +1,7 @@
+# Set "variable roughness", main package: a new road profile for every crossing (the car drives along another
+# line of the lane), with G_d(n0) drawn for every crossing inside the class of the bridge.
+extends: ../p01_base.yaml
+name: p01_variable_main
+description: p01-five-bridges, new roughness profile per crossing, main package (5 bridges x 200 crossings).
+roughness:
+  scope: crossing
