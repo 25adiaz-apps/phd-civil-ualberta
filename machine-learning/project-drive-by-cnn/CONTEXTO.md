@@ -20,6 +20,7 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
 - **No usar la palabra "filtro" para el efecto de la dinámica del carro** (usar "atenúa", "deja pasar"), para no confundirlo con lo que hace la red.
 - Si hay que cambiar el dataset, avisar para regenerarlo. **No modificar el generador ni p01 sin aprobación.**
 - Respuestas en español, cortas y directas.
+- **Mantener el código simple** en todas las secciones (lo ha pedido varias veces).
 
 ## 3. Decisiones tomadas
 
@@ -41,6 +42,7 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
   3. Mirar un viaje (Figura 2 señales; Figura 3 puente bajo la rueda vs parte del puente en el teléfono).
   4. Entrada y salida, versión A (Tabla 2; 4.1 `measured` + `bridge_mask`; 4.2 target; 4.3 Figura 4).
   5. División y escala (Tabla 3 con viajes por grupo y frecuencias de todos los modos; Ec. 1; Figura 5).
+  6. Construir la red: U-Net 1D, `CHANNELS = [16, 32, 64, 64, 64, 64, 64, 64]` (8 niveles, 7 reducciones a la mitad), bloques de 2 convoluciones de 9 muestras + ReLU, relleno 11 000 → 11 008. 1 041 009 parámetros. Ve ±15.3 s alrededor de cada muestra (comprobado con gradientes). Ec. 2 (convolución), Figura 6 (esquema).
 - **Análisis hechos** (en la conversación, no en el notebook):
   - Relación puente/rugosidad dentro del carro cerca de f1: −9 (B5) a −27 dB (B1); puente/ruido: +3 (B1) a +27 dB (B5).
   - Transmisibilidad del carro T(f) (rueda → teléfono), verificada contra el simulador: no hay un corte fijo; cae a 0.1 entre 5.8 y 19 Hz según el carro (mediana 12.6 Hz). T a 20 Hz ≈ 0.02, a 27 Hz ≈ 0.006 (medianas).
@@ -61,7 +63,6 @@ Se continúa con la **versión A** (`measured` + `bridge_mask`, sin perfil de la
 
 ### Secciones del notebook por hacer
 
-6. Construir la red: U-Net 1D propuesta (5 niveles, rellenar 11 000 → 11 008 muestras, ventana de ~5 s a cada lado). Aún no aprobada.
 7. Entrenar: error calculado solo sobre las muestras del puente.
 8. Evaluar en prueba: comparar el espectro de la salida con el de `bridge_acc` **en cada modo de la Tabla 3**, no solo f1; error por modo; también promediando los viajes de cada puente.
 9. Comparar con un método sin red.
