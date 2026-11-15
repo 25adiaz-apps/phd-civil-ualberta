@@ -46,6 +46,8 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
   7. Entrenar (primera corrida, versión A, target `bridge_acc` completo): error cuadrático medio solo sobre el puente (Ec. 3); Adam, lr 3e-4, lote 8, 100 épocas (~4 min); se guardan los pesos con menor error de validación (Tabla 4, Figura 7).
      - **Resultado:** el error de validación queda en ~1.04 desde la primera época, solo ~5 % por debajo de una red que devuelve 0 (1.10), y no mejora. Desde la época ~40 la red memoriza el entrenamiento (entrenamiento baja a ~0.77, validación sube a ~1.15). Pruebas fuera del notebook: BatchNorm y otra tasa de aprendizaje dan lo mismo; con target "parte del puente en el teléfono" la validación baja a ~0.60.
      - Posible explicación (por comprobar en la sección 8): la rugosidad desconocida sobre el puente domina al puente en el teléfono (−9 a −27 dB cerca de f1); con un error muestra por muestra, lo óptimo es devolver casi 0.
+  8. Evaluar en prueba (Tablas 5 y 6, Ec. 4, Figuras 8 y 9).
+     - **Resultado:** el error de la red es igual al de una red que devuelve 0 en los 5 puentes; la salida mide 3–6 % del target. El pico más alto de la salida está en 1.7–2.0 Hz en todos los puentes (rango del cuerpo del carro, no del puente). Modo 1: como mucho 4 % de la amplitud; modos altos: ≤ 2 %. **La red no obtiene ningún modo del puente en la primera corrida.**
 - **Análisis hechos** (en la conversación, no en el notebook):
   - Relación puente/rugosidad dentro del carro cerca de f1: −9 (B5) a −27 dB (B1); puente/ruido: +3 (B1) a +27 dB (B5).
   - Transmisibilidad del carro T(f) (rueda → teléfono), verificada contra el simulador: no hay un corte fijo; cae a 0.1 entre 5.8 y 19 Hz según el carro (mediana 12.6 Hz). T a 20 Hz ≈ 0.02, a 27 Hz ≈ 0.006 (medianas).
@@ -66,14 +68,17 @@ Se continúa con la **versión A** (`measured` + `bridge_mask`, sin perfil de la
 
 ### Secciones del notebook por hacer
 
-8. Evaluar en prueba: comparar el espectro de la salida con el de `bridge_acc` **en cada modo de la Tabla 3**, no solo f1; error por modo; también promediando los viajes de cada puente.
 9. Comparar con un método sin red.
 10. Probar en puentes no vistos (G1–G5).
 11. Conclusiones.
 
 ### Decisión abierta tras la primera corrida
 
-Cómo seguir, dado que la red no aprende `bridge_acc` muestra por muestra (pendiente de decidir con el usuario, después de ver la sección 8).
+Cómo seguir, dado que en la primera corrida la red no obtiene ningún modo (pendiente de decidir con el usuario). Opciones propuestas:
+
+1. Prueba sin rugosidad (ya estaba pendiente): dataset nuevo con `roughness.enabled: false` (solo un yaml, sin cambiar el generador). Dice si el planteamiento funciona cuando la rugosidad no tapa al puente.
+2. Error que compare espectros sobre el puente (no muestra por muestra), acorde al objetivo de obtener frecuencias.
+3. Versión B (perfil completo antes y después).
 
 ### Pruebas posteriores
 
