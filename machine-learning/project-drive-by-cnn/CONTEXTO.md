@@ -9,6 +9,7 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
 - Idea: con lo que se conoce antes y después del puente, la red aprende el efecto de la dinámica del carro (relación entre lo que siente la rueda y lo que mide el teléfono) y lo aplica sobre el puente para obtener la oscilación del puente.
 - Datos: 5 puentes (B1–B5) para entrenar, validar y probar; 5 puentes no vistos (G1–G5) para generalización.
 - Es el proyecto final del curso de machine learning: mantenerlo simple.
+- **Los datos tienen que ser lo más reales posibles** (pedido el 2026-11-16, tras ver que p01/p02 son demasiado simples).
 
 ## 2. Reglas de trabajo (pedidas por el usuario)
 
@@ -55,6 +56,22 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
   - `bridge_acc` (punto fijo) difiere de la aceleración que siente la rueda (d²u/dt²): correlación 0.87–0.91. Se decidió mantener `bridge_acc`.
 
 ## 5. Pendiente
+
+### Dataset realista p03 (pedido el 2026-11-16; propuesta pendiente de aprobación)
+
+Por qué p01/p02 no sirven:
+- f1 está escrita a mano en cada puente y sigue casi exactamente la tabla f1(L) del generador; los G son "vecinos" de los B con L y f1 cambiados juntos.
+- Solo hay 5 puentes, así que la red puede reconocerlos y memorizarlos.
+- Muchas perturbaciones reales están apagadas: motor, soporte del teléfono, ruido rosa, sesgo, deriva, jitter y cuantización.
+- Es una decisión del dataset, no del generador: por defecto, el generador ya varía f1 entre 0.7 y 1.3 veces el valor de la tabla.
+
+Propuesta (solo yaml nuevos, sin cambiar el generador):
+- Muchos puentes distintos, cada uno con L, f1 (factor 0.7–1.3), masa y amortiguamiento de cada modo al azar.
+- Puentes y carros separados entre entrenamiento, validación y prueba (`partitions`), de modo que los de prueba son nuevos.
+- Carro `half_car`: dos ejes y cabeceo.
+- Motor, soporte del teléfono y las imperfecciones del sensor encendidos.
+
+Límite del generador: solo modela vigas simplemente apoyadas, donde f_n = n²·f1. Otros tipos de puente (continuos, con modos que no siguen n²) requieren modificar el generador; eso necesita la aprobación del usuario.
 
 ### Perfil de la carretera como entrada (decidido: versión A)
 
