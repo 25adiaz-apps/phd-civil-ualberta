@@ -75,6 +75,12 @@ p03 (`datasets/p03-random-bridges-traffic/`, solo yaml nuevo, generador sin camb
   - Error relativo mediano en f1: red 16.5 %; red sin el puente en la entrada 16.5 % (idéntico); referencia que solo usa el largo exacto y la tabla 17.7 %; promedio 38 %. Los modos 2–5 dan lo mismo.
   - **La red sigue sin usar la vibración del puente.** Solo aprende el atajo del largo (vía el ancho de la máscara), cuyo error es la dispersión del factor 0.7–1.3.
   - Causa probable: en p03 el puente está muy por debajo de la rugosidad en el teléfono (mediana −35 dB, rango 5–95 % de −53 a −18 dB, nunca por encima) e incluso por debajo del ruido del sensor (mediana −4.7 dB). Son relaciones de la señal completa sobre el puente, de los metadatos.
+- **Comprobación sin red en p03** (fuera del notebook; pedida por el usuario).
+  - Para cada uno de los 300 puentes se combinan sus 5 viajes y se busca el pico más alto entre 1 y 12 Hz. Cuenta como acierto si el pico cae a ±10 % de f1.
+  - (A) Espectro medio sobre el puente: 14.0 % de aciertos; sin el puente en la señal, 12.3 %; solo con la parte del puente, 100 % (el método funciona si el puente se ve).
+  - (B) Cociente entre el espectro sobre el puente y el de la carretera, con la misma ventana: 7.7 % con 5 viajes y 8.0 % con 1 viaje. El azar da 6.1 %.
+  - Cerca de f1 (±10 %), el puente está a una mediana de −21.5 dB de lo demás (rango 5–95 % de −42 a −2 dB). Solo en el 3.8 % de los viajes queda por encima.
+  - **Conclusión:** con estas amplitudes, ni 1 ni 5 viajes traen información visible de f1. Ninguna red la puede sacar de ahí.
   - Pendiente de decidir con el usuario cómo seguir.
 
 Límite del generador: solo modela vigas simplemente apoyadas (f_n = n²·f1). Se anota como limitación.
