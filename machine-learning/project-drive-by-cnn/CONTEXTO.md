@@ -57,21 +57,27 @@ Registro de lo que estamos haciendo, lo que se ha pedido, lo hecho y lo pendient
 
 ## 5. Pendiente
 
-### Dataset realista p03 (pedido el 2026-11-16; propuesta pendiente de aprobación)
+### Dataset realista p03 (pedido el 2026-11-16; generado)
+
+**Simplificaciones pedidas por el usuario (se mantienen; van al final como limitaciones o investigación futura):** quarter car; sin motor, rueda ni soporte del teléfono; solo ruido blanco del sensor y filtro anti-alias. No volver a proponer half car ni perturbaciones.
 
 Por qué p01/p02 no sirven:
-- f1 está escrita a mano en cada puente y sigue casi exactamente la tabla f1(L) del generador; los G son "vecinos" de los B con L y f1 cambiados juntos.
+- f1 está escrita a mano en cada puente y sigue casi exactamente la tabla f1(L) del generador; los G son "vecinos" de los B con L y f1 cambiados juntos. Con eso basta una regresión del largo, no una CNN.
 - Solo hay 5 puentes, así que la red puede reconocerlos y memorizarlos.
-- Muchas perturbaciones reales están apagadas: motor, soporte del teléfono, ruido rosa, sesgo, deriva, jitter y cuantización.
 - Es una decisión del dataset, no del generador: por defecto, el generador ya varía f1 entre 0.7 y 1.3 veces el valor de la tabla.
 
-Propuesta (solo yaml nuevos, sin cambiar el generador):
-- Muchos puentes distintos, cada uno con L, f1 (factor 0.7–1.3), masa y amortiguamiento de cada modo al azar.
-- Puentes y carros separados entre entrenamiento, validación y prueba (`partitions`), de modo que los de prueba son nuevos.
-- Carro `half_car`: dos ejes y cabeceo.
-- Motor, soporte del teléfono y las imperfecciones del sensor encendidos.
+p03 (`datasets/p03-random-bridges-traffic/`, solo yaml nuevo, generador sin cambios):
+- Todo igual a p02, salvo los puentes: 300 puentes al azar × 5 viajes = 1500 viajes.
+- Cada puente sortea L (15–60 m), f1 = f1_tabla(L) × factor (0.7–1.3), masa (4000–20 000 kg/m) y amortiguamiento de cada modo (0.5–3 %).
+- Clase de rugosidad A/B/C sorteada por viaje.
+- `partitions` [0.70, 0.15, 0.15]: 210 / 45 / 45 puentes (1050 / 225 / 225 viajes), y ningún puente ni carro aparece en dos grupos. Los puentes de prueba son nuevos, así que reemplazan a G1–G5.
+- **Prueba de salida de frecuencias en p03** (fuera del notebook): misma red y error que en p02, 100 épocas, evaluada en los 45 puentes de prueba.
+  - Error relativo mediano en f1: red 16.5 %; red sin el puente en la entrada 16.5 % (idéntico); referencia que solo usa el largo exacto y la tabla 17.7 %; promedio 38 %. Los modos 2–5 dan lo mismo.
+  - **La red sigue sin usar la vibración del puente.** Solo aprende el atajo del largo (vía el ancho de la máscara), cuyo error es la dispersión del factor 0.7–1.3.
+  - Causa probable: en p03 el puente está muy por debajo de la rugosidad en el teléfono (mediana −35 dB, rango 5–95 % de −53 a −18 dB, nunca por encima) e incluso por debajo del ruido del sensor (mediana −4.7 dB). Son relaciones de la señal completa sobre el puente, de los metadatos.
+  - Pendiente de decidir con el usuario cómo seguir.
 
-Límite del generador: solo modela vigas simplemente apoyadas, donde f_n = n²·f1. Otros tipos de puente (continuos, con modos que no siguen n²) requieren modificar el generador; eso necesita la aprobación del usuario.
+Límite del generador: solo modela vigas simplemente apoyadas (f_n = n²·f1). Se anota como limitación.
 
 ### Perfil de la carretera como entrada (decidido: versión A)
 
