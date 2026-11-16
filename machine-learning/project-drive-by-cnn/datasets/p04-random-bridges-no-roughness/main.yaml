@@ -1,0 +1,10 @@
+# p04-random-bridges-no-roughness. Same as p03-random-bridges-traffic (same 300 bridges, same split, same seed),
+# without road roughness: the phone measures only the bridge (through the quarter car) plus the phone noise.
+# Test of the approach when roughness does not hide the bridge.
+extends: ../p03-random-bridges-traffic/main.yaml
+name: p04_main
+description: >-
+  p04-random-bridges-no-roughness: p03 without road roughness (300 random bridges x 5 crossings, bridge excited
+  by traffic, 100 m of road before and after, disjoint train/val/test bridges).
+roughness:
+  enabled: false

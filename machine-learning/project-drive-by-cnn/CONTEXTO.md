@@ -88,7 +88,29 @@ p03 (`datasets/p03-random-bridges-traffic/`, solo yaml nuevo, generador sin camb
     - Si son g, la mediana es 0.002 m/s² y el p99 es 0.037 m/s².
     - Los sensores verticales del EMS no están en el centro del vano de 30 m, así que el valor en el vientre puede ser algo mayor.
   - **Conclusión:** el rango del generador no es pesimista; está en el extremo alto de lo medido o por encima. Las señales de p03 son realistas, o incluso favorables al puente. El hallazgo se mantiene: en un viaje con un carro y un teléfono, el puente casi no se ve.
-  - Pendiente de decidir con el usuario cómo seguir.
+
+### Prueba sin rugosidad: p04 (pedida por el usuario el 2026-11-16; hecha fuera del notebook)
+
+- **p04** (`datasets/p04-random-bridges-no-roughness/`) es p03 con `roughness.enabled: false`: mismos 300 puentes, misma división y semilla. Lo comprobé: las f1 y las particiones son idénticas, y la rugosidad vale 0.
+- **Modelo:** el mismo del notebook (U-Net, `measured` + máscara → `bridge_acc` × máscara, Ec. 3, Adam 3e-4, lote 8, 100 épocas, mejores pesos de validación). Evaluado en los 45 puentes de prueba (225 viajes).
+- **Entrenamiento:** la mejor validación es 0.921 (época 24), frente a 1.090 de una salida 0. Desde ahí memoriza.
+- **Prueba en el tiempo:** error 0.754 frente a 0.841 de una salida 0; correlación mediana salida–target 0.26.
+- **Pico en f_n** (pico más alto en [0.75, 1.25]·f_n que cae a ±10 % de f_n), con salida / target / `measured`:
+
+  | Modo | Salida | Target | `measured` |
+  |---|---|---|---|
+  | 1 | 86.7 % | 88.9 % | 87.6 % |
+  | 2 | 59.6 % | 90.2 % | 62.7 % |
+  | 3 | 17.4 % | 88.2 % | 44.6 % |
+  | 4 | 13.3 % | 85.7 % | 37.1 % |
+  | 5 | 16.0 % | 88.0 % | 44.0 % |
+
+  Amplitud de la salida respecto del target: 0.74, 0.34, 0.06, 0.02, 0.02.
+- **Lectura:**
+  - Sin rugosidad, f1 (y en parte f2) ya se ve directamente en `measured`, sin red.
+  - La red no mejora sobre el espectro directo de `measured` en f1 y f2, y en los modos 3–5 pierde información frente a él (apaga los modos altos).
+  - El error muestra por muestra sigue siendo malo.
+- Pendiente de decidir con el usuario cómo seguir.
 
 Límite del generador: solo modela vigas simplemente apoyadas (f_n = n²·f1). Se anota como limitación.
 
