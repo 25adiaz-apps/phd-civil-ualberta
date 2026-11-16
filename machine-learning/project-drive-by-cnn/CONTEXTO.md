@@ -81,6 +81,13 @@ p03 (`datasets/p03-random-bridges-traffic/`, solo yaml nuevo, generador sin camb
   - (B) Cociente entre el espectro sobre el puente y el de la carretera, con la misma ventana: 7.7 % con 5 viajes y 8.0 % con 1 viaje. El azar da 6.1 %.
   - Cerca de f1 (±10 %), el puente está a una mediana de −21.5 dB de lo demás (rango 5–95 % de −42 a −2 dB). Solo en el 3.8 % de los viajes queda por encima.
   - **Conclusión:** con estas amplitudes, ni 1 ni 5 viajes traen información visible de f1. Ninguna red la puede sacar de ahí.
+- **¿Es realista la vibración del puente del generador (0.01–0.1 m/s² RMS por modo, en el vientre del modo)?** Se comparó con mediciones reales del repositorio (fuera del notebook). Se calculó el RMS en una banda alrededor de cada modo, tomando el sensor que más se mueve.
+  - **OPARA (openBridgeLAB, Bautzen, m/s²):** de 1e-5 a 1e-4 m/s² por modo (de día, mediana); el máximo de todas las mediciones es 6e-4. Por recordar, sin confirmar: es un puente de investigación sin tráfico, así que representa el piso sin tráfico.
+  - **Z24 (EMS, con tráfico encima):** las unidades no están documentadas (m/s² o g). En ventanas de 5 s (como un cruce), modo 1 (3.98 Hz): mediana 2.2e-4, p90 1.1e-3, p99 3.8e-3 y p99.9 8.0e-3, en unidades del archivo.
+    - Si son m/s², hasta el 99.9 % de las ventanas está por debajo de 0.01, el mínimo del generador.
+    - Si son g, la mediana es 0.002 m/s² y el p99 es 0.037 m/s².
+    - Los sensores verticales del EMS no están en el centro del vano de 30 m, así que el valor en el vientre puede ser algo mayor.
+  - **Conclusión:** el rango del generador no es pesimista; está en el extremo alto de lo medido o por encima. Las señales de p03 son realistas, o incluso favorables al puente. El hallazgo se mantiene: en un viaje con un carro y un teléfono, el puente casi no se ve.
   - Pendiente de decidir con el usuario cómo seguir.
 
 Límite del generador: solo modela vigas simplemente apoyadas (f_n = n²·f1). Se anota como limitación.
