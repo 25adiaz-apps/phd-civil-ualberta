@@ -10,16 +10,6 @@ Members     : Amilcar Diaz     (CCID: adiazgar)
 Submitted   : November 19, 2026
 
 --------------------------------------------------------------------------------
-WHAT EACH MEMBER CONTRIBUTED
---------------------------------------------------------------------------------
-Amilcar Diaz     : Section 0 (data loading and extraction), Part C (bivariate
-                   analysis), Part D (feature fusion), Part E (PCA) and Part F
-                   (engineering insights). Notebook structure, figure, table
-                   and equation numbering, merging of the group's versions.
-Alexander Jordan : Part A (feature distribution analysis) and Part B (single
-                   feature damage detection).
-
---------------------------------------------------------------------------------
 ASSIGNED SENSORS (metadata.sensor_assignments.group_6)
 --------------------------------------------------------------------------------
 Span 1 (0-20 m)  : S2  (x =   7.5 m), S4  (x =  17.5 m)
