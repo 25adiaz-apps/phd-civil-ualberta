@@ -112,6 +112,12 @@ p03 (`datasets/p03-random-bridges-traffic/`, solo yaml nuevo, generador sin camb
   - El error muestra por muestra sigue siendo malo.
 - Pendiente de decidir con el usuario cómo seguir.
 
+### Filtro inverso y varios viajes (preguntas del usuario, 2026-11-19/20; sin código nuevo)
+
+- **Artículos:** Shirzad-Ghaleroudkhani y Gül 2020 (Sensors, laboratorio) y 2021 (Smart Cities, dos puentes reales de Edmonton), PDFs en la raíz del proyecto. Filtro F = Ȳ/X̄ (espectro fuera del puente, ADFT con ventanas Hamming de 3 s), aplicado al espectro sobre el puente. Suponen igual velocidad y rugosidad fuera y sobre el puente (en 2021, emparejadas por rango de velocidad y SRC ±5 %). Solo f1; resultados en ejemplos, sin tasa de acierto ni control.
+- **Implementable sin cambiar el generador** (cada viaje tiene carretera antes y después con el mismo carro, velocidad y clase de rugosidad). La prueba sin red (B) de p03 ya es casi ese método: 8.0 % (1 viaje) y 7.7 % (5 viajes, promedio de log-cocientes) frente a 6.1 % de azar. Falta solo la receta exacta (ADFT + escala Ȳ); ofrecido, no hecho.
+- **Varios viajes:** con 5 viajes no hubo mejora sobre 1. Estimación (no probada): el puente pesa ~0.7 % de la potencia cerca de f1 (−21.5 dB), así que harían falta del orden de miles de viajes por puente. Probarlo requiere generar más viajes por puente (no cambia el generador). Ofrecido, pendiente de decisión.
+
 Límite del generador: solo modela vigas simplemente apoyadas (f_n = n²·f1). Se anota como limitación.
 
 ### Perfil de la carretera como entrada (decidido: versión A)
