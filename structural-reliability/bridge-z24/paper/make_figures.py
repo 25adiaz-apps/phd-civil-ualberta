@@ -54,7 +54,8 @@ print(f"Healthy measurements: {len(healthy)}, "
 # ---------------------------------------------------------------
 # 2. Figure: frequency of each mode vs pavement temperature
 # ---------------------------------------------------------------
-fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.3))
+# One column wide: the three modes one below the other, sharing the temperature axis
+fig, axes = plt.subplots(3, 1, figsize=(3.35, 5.0), sharex=True)
 
 columns = ["f1", "f2", "f3"]
 labels = ["(a)", "(b)", "(c)"]
@@ -62,10 +63,12 @@ for k in range(3):
     ax = axes[k]
     ax.plot(healthy["T"], healthy[columns[k]], ".", markersize=1.5, alpha=0.4)
     ax.axvline(0, color="gray", linestyle="--", linewidth=0.8)     # 0 °C
-    ax.set_xlabel("Pavement temperature (°C)")
     ax.set_ylabel(f"$f_{k + 1}$ (Hz)")
     ax.set_title(labels[k], loc="left")
     ax.grid(alpha=0.3)
+
+# Only the bottom panel shows the temperature label
+axes[2].set_xlabel("Pavement temperature (°C)")
 
 fig.tight_layout()
 fig.savefig(os.path.join(FIGURES_FOLDER, "frequency_vs_temperature.pdf"))
