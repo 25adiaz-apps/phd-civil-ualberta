@@ -306,3 +306,36 @@ fig.legend(handles=handles, loc="lower center", ncol=2, frameon=False, handletex
 fig.tight_layout(rect=(0, 0.07, 1, 1))
 fig.savefig(os.path.join(FIGURES_FOLDER, "bridge_sensors.pdf"))
 plt.close(fig)
+
+
+# ---------------------------------------------------------------
+# 6. Figure: frequency of mode 2 during the damage preparation
+# ---------------------------------------------------------------
+# From 05.08.1998 to the first pier lowering (11.08.1998, 13:15) the system to lower the pier was installed.
+# Mode 2 shows the clearest change: at the same temperature it drops below the healthy cloud.
+# (Modes 1 and 3 stay inside the healthy cloud, so they are not shown.)
+DAMAGE_START = pd.Timestamp("1998-08-11 13:15")   # first pier lowering
+
+preparation = data[(data["start"] >= PREP_START) & (data["start"] < DAMAGE_START)]
+
+# Values quoted in the text: mean f2 between 20 and 35 °C, healthy bridge vs preparation
+healthy_warm = healthy[(healthy["T"] >= 20) & (healthy["T"] <= 35)]["f2"].dropna()
+preparation_warm = preparation[(preparation["T"] >= 20) & (preparation["T"] <= 35)]["f2"].dropna()
+change = (preparation_warm.mean() - healthy_warm.mean()) / healthy_warm.mean() * 100
+print(f"f2 between 20 and 35 °C: healthy {healthy_warm.mean():.3f} Hz (n = {len(healthy_warm)}), "
+      f"preparation {preparation_warm.mean():.3f} Hz (n = {len(preparation_warm)}), change = {change:.1f} %")
+
+fig, ax = plt.subplots(figsize=(3.35, 2.4))
+ax.plot(healthy["T"], healthy["f2"], ".", markersize=1.5, alpha=0.4, color="tab:blue",
+        label="Healthy (10.11.1997 to 04.08.1998)")
+ax.plot(preparation["T"], preparation["f2"], "^", markersize=2.5, color="tab:red",
+        label="Damage preparation (05.08 to 11.08.1998)")
+ax.axvline(0, color="gray", linestyle="--", linewidth=0.8)     # 0 °C
+ax.set_xlabel("Pavement temperature (°C)")
+ax.set_ylabel("$f_2$ (Hz)")
+ax.grid(alpha=0.3)
+ax.legend(loc="upper right", fontsize=6, markerscale=2.5, frameon=True)
+
+fig.tight_layout()
+fig.savefig(os.path.join(FIGURES_FOLDER, "damage_preparation_f2.pdf"))
+plt.close(fig)
