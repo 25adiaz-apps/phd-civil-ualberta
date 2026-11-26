@@ -145,17 +145,15 @@ for column in columns:
 
 
 # ---------------------------------------------------------------
-# 5. Figure: sketch of the bridge and position of all the sensors
+# 5. Figure: sketch of the bridge and position of the sensors used in this study
 # ---------------------------------------------------------------
 # Schematic, not to scale. Positions are approximate, read from the drawings of the
-# EMS documentation (Figs. 27 and 37 to 41 of datos/Z24-EMS-readme.pdf and datos/C11-Appendices.pdf).
-# The documentation does not give the position of the weather station.
+# EMS documentation (Figs. 27 and 37 to 39 of datos/Z24-EMS-readme.pdf and datos/C11-Appendices.pdf).
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch, Polygon, Rectangle
+from matplotlib.patches import Polygon, Rectangle
 
 # Geometry (m): x = 0 at the Utzenstorf abutment and x = 58 at the Koppigen abutment
 SUPPORTS = [0.0, 14.0, 44.0, 58.0]   # abutment, pier, pier, abutment
-PIERS = [14.0, 44.0]
 DECK_START = -2.7                    # the deck goes 2.70 m beyond each abutment
 DECK_END = 60.7
 HALF_WIDTH = 4.3                     # deck width = 8.60 m
@@ -163,83 +161,49 @@ DECK_DEPTH = 1.1
 PIER_HEIGHT = 4.5
 GROUND = -DECK_DEPTH - PIER_HEIGHT   # level of the valley floor in the elevation
 
-# Status of each sensor and its color
-USED = "used"            # used in this study
-NOT_USED = "not used"    # has data, but not used in this study
-NO_DATA = "no data"      # the sensor failed, no data in the dataset
-COLORS = {USED: "tab:red", NOT_USED: "0.35", NO_DATA: "0.72"}
-
 # Cross-sections with temperature sensors: name -> approximate x position (m)
 TEMPERATURE_SECTIONS = {"S1": 8.4, "S2": 29.0, "S3": 51.0}
 
-# Deck accelerometers: channel -> (x, y, direction, status)
+# Deck accelerometers used in this study: channel -> (x, y, direction)
 # y = 0 on the deck axis, y > 0 towards the north edge; "V" = vertical, "L" = longitudinal, "T" = transverse
 DECK_ACCELEROMETERS = {
-    "04": (1.2, 0.9, "T", NO_DATA),
-    "15": (5.6, -2.7, "V", NO_DATA),
-    "05": (6.3, 2.6, "V", USED),
-    "06": (9.7, 0.0, "L", USED),
-    "10": (10.7, 2.6, "V", NOT_USED),    # constant signal in 60 % of the hours, excluded from FDD
-    "16": (14.0, 0.9, "T", USED),
-    "13": (23.6, -2.7, "V", NO_DATA),
-    "09": (24.3, 2.6, "V", NO_DATA),
-    "08": (32.4, 2.6, "V", NO_DATA),
-    "11": (47.4, -2.7, "V", NO_DATA),
-    "07": (48.1, 2.6, "V", USED),
-    "12": (52.3, 2.6, "V", USED),
-    "14": (55.4, 0.9, "T", USED),
+    "05": (6.3, 2.6, "V"),
+    "06": (9.7, 0.0, "L"),
+    "16": (14.0, 0.9, "T"),
+    "07": (48.1, 2.6, "V"),
+    "12": (52.3, 2.6, "V"),
+    "14": (55.4, 0.9, "T"),
 }
 
-# Pier accelerometers (longitudinal): channel -> (height below the deck in the cross-section, status)
-PIER_ACCELEROMETERS = {"03": (-1.6, USED), "02": (-2.4, NO_DATA), "01": (-3.2, NO_DATA)}
-
-# Soil temperatures (3 depths each): name -> (x, top level, depths in m)
-SOIL_SENSORS = {
-    "TSAU": (-1.3, -DECK_DEPTH, [0.4, 0.8, 1.2]),   # Utzenstorf abutment
-    "TSPU": (15.3, GROUND, [0.2, 0.6, 1.0]),        # Utzenstorf pier
-    "TSPK": (42.7, GROUND, [0.2, 0.6, 1.0]),        # Koppigen pier
-    "TSAK": (59.3, -DECK_DEPTH, [0.4, 0.8, 1.2]),   # Koppigen abutment
-}
-SOIL_DEPTH_SCALE = 1.5   # depths drawn larger so that the three levels can be seen
-
-plt.rcParams["font.size"] = 7
-SMALL_FONT = 5.5
+SENSOR_COLOR = "tab:red"
 STRUCTURE_COLOR = "0.85"
 EARTH_COLOR = "0.93"
+plt.rcParams["font.size"] = 7
 
 
 # Draws an out-of-plane accelerometer (circle with a dot)
-def draw_out_of_plane(ax, x, y, color):
-    ax.plot(x, y, "o", markersize=5, markerfacecolor="white", markeredgecolor=color, markeredgewidth=0.9)
-    ax.plot(x, y, "o", markersize=1.5, color=color)
+def draw_out_of_plane(ax, x, y):
+    ax.plot(x, y, "o", markersize=5, markerfacecolor="white", markeredgecolor=SENSOR_COLOR, markeredgewidth=0.9)
+    ax.plot(x, y, "o", markersize=1.5, color=SENSOR_COLOR)
 
 
 # Draws an in-plane accelerometer as a double arrow along its direction
-def draw_in_plane(ax, x, y, dx, dy, color):
+def draw_in_plane(ax, x, y, dx, dy):
     ax.annotate("", xy=(x + dx, y + dy), xytext=(x - dx, y - dy),
-                arrowprops=dict(arrowstyle="<|-|>", color=color, linewidth=0.9, mutation_scale=6))
+                arrowprops=dict(arrowstyle="<|-|>", color=SENSOR_COLOR, linewidth=0.9, mutation_scale=6))
 
 
-# Draws a temperature sensor: filled if it is used, empty if not
-def draw_temperature(ax, x, y, status):
-    color = COLORS[status]
-    if status == USED:
-        ax.plot(x, y, "o", markersize=3.5, color=color)
-    else:
-        ax.plot(x, y, "o", markersize=3.5, markerfacecolor="white", markeredgecolor=color, markeredgewidth=0.8)
+fig, axes = plt.subplots(3, 1, figsize=(3.35, 4.9), gridspec_kw={"height_ratios": [1.15, 1.0, 1.3]})
 
-
-fig, axes = plt.subplots(3, 1, figsize=(3.35, 5.6), gridspec_kw={"height_ratios": [1.45, 1.0, 1.35]})
-
-# (a) Elevation: spans, piers, temperature cross-sections and the other sensors
+# (a) Elevation: spans, piers and temperature cross-sections
 ax = axes[0]
 
 # Embankments behind the abutments and valley floor
-left_embankment = [(DECK_START - 4.5, -DECK_DEPTH), (0.0, -DECK_DEPTH), (6.0, GROUND), (DECK_START - 4.5, GROUND)]
-right_embankment = [(DECK_END + 4.5, -DECK_DEPTH), (58.0, -DECK_DEPTH), (52.0, GROUND), (DECK_END + 4.5, GROUND)]
+left_embankment = [(DECK_START - 1.5, -DECK_DEPTH), (0.0, -DECK_DEPTH), (6.0, GROUND), (DECK_START - 1.5, GROUND)]
+right_embankment = [(DECK_END + 1.5, -DECK_DEPTH), (58.0, -DECK_DEPTH), (52.0, GROUND), (DECK_END + 1.5, GROUND)]
 ax.add_patch(Polygon(left_embankment, closed=True, facecolor=EARTH_COLOR, edgecolor="black", linewidth=0.4))
 ax.add_patch(Polygon(right_embankment, closed=True, facecolor=EARTH_COLOR, edgecolor="black", linewidth=0.4))
-ax.add_patch(Rectangle((DECK_START - 4.5, GROUND - 2.2), DECK_END - DECK_START + 9.0, 2.2,
+ax.add_patch(Rectangle((DECK_START - 1.5, GROUND - 0.8), DECK_END - DECK_START + 3.0, 0.8,
                        facecolor=EARTH_COLOR, edgecolor="none"))
 ax.plot([6.0, 52.0], [GROUND, GROUND], color="black", linewidth=0.4)
 
@@ -259,45 +223,13 @@ for k in range(3):
 
 # Temperature cross-sections
 for name, x in TEMPERATURE_SECTIONS.items():
-    ax.plot([x, x], [0.5, -DECK_DEPTH - 0.5], color=COLORS[USED], linestyle="--", linewidth=0.8)
-    ax.text(x, -DECK_DEPTH - 0.7, name, color=COLORS[USED], ha="center", va="top")
+    ax.plot([x, x], [0.5, -DECK_DEPTH - 0.5], color=SENSOR_COLOR, linestyle="--", linewidth=0.8)
+    ax.text(x, -DECK_DEPTH - 0.7, name, color=SENSOR_COLOR, ha="center", va="top")
 
-# Thermal expansion between the piers (invar wire inside the box) and air temperature in the box
-gray = COLORS[NOT_USED]
-y_box = -0.35
-ax.annotate("", xy=(PIERS[0], y_box), xytext=(PIERS[1], y_box),
-            arrowprops=dict(arrowstyle="|-|", color=gray, linewidth=0.6, mutation_scale=2))
-ax.text(36.5, y_box, "TE", color=gray, fontsize=SMALL_FONT, ha="center", va="center",
-        bbox=dict(facecolor=STRUCTURE_COLOR, edgecolor="none", pad=0.3))
-draw_temperature(ax, 15.5, -0.8, NOT_USED)
-draw_temperature(ax, 42.5, -0.8, NOT_USED)
-ax.text(15.5, -DECK_DEPTH - 0.7, "TBC1", color=gray, fontsize=SMALL_FONT, ha="left", va="top")
-ax.text(42.5, -DECK_DEPTH - 0.7, "TBC2", color=gray, fontsize=SMALL_FONT, ha="right", va="top")
-
-# Rotation at the top of each pier
-for x, name in [(PIERS[0], "ADU"), (PIERS[1], "ADK")]:
-    ax.plot(x, -DECK_DEPTH - 0.45, "s", markersize=3, markerfacecolor="white", markeredgecolor=gray,
-            markeredgewidth=0.8)
-ax.text(PIERS[0] - 0.8, -DECK_DEPTH - 2.0, "ADU", color=gray, fontsize=SMALL_FONT, ha="right", va="center")
-ax.text(PIERS[1] + 0.8, -DECK_DEPTH - 2.0, "ADK", color=gray, fontsize=SMALL_FONT, ha="left", va="center")
-
-# Soil temperatures
-for name, (x, top, depths) in SOIL_SENSORS.items():
-    for depth in depths:
-        draw_temperature(ax, x, top - depth * SOIL_DEPTH_SCALE, NOT_USED)
-    middle = top - depths[1] * SOIL_DEPTH_SCALE
-    if x < 0:
-        ax.text(x - 0.9, middle, name, color=gray, fontsize=SMALL_FONT, ha="right", va="center")
-    elif x > 58:
-        ax.text(x + 0.9, middle, name, color=gray, fontsize=SMALL_FONT, ha="left", va="center")
-    else:
-        ax.text(x, GROUND - depths[-1] * SOIL_DEPTH_SCALE - 0.4, name, color=gray, fontsize=SMALL_FONT,
-                ha="center", va="top")
-
-ax.text(DECK_START - 4.5, 3.2, "Utzenstorf", ha="left", va="bottom")
-ax.text(DECK_END + 4.5, 3.2, "Koppigen", ha="right", va="bottom")
-ax.set_xlim(DECK_START - 4.5, DECK_END + 4.5)
-ax.set_ylim(GROUND - 2.2, 4.4)
+ax.text(DECK_START - 1.5, 3.2, "Utzenstorf", ha="left", va="bottom")
+ax.text(DECK_END + 1.5, 3.2, "Koppigen", ha="right", va="bottom")
+ax.set_xlim(DECK_START - 1.5, DECK_END + 1.5)
+ax.set_ylim(GROUND - 0.8, 4.4)
 ax.set_title("(a) Elevation", loc="left")
 ax.axis("off")
 
@@ -308,29 +240,25 @@ ax.add_patch(Rectangle((DECK_START, -HALF_WIDTH), DECK_END - DECK_START, 2 * HAL
 for x in SUPPORTS:
     ax.plot([x, x], [-HALF_WIDTH, HALF_WIDTH], color="black", linestyle=":", linewidth=0.6)
 
-for channel, (x, y, direction, status) in DECK_ACCELEROMETERS.items():
-    color = COLORS[status]
+for channel, (x, y, direction) in DECK_ACCELEROMETERS.items():
     if direction == "V":
-        draw_out_of_plane(ax, x, y, color)
-        if y > 0:
-            ax.text(x, HALF_WIDTH + 0.3, channel, ha="center", va="bottom", color=color)
-        else:
-            ax.text(x, -HALF_WIDTH - 0.3, channel, ha="center", va="top", color=color)
+        draw_out_of_plane(ax, x, y)
+        ax.text(x, HALF_WIDTH + 0.3, channel, ha="center", va="bottom", color=SENSOR_COLOR)
     elif direction == "L":
-        draw_in_plane(ax, x, y, 3.0, 0.0, color)
-        ax.text(x, y - 1.0, channel, ha="center", va="top", color=color)
+        draw_in_plane(ax, x, y, 3.0, 0.0)
+        ax.text(x, y - 1.0, channel, ha="center", va="top", color=SENSOR_COLOR)
     else:
-        draw_in_plane(ax, x, y, 0.0, 1.6, color)
-        ax.text(x + 1.0, y, channel, ha="left", va="center", color=color)
+        draw_in_plane(ax, x, y, 0.0, 1.6)
+        ax.text(x + 1.0, y, channel, ha="left", va="center", color=SENSOR_COLOR)
 
 ax.text(DECK_END + 0.8, HALF_WIDTH, "North", ha="left", va="top")
 ax.text(DECK_END + 0.8, -HALF_WIDTH, "South", ha="left", va="bottom")
 ax.set_xlim(DECK_START - 1.5, DECK_END + 7.5)
-ax.set_ylim(-HALF_WIDTH - 2.2, HALF_WIDTH + 2.2)
+ax.set_ylim(-HALF_WIDTH - 0.8, HALF_WIDTH + 2.2)
 ax.set_title("(b) Plan view of the deck", loc="left")
 ax.axis("off")
 
-# (c) Cross-section: box girder, temperature sensors and pier accelerometers
+# (c) Cross-section: box girder, temperature sensors and pier accelerometer
 ax = axes[2]
 outline = [(-4.3, 0.0), (4.3, 0.0), (4.3, -0.2), (3.0, -0.4), (3.0, -1.1),
            (-3.0, -1.1), (-3.0, -0.4), (-4.3, -0.2)]
@@ -340,55 +268,41 @@ ax.add_patch(Rectangle((0.15, -0.9), 2.5, 0.65, facecolor="white", edgecolor="bl
 ax.add_patch(Rectangle((-4.3, 0.0), 1.0, 0.25, facecolor="0.7", edgecolor="black", linewidth=0.4))      # south footway
 ax.add_patch(Rectangle((3.3, 0.0), 1.0, 0.25, facecolor="0.7", edgecolor="black", linewidth=0.4))       # north footway
 ax.add_patch(Rectangle((-3.3, 0.0), 6.6, 0.08, facecolor="0.3", edgecolor="none"))                     # pavement
-ax.add_patch(Rectangle((-1.6, -3.6), 3.2, 2.5, facecolor="0.6", edgecolor="black", linewidth=0.4))      # pier
+ax.add_patch(Rectangle((-1.6, -3.0), 3.2, 1.9, facecolor="0.6", edgecolor="black", linewidth=0.4))      # pier
 
-# Temperature sensors used in this study: pavement and upper slab
-used_sensors = [(-0.3, 0.04), (0.45, -0.05), (0.45, -0.21)]
-for (x, y) in used_sensors:
-    draw_temperature(ax, x, y, USED)
-ax.annotate("TP (pavement)", xy=(-0.3, 0.04), xytext=(-2.6, 0.75), color=COLORS[USED], ha="center",
-            arrowprops=dict(arrowstyle="-", color=COLORS[USED], linewidth=0.5))
-ax.annotate("TDT, TDS (upper slab)", xy=(0.45, -0.05), xytext=(2.2, 0.75), color=COLORS[USED], ha="center",
-            arrowprops=dict(arrowstyle="-", color=COLORS[USED], linewidth=0.5))
+# Temperature sensors: pavement (TP) and upper slab (TDT on top, TDS below)
+temperature_sensors = [(-0.3, 0.04), (0.45, -0.05), (0.45, -0.21)]
+for (x, y) in temperature_sensors:
+    ax.plot(x, y, "o", markersize=3.5, color=SENSOR_COLOR)
+ax.annotate("TP (pavement)", xy=(-0.3, 0.04), xytext=(-2.6, 0.75), color=SENSOR_COLOR, ha="center",
+            arrowprops=dict(arrowstyle="-", color=SENSOR_COLOR, linewidth=0.5))
+ax.annotate("TDT, TDS (upper slab)", xy=(0.45, -0.05), xytext=(2.2, 0.75), color=SENSOR_COLOR, ha="center",
+            arrowprops=dict(arrowstyle="-", color=SENSOR_COLOR, linewidth=0.5))
 
-# Temperature sensors not used: footways, webs and lower slab
-not_used_sensors = [(-3.8, 0.12), (3.8, 0.12), (-2.82, -0.65), (0.0, -0.6), (2.82, -0.65), (0.45, -1.0)]
-for (x, y) in not_used_sensors:
-    draw_temperature(ax, x, y, NOT_USED)
-
-# Pier accelerometers (longitudinal, out of the drawing plane)
-for channel, (y, status) in PIER_ACCELEROMETERS.items():
-    color = COLORS[status]
-    draw_out_of_plane(ax, 1.75, y, color)
-    ax.text(2.1, y, channel, ha="left", va="center", color=color)
+# Pier accelerometer 03 (longitudinal, out of the drawing plane)
+draw_out_of_plane(ax, 1.75, -1.6)
+ax.text(2.1, -1.6, "03", ha="left", va="center", color=SENSOR_COLOR)
 
 ax.text(-4.3, -2.2, "South", ha="left", va="center")
 ax.text(4.3, -2.2, "North", ha="right", va="center")
 ax.set_xlim(-4.8, 4.8)
-ax.set_ylim(-3.7, 1.1)
+ax.set_ylim(-3.1, 1.1)
 ax.set_aspect("equal")
 ax.set_title("(c) Cross-section", loc="left")
 ax.axis("off")
 
-# Legend for the three panels: symbols (type of sensor) and colors (status)
+# Legend for the three panels
 handles = [
-    Line2D([], [], marker=r"$\odot$", linestyle="none", markersize=7, color="black",
+    Line2D([], [], marker=r"$\odot$", linestyle="none", markersize=7, color=SENSOR_COLOR,
            label="Accelerometer, out of plane"),
-    Line2D([], [], marker=r"$\leftrightarrow$", linestyle="none", markersize=8, color="black",
+    Line2D([], [], marker=r"$\leftrightarrow$", linestyle="none", markersize=8, color=SENSOR_COLOR,
            label="Accelerometer, in plane"),
-    Line2D([], [], marker="o", linestyle="none", markersize=3.5, markerfacecolor="white",
-           markeredgecolor="black", label="Temperature sensor"),
-    Line2D([], [], marker="s", linestyle="none", markersize=3, markerfacecolor="white",
-           markeredgecolor="black", label="Rotation sensor"),
-    Line2D([], [], marker="|", linestyle="none", markersize=5, color="black",
-           label="TE: thermal expansion"),
-    Patch(facecolor=COLORS[USED], label="Used in this study"),
-    Patch(facecolor=COLORS[NOT_USED], label="Not used in this study"),
-    Patch(facecolor=COLORS[NO_DATA], label="No data (sensor failed)"),
+    Line2D([], [], marker="o", linestyle="none", markersize=3.5, color=SENSOR_COLOR, label="Temperature sensor"),
+    Line2D([], [], color=SENSOR_COLOR, linestyle="--", linewidth=0.8, label="Temperature cross-section"),
 ]
 fig.legend(handles=handles, loc="lower center", ncol=2, frameon=False, handletextpad=0.4,
-           columnspacing=1.0, handlelength=1.2)
+           columnspacing=1.0, handlelength=1.5)
 
-fig.tight_layout(rect=(0, 0.11, 1, 1))
+fig.tight_layout(rect=(0, 0.07, 1, 1))
 fig.savefig(os.path.join(FIGURES_FOLDER, "bridge_sensors.pdf"))
 plt.close(fig)
