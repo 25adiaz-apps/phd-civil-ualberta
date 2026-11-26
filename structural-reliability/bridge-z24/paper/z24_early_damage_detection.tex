@@ -66,6 +66,8 @@ Para este estudio solo se tomaron en cuenta las aceleraciones, la temperatura de
 
 A partir de las aceleraciones medidas se obtuvieron las frecuencias naturales de los tres primeros modos del puente, aplicando el método de descomposición en el dominio de la frecuencia (FDD, \emph{Frequency Domain Decomposition}) \cite{Brincker2001}.
 
+Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por ellos, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relacion que existe entre las frecuencias naturales y la temperatura del la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bi-lineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en 0$\,^\circ$C.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{figures/frequency_vs_temperature}
@@ -73,7 +75,7 @@ A partir de las aceleraciones medidas se obtuvieron las frecuencias naturales de
 \label{fig:frequency-temperature}
 \end{figure}
 
-Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por ellos, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relacion que existe entre las frecuencias naturales y la temperatura del la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bi-lineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en 0$\,^\circ$C.
+Para este estudio se tomaron los datos del puente Z24 ya que cubren un amplio rango de condiciones climáticas. La Tabla~\ref{tab:temperature-range} muestra el rango de temperaturas medidas con el puente sano, por estación. Como se observa, durante el invierno la temperatura del pavimento estuvo bajo $0\,^\circ$C en un 38\% de las mediciones. 
 
 \begin{table}[H]
 \centering
@@ -100,11 +102,29 @@ Total & 4821 & $-6.7$ & 9.6 & 40.4 & $-5.4$ & 8.2 & 32.0 & 16.6 \\
 $n$: número de mediciones horarias. La última columna es el porcentaje de mediciones con la temperatura del pavimento bajo $0\,^\circ$C. Otoño: desde el 10.11.1997; verano: hasta el 04.08.1998.
 \end{table}
 
-Para este estudio se tomaron los datos del puente Z24 ya que cubren un amplio rango de condiciones climáticas. La Tabla~\ref{tab:temperature-range} muestra el rango de temperaturas medidas con el puente sano, por estación. Como se observa, durante el invierno la temperatura del pavimento estuvo bajo $0\,^\circ$C en un 38\% de las mediciones. 
-
 \subsection{Limpieza de datos}
 
+La Tabla~\ref{tab:accelerometers} resume los acelerómetros utilizados en este estudio. Los demás acelerómetros fueron descartados ya que no recolectaron información durante las mediciones, con excepción del acelerómetro 10, cuya señal se mantuvo fija en un valor constante (sin vibración) en más de la mitad de las mediciones.
 
+\begin{table}[H]
+\centering
+\caption{\bf Acelerómetros utilizados en este estudio}
+\small
+\begin{tabular}{lll}
+\hline
+Canal & Ubicación & Dirección \\
+\hline
+03 & Pila, parte superior & Longitudinal \\
+05 & Tablero, borde norte, lado Utzenstorf & Vertical \\
+06 & Tablero, lado Utzenstorf & Longitudinal \\
+07 & Tablero, borde norte, lado Koppigen & Vertical \\
+12 & Tablero, borde norte, lado Koppigen & Vertical \\
+14 & Tablero, extremo Koppigen & Transversal \\
+16 & Tablero, lado Utzenstorf & Transversal \\
+\hline
+\end{tabular}
+  \label{tab:accelerometers}
+\end{table}
 
 \section{Corresponding author}
 
