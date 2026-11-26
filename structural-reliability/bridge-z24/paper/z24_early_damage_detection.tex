@@ -36,29 +36,38 @@ This template contains important information on submissions to Optica Publishing
 
 \maketitle
 
-\section{I ntroduction}
+\section{Introduction}
 We encourage authors to focus first and foremost on their content and not on formatting.  This template is provided as a guide, but following the visual styling is optional. Each manuscript will be formatted in a consistent way during production. Authors also have the option to \href{https://opticaopen.org}{submit articles} to the Optica Publishing Group preprint server, \href{https://preprints.opticaopen.org}{Optica Open}. You may find it helpful to use our optional \href{https://preflight.paperpal.com/partner/optica/opticapublishinggroupjournals}{Paperpal manuscript readiness check} and \href{https://languageediting.optica.org/}{language polishing service}. 
 
 \section{Metodología}
 
 \subsection{Datos}
 
-Para este estudio se utilizaron los datos medidos en el puente Z24, en Suiza. Las mediciones las realizó el grupo de Mecánica Estructural de la KU Leuven (Bélgica), dentro del proyecto europeo SIMCES, y los datos se publicaron en \cite{Peeters2001}.
+Para este estudio se utilizaron los datos medidos en el puente Z24, en Suiza. Estas mediciones fueron realizadas por el grupo de Mecánica Estructural de la KU Leuven (Bélgica) y los datos se publicaron en \cite{Peeters2001}.
 
 El Z24 es un puente de concreto postensado de tres vanos, como se observa en la Fig.~\ref{fig:z24-bridge}, donde también se ilustran las posiciones en las que se colocaron los sensores.
 
 \begin{figure}[ht]
 \centering
-\fbox{\parbox[c][3cm][c]{0.9\linewidth}{\centering Diagrama del puente Z24 y posición de los sensores (pendiente)}}
-\caption{Puente Z24 y posición de los sensores.}
+\includegraphics[width=\linewidth]{figures/bridge_sensors}
+\caption{Puente Z24 y posición de los sensores (esquema sin escala, posiciones aproximadas): (a) elevación, (b) planta del tablero y (c) sección transversal.}
 \label{fig:z24-bridge}
 \end{figure}
 
-Los acelerómetros registraron cada hora las aceleraciones del puente en las direcciones vertical, transversal y longitudinal bajo condiciones de operación. Estas mediciones se hicieron durante casi un año, del 10 de noviembre de 1997 al 10 de septiembre de 1998. Durante los primeros nueve meses el puente estuvo sano. Después, a partir del 11 de agosto de 1998, se le aplicaron daños progresivos y se siguieron tomando las mismas mediciones sobre el puente dañado.
+Las mediciones tomadas por el grupo de investigación incluyen las aceleraciones del puente, la temperatura del aire, la humedad relativa, la lluvia, la velocidad y dirección del viento, la temperatura del suelo junto a las pilas y los estribos, y la temperatura en distintos puntos de la estructura (pavimento, losas superior e inferior, almas y veredas). Estas mediciones se hicieron durante casi un año, del 10 de noviembre de 1997 al 10 de septiembre de 1998. Durante los primeros nueve meses el puente estuvo sano. Después, a partir del 11 de agosto de 1998, se le aplicaron daños progresivos y se siguieron tomando las mismas mediciones sobre el puente dañado.
 
-Se seleccionaron estos datos principalmente por tres razones. Primero, son datos reales, no simulados. Segundo, cuentan con un amplio rango de mediciones del puente sano. Tercero, permiten analizar el efecto de los cambios de temperatura en la rigidez del puente y, por ende, en sus frecuencias naturales.
+Para este estudio solo se tomaron en cuenta las aceleraciones, la temperatura del pavimento y la temperatura de la losa superior para analizar el efecto de los cambios de temperatura en las propiedades dinámicas del puente. 
 
-A partir de las aceleraciones medidas se obtuvieron las frecuencias naturales de los tres primeros modos del puente, aplicando el método de descomposición en el dominio de la frecuencia (FDD, \emph{Frequency Domain Decomposition}) \cite{Brincker2001}. Para este estudio, además de las frecuencias naturales, se utilizaron las mediciones de temperatura en el pavimento y en la losa superior del tablero, para analizar el efecto de la temperatura en las propiedades dinámicas del puente.
+A partir de las aceleraciones medidas se obtuvieron las frecuencias naturales de los tres primeros modos del puente, aplicando el método de descomposición en el dominio de la frecuencia (FDD, \emph{Frequency Domain Decomposition}) \cite{Brincker2001}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/frequency_vs_temperature}
+\caption{Frecuencia natural frente a la temperatura del pavimento, puente sano (10.11.1997 al 04.08.1998): (a) modo 1, (b) modo 2 y (c) modo 3. La línea discontinua marca $0\,^\circ$C.}
+\label{fig:frequency-temperature}
+\end{figure}
+
+Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por ellos, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relacion que existe entre las frecuencias naturales y la temperatura del la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bi-lineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en 0$\,^\circ$C.
 
 \begin{table}[H]
 \centering
@@ -85,12 +94,11 @@ Total & 4821 & $-6.7$ & 9.6 & 40.4 & $-5.4$ & 8.2 & 32.0 & 16.6 \\
 $n$: número de mediciones horarias. La última columna es el porcentaje de mediciones con la temperatura del pavimento bajo $0\,^\circ$C. Otoño: desde el 10.11.1997; verano: hasta el 04.08.1998.
 \end{table}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{figures/frequency_vs_temperature}
-\caption{Frecuencia natural frente a la temperatura del pavimento, puente sano (10.11.1997 al 04.08.1998): (a) modo 1, (b) modo 2 y (c) modo 3. La línea discontinua marca $0\,^\circ$C.}
-\label{fig:frequency-temperature}
-\end{figure}
+Para este estudio se tomaron los datos del puente Z24 ya que cubren un amplio rango de condiciones climáticas. La Tabla~\ref{tab:temperature-range} muestra el rango de temperaturas medidas con el puente sano, por estación. Como se observa, durante el invierno la temperatura del pavimento estuvo bajo $0\,^\circ$C en un 38\% de las mediciones. 
+
+\subsection{Limpieza de datos}
+
+
 
 \section{Corresponding author}
 

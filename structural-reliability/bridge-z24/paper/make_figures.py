@@ -142,3 +142,169 @@ for column in columns:
     print(f"{column}: median 0-2 °C = {near_zero:.2f} Hz, median 28-32 °C = {warm:.2f} Hz, "
           f"change = {(warm - near_zero) / near_zero * 100:.1f} %, "
           f"99th percentile below 0 °C = {cold:.2f} Hz ({(cold - near_zero) / near_zero * 100:.1f} %)")
+
+
+# ---------------------------------------------------------------
+# 5. Figure: sketch of the bridge and position of the sensors
+# ---------------------------------------------------------------
+# Schematic, not to scale. Positions are approximate, read from the drawings of the
+# EMS documentation (Figs. 27, 37, 38 and 39 of datos/Z24-EMS-readme.pdf and datos/C11-Appendices.pdf)
+from matplotlib.lines import Line2D
+from matplotlib.patches import Polygon, Rectangle
+
+# Geometry (m): x = 0 at the Utzenstorf abutment and x = 58 at the Koppigen abutment
+SUPPORTS = [0.0, 14.0, 44.0, 58.0]   # abutment, pier, pier, abutment
+DECK_START = -2.7                    # the deck goes 2.70 m beyond each abutment
+DECK_END = 60.7
+HALF_WIDTH = 4.3                     # deck width = 8.60 m
+DECK_DEPTH = 1.1
+PIER_HEIGHT = 4.5
+
+# Cross-sections with temperature sensors: name -> approximate x position (m)
+TEMPERATURE_SECTIONS = {"S1": 8.4, "S2": 29.0, "S3": 51.0}
+
+# Deck accelerometers with data: channel -> (x, y, direction)
+# y = 0 on the deck axis, y > 0 towards the north edge; "V" = vertical, "L" = longitudinal, "T" = transverse
+DECK_ACCELEROMETERS = {
+    "05": (6.3, 2.6, "V"),
+    "10": (10.7, 2.6, "V"),
+    "06": (9.7, 0.0, "L"),
+    "16": (14.0, 0.9, "T"),
+    "07": (48.1, 2.6, "V"),
+    "12": (52.3, 2.6, "V"),
+    "14": (55.4, 0.9, "T"),
+}
+NOT_USED_CHANNELS = ["10"]           # constant signal in 60 % of the hours, excluded from FDD
+
+USED_COLOR = "tab:red"
+NOT_USED_COLOR = "gray"
+STRUCTURE_COLOR = "0.85"
+plt.rcParams["font.size"] = 7
+
+
+# Draws an out-of-plane accelerometer (circle with a dot) or a temperature sensor (filled circle)
+def draw_out_of_plane(ax, x, y, color):
+    ax.plot(x, y, "o", markersize=5, markerfacecolor="white", markeredgecolor=color, markeredgewidth=0.9)
+    ax.plot(x, y, "o", markersize=1.5, color=color)
+
+
+# Draws an in-plane accelerometer as a double arrow along its direction
+def draw_in_plane(ax, x, y, dx, dy, color):
+    ax.annotate("", xy=(x + dx, y + dy), xytext=(x - dx, y - dy),
+                arrowprops=dict(arrowstyle="<|-|>", color=color, linewidth=0.9, mutation_scale=6))
+
+
+fig, axes = plt.subplots(3, 1, figsize=(3.35, 4.9), gridspec_kw={"height_ratios": [1.0, 1.0, 1.35]})
+
+# (a) Elevation: spans, piers and temperature cross-sections
+ax = axes[0]
+ground = -DECK_DEPTH - PIER_HEIGHT
+ax.add_patch(Rectangle((DECK_START, -DECK_DEPTH), DECK_END - DECK_START, DECK_DEPTH,
+                       facecolor=STRUCTURE_COLOR, edgecolor="black", linewidth=0.6))
+for x in SUPPORTS:
+    ax.add_patch(Rectangle((x - 0.5, ground), 1.0, PIER_HEIGHT, facecolor="0.6", edgecolor="black", linewidth=0.4))
+ax.plot([DECK_START - 1, DECK_END + 1], [ground, ground], color="black", linewidth=0.6)
+
+# Span lengths
+for k in range(3):
+    left = SUPPORTS[k]
+    right = SUPPORTS[k + 1]
+    ax.annotate("", xy=(left, 1.4), xytext=(right, 1.4),
+                arrowprops=dict(arrowstyle="<->", linewidth=0.5, mutation_scale=5))
+    ax.text((left + right) / 2, 1.8, f"{right - left:.0f} m", ha="center", va="bottom")
+
+# Temperature cross-sections
+for name, x in TEMPERATURE_SECTIONS.items():
+    ax.plot([x, x], [0.6, -DECK_DEPTH - 0.6], color=USED_COLOR, linestyle="--", linewidth=0.8)
+    ax.text(x, -DECK_DEPTH - 1.0, name, color=USED_COLOR, ha="center", va="top")
+
+ax.text(DECK_START, ground - 0.4, "Utzenstorf", ha="left", va="top")
+ax.text(DECK_END, ground - 0.4, "Koppigen", ha="right", va="top")
+ax.set_xlim(DECK_START - 1.5, DECK_END + 1.5)
+ax.set_ylim(ground - 2.2, 3.4)
+ax.set_title("(a) Elevation", loc="left")
+ax.axis("off")
+
+# (b) Plan view of the deck: accelerometers
+ax = axes[1]
+ax.add_patch(Rectangle((DECK_START, -HALF_WIDTH), DECK_END - DECK_START, 2 * HALF_WIDTH,
+                       facecolor=STRUCTURE_COLOR, edgecolor="black", linewidth=0.6))
+for x in SUPPORTS:
+    ax.plot([x, x], [-HALF_WIDTH, HALF_WIDTH], color="black", linestyle=":", linewidth=0.6)
+
+for channel, (x, y, direction) in DECK_ACCELEROMETERS.items():
+    if channel in NOT_USED_CHANNELS:
+        color = NOT_USED_COLOR
+    else:
+        color = USED_COLOR
+
+    if direction == "V":
+        draw_out_of_plane(ax, x, y, color)
+        ax.text(x, y + 1.1, channel, ha="center", va="bottom", color=color)
+    elif direction == "L":
+        draw_in_plane(ax, x, y, 3.0, 0.0, color)
+        ax.text(x, y - 1.0, channel, ha="center", va="top", color=color)
+    else:
+        draw_in_plane(ax, x, y, 0.0, 1.6, color)
+        ax.text(x + 1.0, y, channel, ha="left", va="center", color=color)
+
+ax.text(DECK_END + 0.8, HALF_WIDTH, "North", ha="left", va="top")
+ax.text(DECK_END + 0.8, -HALF_WIDTH, "South", ha="left", va="bottom")
+ax.set_xlim(DECK_START - 1.5, DECK_END + 7.5)
+ax.set_ylim(-HALF_WIDTH - 0.8, HALF_WIDTH + 0.8)
+ax.set_title("(b) Plan view of the deck", loc="left")
+ax.axis("off")
+
+# (c) Cross-section: box girder, temperature sensors and pier accelerometer
+ax = axes[2]
+outline = [(-4.3, 0.0), (4.3, 0.0), (4.3, -0.2), (3.0, -0.4), (3.0, -1.1),
+           (-3.0, -1.1), (-3.0, -0.4), (-4.3, -0.2)]
+ax.add_patch(Polygon(outline, closed=True, facecolor=STRUCTURE_COLOR, edgecolor="black", linewidth=0.6))
+ax.add_patch(Rectangle((-2.65, -0.9), 2.5, 0.65, facecolor="white", edgecolor="black", linewidth=0.4))   # south cell
+ax.add_patch(Rectangle((0.15, -0.9), 2.5, 0.65, facecolor="white", edgecolor="black", linewidth=0.4))    # north cell
+ax.add_patch(Rectangle((-4.3, 0.0), 1.0, 0.25, facecolor="0.7", edgecolor="black", linewidth=0.4))      # south footway
+ax.add_patch(Rectangle((3.3, 0.0), 1.0, 0.25, facecolor="0.7", edgecolor="black", linewidth=0.4))       # north footway
+ax.add_patch(Rectangle((-3.3, 0.0), 6.6, 0.08, facecolor="0.3", edgecolor="none"))                     # pavement
+ax.add_patch(Rectangle((-1.6, -3.0), 3.2, 1.9, facecolor="0.6", edgecolor="black", linewidth=0.4))      # pier
+
+# Temperature sensors used in this study
+used_sensors = {"TP": (-0.3, 0.04), "TDT": (0.45, -0.05), "TDS": (0.45, -0.21)}
+for name, (x, y) in used_sensors.items():
+    ax.plot(x, y, "o", markersize=3.5, color=USED_COLOR)
+ax.annotate("TP (pavement)", xy=(-0.3, 0.04), xytext=(-2.6, 0.75), color=USED_COLOR, ha="center",
+            arrowprops=dict(arrowstyle="-", color=USED_COLOR, linewidth=0.5))
+ax.annotate("TDT, TDS (upper slab)", xy=(0.45, -0.05), xytext=(2.2, 0.75), color=USED_COLOR, ha="center",
+            arrowprops=dict(arrowstyle="-", color=USED_COLOR, linewidth=0.5))
+
+# Temperature sensors not used: footways, webs and lower slab
+not_used_sensors = [(-3.8, 0.12), (3.8, 0.12), (-2.82, -0.65), (0.0, -0.6), (2.82, -0.65), (0.45, -1.0)]
+for (x, y) in not_used_sensors:
+    ax.plot(x, y, "o", markersize=3.5, markerfacecolor="white", markeredgecolor=NOT_USED_COLOR, markeredgewidth=0.8)
+
+# Pier accelerometer 03 (longitudinal, out of the drawing plane)
+draw_out_of_plane(ax, 1.75, -1.6, USED_COLOR)
+ax.text(2.1, -1.6, "03", ha="left", va="center", color=USED_COLOR)
+
+ax.text(-4.3, -2.2, "South", ha="left", va="center")
+ax.text(4.3, -2.2, "North", ha="right", va="center")
+ax.set_xlim(-4.8, 4.8)
+ax.set_ylim(-3.0, 1.1)
+ax.set_aspect("equal")
+ax.set_title("(c) Cross-section", loc="left")
+ax.axis("off")
+
+# Legend for the three panels
+handles = [
+    Line2D([], [], marker=r"$\odot$", linestyle="none", markersize=7, color=USED_COLOR,
+           label="Accelerometer, out of plane"),
+    Line2D([], [], marker=r"$\leftrightarrow$", linestyle="none", markersize=8, color=USED_COLOR,
+           label="Accelerometer, in plane"),
+    Line2D([], [], marker="o", linestyle="none", markersize=3.5, color=USED_COLOR, label="Temperature sensor"),
+    Line2D([], [], marker="o", linestyle="none", markersize=3.5, markerfacecolor="white",
+           markeredgecolor=NOT_USED_COLOR, label="Not used in this study"),
+]
+fig.legend(handles=handles, loc="lower center", ncol=2, frameon=False, handletextpad=0.3, columnspacing=1.0)
+
+fig.tight_layout(rect=(0, 0.07, 1, 1))
+fig.savefig(os.path.join(FIGURES_FOLDER, "bridge_sensors.pdf"))
+plt.close(fig)
