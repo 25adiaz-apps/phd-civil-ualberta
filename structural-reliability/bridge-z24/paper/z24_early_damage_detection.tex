@@ -75,7 +75,7 @@ Para este estudio solo se tomaron en cuenta las aceleraciones, la temperatura de
 
 A partir de las aceleraciones medidas se obtuvieron las frecuencias naturales de los tres primeros modos del puente, aplicando el método de descomposición en el dominio de la frecuencia (FDD, \emph{Frequency Domain Decomposition}) \cite{Brincker2001}.
 
-Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por esta razón, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relación que existe entre las frecuencias naturales y la temperatura de la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bilineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en $0\,^\circ$C.
+Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por esta razón, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relación que existe entre las frecuencias naturales y la temperatura de la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bilineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en $0\,^\circ$C. Esto refuerza lo encontrado por Peeters y De Roeck \cite{Peeters2001}, quienes atribuyeron este comportamiento al aumento de la rigidez de la capa de asfalto cuando se congela.
 
 \begin{figure}[H]
 \centering
@@ -201,7 +201,7 @@ Después, se agregaron otras variables para representar el efecto del enfriamien
 \subsubsection{Variables de entrada}
 \label{sec:input-variables}
 
-No toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior. Por ello, se agregaron variables que representan el enfriamiento y el calentamiento progresivo de la estructura. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, que se calculó como
+No toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior. Por ello, se agregaron variables que representan el enfriamiento y el calentamiento progresivo de la estructura. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, ya que Peeters y De Roeck \cite{Peeters2001} encontraron que un modelo que incluye las temperaturas de las horas anteriores predice mejor las frecuencias naturales del Z24 que un modelo que solo usa la temperatura actual. Este promedio se calculó como
 \begin{equation}
 \bar{T}_{w,i} = \frac{1}{n_{w,i}} \sum_{j\,:\; t_i - w < t_j \le t_i} T_j,
 \label{eq:moving-average}
