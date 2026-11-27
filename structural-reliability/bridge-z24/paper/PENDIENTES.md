@@ -35,5 +35,6 @@ Lista de lo que falta revisar o agregar. Se revisa al final.
 
 - [ ] Rehacer `z24_model_selection_v2.ipynb` con la nueva división de los datos antes de escribir Resultados.
 - [ ] Título (todavía dice "TITTLE HERE"), resumen e introducción.
-- [ ] Borrar las secciones de ejemplo de la plantilla que quedan después de Resultados.
+- [ ] Secciones finales (*back matter*): Funding, Acknowledgment, Disclosures y Data availability (obligatoria). Están comentadas al final del `.tex`; opciones en `GUIA_TEMPLATE.md`.
+- [ ] **Accesibilidad de las figuras (regla de Optica):** no distinguir elementos solo por el color. Revisar sobre todo la Fig. 5 (folds por color) y la Fig. 1 (cajas en azul).
 - [ ] Verificar las referencias Peeters2001 y Brincker2001 en el `.bib`.
