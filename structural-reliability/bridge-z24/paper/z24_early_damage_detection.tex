@@ -137,6 +137,10 @@ Durante el estudio hubo un periodo en el que se preparó el puente para aplicarl
 
 \subsection{División de los datos y validación}
 
+Los modelos de machine learning se probaron tanto con el puente sano, donde no deberían indicar daño, como con el puente dañado, donde deberían indicarlo lo antes posible. Considerando esto, el dataset de prueba está compuesto por las mediciones del puente dañado, un periodo de mediciones del puente sano justo antes de la preparación para los daños y otro periodo de mediciones del puente sano en invierno, que incluye temperaturas bajo $0\,^\circ$C.
+
+Para la validación cruzada, el dataset de entrenamiento y validación se dividió en 5 folds. Estos folds no se formaron al azar con mediciones sueltas, ya que las frecuencias naturales de dos mediciones consecutivas son muy parecidas y el propósito es que el modelo pueda predecir las frecuencias naturales del puente sano en días que no haya visto antes. Para lograrlo, los folds se formaron con bloques de tiempo de una semana, como se muestra en la Fig.~\ref{fig:data-split}. La Tabla~\ref{tab:data-split} resume la división de los datos utilizada para la construcción y la prueba de los modelos de machine learning.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{figures/data_split}
