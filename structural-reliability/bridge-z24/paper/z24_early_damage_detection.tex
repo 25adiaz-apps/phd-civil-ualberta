@@ -189,7 +189,7 @@ Mediciones con las tres frecuencias naturales y las temperaturas del pavimento y
 
 \subsection{Modelo del comportamiento sano}
 
-Se inició probando con un modelo lineal que relacionaba las frecuencias naturales del puente sano con la temperatura del pavimento en cada medición. Los residuos de ese modelo se analizaron para decidir si el modelo era capaz de predecir correctamente las frecuencias naturales del puente sano o si había que considerar otras variables o cambiar de modelo. En cada medición, el residuo es la diferencia entre la frecuencia natural medida y la frecuencia natural predicha por el modelo:
+Debido a la relación bilineal observada en la Fig.~\ref{fig:frequency-temperature}, se inició probando con un modelo lineal con dos pendientes, una sobre $0\,^\circ$C y otra bajo $0\,^\circ$C, que relacionaba las frecuencias naturales del puente sano con la temperatura del pavimento en cada medición. Los residuos de ese modelo se analizaron para decidir si el modelo era capaz de predecir correctamente las frecuencias naturales del puente sano o si había que considerar otras variables o cambiar de modelo. En cada medición, el residuo es la diferencia entre la frecuencia natural medida y la frecuencia natural predicha por el modelo:
 \begin{equation}
 r_{m,i} = f_{m,i} - \hat{f}_{m,i},
 \label{eq:residual}
@@ -225,7 +225,6 @@ La Tabla~\ref{tab:feature-sets} resume los conjuntos de variables con los que se
 \hline
 Conjunto & Variables \\
 \hline
-Temperatura actual & $T$ \\
 Bilineal & $T$, $\min(T,0)$ \\
 Historia térmica & $T$, $\bar{T}_6$, $\bar{T}_{12}$, $\bar{T}_{24}$, $h$ \\
 Físico & $T$, $\bar{T}_{24}$, $\min(T,0)$, $\sqrt{I}$ \\
