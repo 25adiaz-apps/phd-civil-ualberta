@@ -75,7 +75,7 @@ Para este estudio solo se tomaron en cuenta las aceleraciones, la temperatura de
 
 A partir de las aceleraciones medidas se obtuvieron las frecuencias naturales de los tres primeros modos del puente, aplicando el método de descomposición en el dominio de la frecuencia (FDD, \emph{Frequency Domain Decomposition}) \cite{Brincker2001}.
 
-Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por ellos, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relacion que existe entre las frecuencias naturales y la temperatura del la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bi-lineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en 0$\,^\circ$C.
+Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por esta razón, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relación que existe entre las frecuencias naturales y la temperatura de la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bilineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en $0\,^\circ$C.
 
 \begin{figure}[H]
 \centering
@@ -150,7 +150,7 @@ Los modelos de machine learning se probaron tanto con el puente sano, donde no d
 
 Para la validación cruzada, el dataset de entrenamiento y validación se dividió en 5 folds. Estos folds no se formaron al azar con mediciones sueltas, ya que las frecuencias naturales de dos mediciones consecutivas son muy parecidas y el propósito es que el modelo pueda predecir las frecuencias naturales del puente sano en días que no haya visto antes. Para lograrlo, los folds se formaron con bloques de una semana, como se muestra en la Fig.~\ref{fig:data-split}.
 
-La Tabla~\ref{tab:data-split} resume la división de los datos utilizada para la construcción y la prueba de los modelos de machine learning. De esta manera se garantiza que el modelo sea entrenado y validado para las diferentes condiciones de temperatura medidas y tambien se puede probar tanto para temperaturas de verano, como para temperaturas de invierno con mediciones que el modelo no vió durante la etapa de entrenamiento y validación.
+La Tabla~\ref{tab:data-split} resume la división de los datos utilizada para la construcción y la prueba de los modelos de machine learning. De esta manera se garantiza que el modelo sea entrenado y validado para las diferentes condiciones de temperatura medidas y también se puede probar tanto para temperaturas de verano, como para temperaturas de invierno con mediciones que el modelo no vio durante la etapa de entrenamiento y validación.
 
 \begin{figure}[H]
 \centering
