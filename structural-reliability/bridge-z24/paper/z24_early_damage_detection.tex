@@ -144,6 +144,33 @@ Durante el estudio hubo un periodo en el que se preparó el puente para aplicarl
 \label{fig:data-split}
 \end{figure}
 
+\begin{table}[H]
+\centering
+\caption{\bf Mediciones de cada conjunto y de cada fold}
+\small
+\begin{tabular}{lrr}
+\hline
+Conjunto & Mediciones & Bajo $0\,^\circ$C \\
+\hline
+Fold 1 & 818 & 195 \\
+Fold 2 & 842 & 108 \\
+Fold 3 & 956 & 206 \\
+Fold 4 & 802 & 125 \\
+Fold 5 & 835 & 91 \\
+Entrenamiento y validación & 4253 & 725 \\
+\hline
+Prueba, puente sano & 324 & 0 \\
+Preparación (excluida) & 158 & 0 \\
+Prueba, puente dañado & 494 & 0 \\
+\hline
+\end{tabular}
+  \label{tab:data-split}
+
+\smallskip
+\footnotesize
+Mediciones con las tres frecuencias naturales y la temperatura del pavimento; en la preparación se cuentan todas las mediciones. Bajo $0\,^\circ$C: temperatura del pavimento.
+\end{table}
+
 \subsection{Modelo del comportamiento sano}
 
 \subsubsection{Variables de entrada}
