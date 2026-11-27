@@ -201,7 +201,7 @@ Después, se agregaron otras variables para representar el efecto del enfriamien
 \subsubsection{Variables de entrada}
 \label{sec:input-variables}
 
-No toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior. Por ello, se agregaron variables que representan el enfriamiento y el calentamiento progresivo de la estructura. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, ya que Peeters y De Roeck \cite{Peeters2001} encontraron que un modelo que incluye las temperaturas de las horas anteriores predice mejor las frecuencias naturales del Z24 que un modelo que solo usa la temperatura actual. Este promedio se calculó como
+Considerando que no toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior, se agregaron variables que representan el enfriamiento y el calentamiento progresivo de la estructura. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, ya que Peeters y De Roeck \cite{Peeters2001} encontraron que un modelo que incluye las temperaturas de las horas anteriores predice mejor las frecuencias naturales del Z24 que un modelo que solo usa la temperatura actual. Este promedio se calculó como
 \begin{equation}
 \bar{T}_{w,i} = \frac{1}{n_{w,i}} \sum_{j\,:\; t_i - w < t_j \le t_i} T_j,
 \label{eq:moving-average}
@@ -214,6 +214,29 @@ I_i = \max\left(0,\; I_{i-1} - T_i\,\Delta t_i\right),
 \label{eq:freezing-index}
 \end{equation}
 donde $I_i$ es el índice de congelamiento ($^\circ$C$\cdot$h) en la medición $i$ y $\Delta t_i$ son las horas desde la medición anterior. De esta manera, el índice crece mientras la temperatura está bajo $0\,^\circ$C, disminuye con el deshielo y nunca es negativo.
+
+La Tabla~\ref{tab:feature-sets} resume los conjuntos de variables con los que se probaron los modelos.
+
+\begin{table}[H]
+\centering
+\caption{\bf Conjuntos de variables de entrada}
+\small
+\begin{tabular}{ll}
+\hline
+Conjunto & Variables \\
+\hline
+Temperatura actual & $T$ \\
+Bilineal & $T$, $\min(T,0)$ \\
+Historia térmica & $T$, $\bar{T}_6$, $\bar{T}_{12}$, $\bar{T}_{24}$, $h$ \\
+Físico & $T$, $\bar{T}_{24}$, $\min(T,0)$, $\sqrt{I}$ \\
+\hline
+\end{tabular}
+  \label{tab:feature-sets}
+
+\smallskip
+\footnotesize
+$T$: temperatura del pavimento; $\bar{T}_w$: promedio de las últimas $w$ horas (Ec.~\eqref{eq:moving-average}); $\min(T,0)$: igual a $T$ bajo $0\,^\circ$C e igual a 0 sobre $0\,^\circ$C; $h$: horas seguidas bajo $0\,^\circ$C; $I$: índice de congelamiento (Ec.~\eqref{eq:freezing-index}).
+\end{table}
 
 \subsubsection{Modelos candidatos}
 \label{sec:candidate-models}
