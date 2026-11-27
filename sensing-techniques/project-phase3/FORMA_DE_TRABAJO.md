@@ -67,7 +67,7 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 ## Google Drive (trabajo con el compañero)
 
 - El compañero trabaja en Google Colab. Nosotros trabajamos primero en local.
-- Carpeta compartida: `CIV E 789/ProjectPhase3_Group6/`, con la misma estructura que `ProjectPhase3_Group6/` en local (sin los `.gitkeep`). En este PC, `CIV E 789` está montada en `G:\.shortcut-targets-by-id\19igiJAqeDixiQzelAH-aNp7HxnJjV69i\CIV E 789`. En Colab, la primera celda del notebook (etiqueta `remove-cell`, no sale en el PDF) monta el Drive y entra a la carpeta del proyecto.
+- Carpeta compartida: `CIV E 789/ProjectPhase3_Group6/`, con la misma estructura que `ProjectPhase3_Group6/` en local (sin los `.gitkeep`). En este PC, `CIV E 789` está montada en `G:\.shortcut-targets-by-id\19igiJAqeDixiQzelAH-aNp7HxnJjV69i\CIV E 789`. La primera celda de código del notebook (sección 0, etiqueta `hide-cell`, no sale en el PDF) es para Colab: se deja en blanco para que el compañero la configure él mismo; nosotros no la tocamos.
 - **Subir:** solo cuando lo pidas, se copia la versión local actual al Drive para que el compañero continúe.
 - **Traer:** cuando lo pidas:
   1. Revisar los cambios que el compañero hizo en el Drive.
