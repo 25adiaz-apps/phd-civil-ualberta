@@ -339,3 +339,89 @@ ax.legend(loc="upper right", fontsize=6, markerscale=2.5, frameon=True)
 fig.tight_layout()
 fig.savefig(os.path.join(FIGURES_FOLDER, "damage_preparation_f2.pdf"))
 plt.close(fig)
+
+
+# ---------------------------------------------------------------
+# 7. Figure: division of the data (weekly folds, tests and excluded period)
+# ---------------------------------------------------------------
+# Same blocks and folds as machine-learning-project/z24_model_selection_v2.ipynb (section 1)
+import matplotlib.dates as mdates
+
+TEST_START = pd.Timestamp("1998-07-15")           # start of the healthy test block
+N_FOLDS = 5
+
+# 1. Measurements with the three frequencies and the temperature (the ones the models use)
+complete = data["f1"].notna() & data["f2"].notna() & data["f3"].notna() & data["T"].notna()
+
+# 2. Time blocks
+training_block = data[data["start"] < TEST_START].copy()
+healthy_test = data[(data["start"] >= TEST_START) & (data["start"] < PREP_START) & complete]
+preparation_block = data[(data["start"] >= PREP_START) & (data["start"] < DAMAGE_START)]
+damage_test = data[(data["start"] >= DAMAGE_START) & complete]
+
+# 3. Folds: week counted from the first training measurement, weeks assigned in turn to the 5 folds
+first_date = training_block["start"].min()
+week = (training_block["start"] - first_date).dt.days // 7
+training_block["fold"] = week % N_FOLDS + 1
+training = training_block[complete.loc[training_block.index]]
+
+for fold in range(1, N_FOLDS + 1):
+    fold_data = training[training["fold"] == fold]
+    print(f"Fold {fold}: {len(fold_data)} measurements, {(fold_data['T'] < 0).sum()} below 0 °C")
+print(f"Healthy test: {len(healthy_test)}, damage preparation (excluded): {len(preparation_block)}, "
+      f"damage test: {len(damage_test)}")
+
+TRAINING_COLOR = "tab:blue"
+HEALTHY_TEST_COLOR = "tab:green"
+PREPARATION_COLOR = "0.6"
+DAMAGE_TEST_COLOR = "tab:red"
+
+fig, axes = plt.subplots(2, 1, figsize=(3.35, 3.9), sharex=True, gridspec_kw={"height_ratios": [1.0, 1.1]})
+
+# (a) Pavement temperature of each block
+ax = axes[0]
+ax.plot(training["start"], training["T"], ".", markersize=0.8, color=TRAINING_COLOR,
+        label="Training and validation")
+ax.plot(healthy_test["start"], healthy_test["T"], ".", markersize=0.8, color=HEALTHY_TEST_COLOR,
+        label="Test, healthy")
+ax.plot(preparation_block["start"], preparation_block["T"], ".", markersize=0.8, color=PREPARATION_COLOR,
+        label="Damage preparation (excluded)")
+ax.plot(damage_test["start"], damage_test["T"], ".", markersize=0.8, color=DAMAGE_TEST_COLOR,
+        label="Test, damaged")
+ax.axhline(0, color="gray", linestyle="--", linewidth=0.6)
+ax.set_ylabel("Pavement temperature (°C)")
+ax.set_title("(a)", loc="left")
+ax.grid(alpha=0.3)
+
+# (b) One row per fold and per block: a tick at each measurement
+ax = axes[1]
+row_names = []
+row = 0
+for fold in range(1, N_FOLDS + 1):
+    fold_data = training[training["fold"] == fold]
+    ax.plot(fold_data["start"], np.full(len(fold_data), row), "|", markersize=4, color=TRAINING_COLOR)
+    row_names.append(f"Fold {fold}")
+    row = row + 1
+for name, block_data, color in [("Test, healthy", healthy_test, HEALTHY_TEST_COLOR),
+                                ("Preparation", preparation_block, PREPARATION_COLOR),
+                                ("Test, damaged", damage_test, DAMAGE_TEST_COLOR)]:
+    ax.plot(block_data["start"], np.full(len(block_data), row), "|", markersize=4, color=color)
+    row_names.append(name)
+    row = row + 1
+ax.set_yticks(range(len(row_names)))
+ax.set_yticklabels(row_names)
+ax.set_ylim(len(row_names) - 0.5, -0.5)          # fold 1 at the top
+ax.set_title("(b)", loc="left")
+ax.grid(axis="x", alpha=0.3)
+
+ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=[11, 1, 3, 5, 7, 9]))
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%b\n%Y"))
+
+# Legend of both panels, above the figure
+handles, labels = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc="upper center", ncol=2, fontsize=6, markerscale=6, frameon=False,
+           handletextpad=0.2, columnspacing=0.8)
+
+fig.tight_layout(rect=(0, 0, 1, 0.93))
+fig.savefig(os.path.join(FIGURES_FOLDER, "data_split.pdf"))
+plt.close(fig)
