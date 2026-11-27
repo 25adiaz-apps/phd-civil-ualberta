@@ -52,7 +52,7 @@ La idea principal de este estudio es que, si un modelo de machine learning es ca
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{figures/method_flowchart}
-\caption{Esquema del método. En azul, lo que se obtiene con las mediciones del puente sano: el modelo que predice las frecuencias naturales a partir de la temperatura y el límite de alarma. Los residuos entre las frecuencias medidas y las predichas se combinan con la distancia de Mahalanobis y se suavizan en el tiempo con un EWMA; la alarma se genera cuando el EWMA supera el límite.}
+\caption{Esquema del método. En azul, lo que se obtiene con las mediciones del puente sano: las frecuencias naturales predichas por el modelo de machine learning y el límite de alarma. Los residuos entre las frecuencias medidas y las predichas se combinan con la distancia de Mahalanobis y se suavizan en el tiempo con un EWMA; la alarma se genera cuando el EWMA supera el límite.}
 \label{fig:method}
 \end{figure}
 
@@ -148,7 +148,9 @@ Durante el estudio hubo un periodo en el que se preparó el puente para aplicarl
 
 Los modelos de machine learning se probaron tanto con el puente sano, donde no deberían indicar daño, como con el puente dañado, donde deberían indicarlo lo antes posible. Considerando esto, el dataset de prueba está compuesto por las mediciones del puente dañado, un periodo de mediciones del puente sano justo antes de la preparación para los daños y otro periodo de mediciones del puente sano en invierno, que incluye temperaturas bajo $0\,^\circ$C.
 
-Para la validación cruzada, el dataset de entrenamiento y validación se dividió en 5 folds. Estos folds no se formaron al azar con mediciones sueltas, ya que las frecuencias naturales de dos mediciones consecutivas son muy parecidas y el propósito es que el modelo pueda predecir las frecuencias naturales del puente sano en días que no haya visto antes. Para lograrlo, los folds se formaron con bloques de tiempo de una semana, como se muestra en la Fig.~\ref{fig:data-split}. La Tabla~\ref{tab:data-split} resume la división de los datos utilizada para la construcción y la prueba de los modelos de machine learning.
+Para la validación cruzada, el dataset de entrenamiento y validación se dividió en 5 folds. Estos folds no se formaron al azar con mediciones sueltas, ya que las frecuencias naturales de dos mediciones consecutivas son muy parecidas y el propósito es que el modelo pueda predecir las frecuencias naturales del puente sano en días que no haya visto antes. Para lograrlo, los folds se formaron con bloques de una semana, como se muestra en la Fig.~\ref{fig:data-split}.
+
+La Tabla~\ref{tab:data-split} resume la división de los datos utilizada para la construcción y la prueba de los modelos de machine learning. De esta manera se garantiza que el modelo sea entrenado y validado para las diferentes condiciones de temperatura medidas y tambien se puede probar tanto para temperaturas de verano, como para temperaturas de invierno con mediciones que el modelo no vió durante la etapa de entrenamiento y validación.
 
 \begin{figure}[H]
 \centering
