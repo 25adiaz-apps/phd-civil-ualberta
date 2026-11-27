@@ -291,6 +291,32 @@ Como el RMSE cambia de un fold a otro, un modelo con un RMSE un poco menor no es
 donde $\text{RMSE}_j$ es el RMSE del modelo $j$, $\text{RMSE}_{\min}$ es el menor RMSE de todos los modelos, $s_{\min}$ es la desviación estándar del RMSE de ese modelo entre los folds y $k = 5$ es el número de folds. El orden de simplicidad sigue la escalera de la Sección~\ref{sec:candidate-models}: regresión lineal, regresión lineal regularizada, SVR y random forest; con el mismo modelo, el conjunto con menos variables se consideró más simple.
 
 \subsection{Sistema de detección}
+\label{sec:detection-system}
+
+Una vez elegido el modelo de cada frecuencia natural, los residuos (Ec.~\eqref{eq:residual}) se utilizaron para detectar el daño, siguiendo los pasos de la Fig.~\ref{fig:method}. Si el puente está sano, los residuos solo representan la dispersión normal que el modelo no logra explicar; si el puente se daña, las frecuencias medidas se alejan de las predichas y los residuos aumentan.
+
+Como el daño puede afectar a las tres frecuencias naturales de manera distinta, los tres residuos de cada medición se combinaron en un solo índice de daño con la distancia de Mahalanobis:
+\begin{equation}
+d_i = \sqrt{\left(\mathbf{r}_i - \boldsymbol{\mu}\right)^\top \boldsymbol{\Sigma}^{-1} \left(\mathbf{r}_i - \boldsymbol{\mu}\right)},
+\label{eq:mahalanobis}
+\end{equation}
+donde $\mathbf{r}_i = [r_{1,i},\, r_{2,i},\, r_{3,i}]^\top$ son los residuos de las tres frecuencias naturales en la medición $i$, y $\boldsymbol{\mu}$ y $\boldsymbol{\Sigma}$ son la media y la matriz de covarianza de los residuos del entrenamiento. A diferencia de la distancia euclidiana, la distancia de Mahalanobis toma en cuenta que cada residuo tiene una dispersión distinta y que los residuos pueden estar correlacionados entre sí.
+
+Sin embargo, el índice de daño de una sola medición puede ser alto por un error en la identificación de las frecuencias, sin que el puente esté dañado. Por ello, el índice se suavizó en el tiempo con un promedio móvil con pesos exponenciales (EWMA, \emph{Exponentially Weighted Moving Average}):
+\begin{equation}
+z_i = \lambda\, d_i + (1 - \lambda)\, z_{i-1},
+\label{eq:ewma}
+\end{equation}
+donde $z_i$ es el índice suavizado en la medición $i$ y $\lambda = 0.1$ es el peso de la medición actual, que se fijó antes de evaluar el sistema. De esta manera, una medición aislada con un índice alto tiene poco efecto, mientras que un aumento que se mantiene en el tiempo, como el que produce el daño, hace crecer $z_i$. El valor inicial $z_0$ es la media del índice de daño en el entrenamiento.
+
+Finalmente, se activa una alarma de daño cuando $z_i$ supera un límite de control (UCL, \emph{Upper Control Limit}), que se definió como el mayor valor de $z_i$ en el entrenamiento:
+\begin{equation}
+\text{UCL} = \max_{i \,\in\, \text{entrenamiento}} z_i.
+\label{eq:ucl}
+\end{equation}
+Así, el límite representa la mayor dispersión que tuvo el puente sano. Para el entrenamiento se utilizaron los residuos de la validación cruzada, de manera que cada residuo se calculó con un modelo que no vio la semana de esa medición. Para la prueba, el modelo se entrenó con todas las mediciones de entrenamiento y validación.
+
+El sistema se evaluó una sola vez con los conjuntos de prueba (Tabla~\ref{tab:data-split}), a través del número de falsas alarmas con el puente sano, del tiempo entre el inicio del daño y la primera alarma, y del área bajo la curva ROC (AUC, \emph{Area Under the Curve}).
 
 \section{Resultados}
 
