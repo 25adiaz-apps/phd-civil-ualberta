@@ -145,6 +145,7 @@ Durante el estudio hubo un periodo en el que se preparó el puente para aplicarl
 \end{figure}
 
 \subsection{División de los datos y validación}
+\label{sec:data-split}
 
 Los modelos de machine learning se probaron tanto con el puente sano, donde no deberían indicar daño, como con el puente dañado, donde deberían indicarlo lo antes posible. Considerando esto, el dataset de prueba está compuesto por las mediciones del puente dañado, un periodo de mediciones del puente sano justo antes de la preparación para los daños y otro periodo de mediciones del puente sano en invierno, que incluye temperaturas bajo $0\,^\circ$C.
 
@@ -240,8 +241,54 @@ $T$: temperatura del pavimento; $\bar{T}_w$: promedio de las últimas $w$ horas 
 \subsubsection{Modelos candidatos}
 \label{sec:candidate-models}
 
+Los modelos se probaron en orden de complejidad, de manera que cada modelo agrega algo que el anterior no puede hacer. La regresión lineal se probó con los tres conjuntos de variables de la Tabla~\ref{tab:feature-sets}, y los demás modelos, con los conjuntos Historia térmica y Físico.
+
+El primer modelo fue la regresión lineal, en la que la frecuencia natural predicha es una suma ponderada de las variables de entrada:
+\begin{equation}
+\hat{f} = \theta_0 + \sum_{j=1}^{p} \theta_j x_j,
+\label{eq:linear}
+\end{equation}
+donde $x_j$ son las $p$ variables del conjunto y $\theta_j$ son los parámetros, que se ajustan por mínimos cuadrados. Es el modelo más simple y sus parámetros se pueden interpretar directamente. Por ejemplo, con el conjunto Bilineal, el parámetro de $\min(T,0)$ es el cambio de pendiente bajo $0\,^\circ$C.
+
+Sin embargo, cuando las variables de entrada se mueven juntas, como la temperatura del pavimento y sus promedios, los parámetros de la regresión lineal pueden volverse muy grandes e inestables. Por ello, el segundo modelo fue una regresión lineal regularizada (Ridge), que agrega al ajuste una penalización de los parámetros grandes:
+\begin{equation}
+\min_{\boldsymbol{\theta}} \; \sum_{i=1}^{n} \left(f_i - \hat{f}_i\right)^2 + \alpha \sum_{j=1}^{p} \theta_j^2,
+\label{eq:ridge}
+\end{equation}
+donde $n$ es el número de mediciones y el hiperparámetro $\alpha$ controla la penalización. El modelo tiene la misma forma de la Ec.~\eqref{eq:linear}; solo cambia la forma de ajustar sus parámetros.
+
+Los dos modelos anteriores solo pueden representar la forma que ya tienen sus variables de entrada. Por ello, el tercer modelo fue una regresión de vectores de soporte con kernel RBF (SVR, \emph{Support Vector Regression}; RBF, \emph{Radial Basis Function}), que ajusta una curva suave sin imponer su forma:
+\begin{equation}
+\hat{f}(\mathbf{x}) = b + \sum_{i} a_i \exp\left(-\gamma \lVert \mathbf{x} - \mathbf{x}_i \rVert^2\right),
+\label{eq:svr}
+\end{equation}
+donde $\mathbf{x}$ es el vector de variables de entrada, $\mathbf{x}_i$ son mediciones del entrenamiento, $a_i$ y $b$ son parámetros que se ajustan y $\gamma$ controla qué tan local es cada término. Además, los errores menores que $\varepsilon$ no se penalizan y $C$ controla cuánto se penalizan los demás.
+
+Finalmente, como la curva del SVR es suave, puede tener dificultad para seguir cambios bruscos como los que produce el congelamiento. Por ello, el cuarto modelo fue un random forest, que promedia las predicciones de $B$ árboles de regresión:
+\begin{equation}
+\hat{f}(\mathbf{x}) = \frac{1}{B} \sum_{b=1}^{B} h_b(\mathbf{x}),
+\label{eq:random-forest}
+\end{equation}
+donde $h_b$ es el árbol $b$, entrenado con una muestra aleatoria de las mediciones, y $B = 200$. Cada árbol divide las mediciones con umbrales sobre las variables, por lo que puede representar cambios bruscos; sin embargo, no puede predecir valores fuera del rango del entrenamiento.
+
+Los hiperparámetros de cada modelo ($\alpha$; $C$, $\gamma$ y $\varepsilon$; y el mínimo de mediciones por hoja y el número de variables por división del random forest) se ajustaron con la validación cruzada de la Sección~\ref{sec:data-split}. En la regresión lineal regularizada y en el SVR, las variables se estandarizaron con la media y la desviación estándar de los folds de ajuste.
+
 \subsubsection{Criterio de selección}
 \label{sec:selection-criterion}
+
+Para comparar los modelos se utilizó la raíz del error cuadrático medio (RMSE, \emph{Root Mean Square Error}) de la validación cruzada:
+\begin{equation}
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} r_i^2},
+\label{eq:rmse}
+\end{equation}
+donde $r_i$ es el residuo (Ec.~\eqref{eq:residual}) de la medición $i$, calculado con el modelo entrenado sin el fold de esa medición, y $n$ es el número de mediciones. De esta manera, cada medición se evalúa con un modelo que no vio su semana. El RMSE se calculó por separado para cada frecuencia natural, por lo que se eligió un modelo para cada una.
+
+Como el RMSE cambia de un fold a otro, un modelo con un RMSE un poco menor no es necesariamente mejor. Por ello, se aplicó la regla de un error estándar: entre los modelos cuyo RMSE no supera al menor RMSE por más de un error estándar, se eligió el más simple. Es decir, se eligió el modelo más simple que cumple
+\begin{equation}
+\text{RMSE}_j \le \text{RMSE}_{\min} + \frac{s_{\min}}{\sqrt{k}},
+\label{eq:one-se}
+\end{equation}
+donde $\text{RMSE}_j$ es el RMSE del modelo $j$, $\text{RMSE}_{\min}$ es el menor RMSE de todos los modelos, $s_{\min}$ es la desviación estándar del RMSE de ese modelo entre los folds y $k = 5$ es el número de folds. El orden de simplicidad sigue la escalera de la Sección~\ref{sec:candidate-models}: regresión lineal, regresión lineal regularizada, SVR y random forest; con el mismo modelo, el conjunto con menos variables se consideró más simple.
 
 \subsection{Sistema de detección}
 
