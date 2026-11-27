@@ -196,7 +196,12 @@ r_{m,i} = f_{m,i} - \hat{f}_{m,i},
 \end{equation}
 donde $r_{m,i}$ es el residuo del modo $m$ en la medición $i$, $f_{m,i}$ es la frecuencia natural medida y $\hat{f}_{m,i}$ es la frecuencia natural predicha.
 
-Después, se agregaron otras variables para representar el efecto del enfriamiento y del calentamiento progresivo de la estructura, ya que no toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, que se calculó como
+Después, se agregaron otras variables para representar el efecto del enfriamiento y del calentamiento progresivo de la estructura (Sección~\ref{sec:input-variables}). Luego, con esas variables, se probaron modelos más complejos que el lineal (Sección~\ref{sec:candidate-models}). Finalmente, se eligió un modelo para cada frecuencia natural con el criterio de la Sección~\ref{sec:selection-criterion}.
+
+\subsubsection{Variables de entrada}
+\label{sec:input-variables}
+
+No toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior. Por ello, se agregaron variables que representan el enfriamiento y el calentamiento progresivo de la estructura. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, que se calculó como
 \begin{equation}
 \bar{T}_{w,i} = \frac{1}{n_{w,i}} \sum_{j\,:\; t_i - w < t_j \le t_i} T_j,
 \label{eq:moving-average}
@@ -210,11 +215,11 @@ I_i = \max\left(0,\; I_{i-1} - T_i\,\Delta t_i\right),
 \end{equation}
 donde $I_i$ es el índice de congelamiento ($^\circ$C$\cdot$h) en la medición $i$ y $\Delta t_i$ son las horas desde la medición anterior. De esta manera, el índice crece mientras la temperatura está bajo $0\,^\circ$C, disminuye con el deshielo y nunca es negativo.
 
-\subsubsection{Variables de entrada}
-
 \subsubsection{Modelos candidatos}
+\label{sec:candidate-models}
 
 \subsubsection{Criterio de selección}
+\label{sec:selection-criterion}
 
 \subsection{Sistema de detección}
 
