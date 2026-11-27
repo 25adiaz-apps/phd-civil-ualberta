@@ -443,9 +443,9 @@ MODEL_COLOR = "#dbe9f6"        # boxes of the model trained with the healthy bri
 MEASURED_COLOR = "0.92"        # boxes of the measurements
 ALARM_COLOR = "#f6d5d5"        # alarm box
 
-fig, ax = plt.subplots(figsize=(3.35, 2.8))
+fig, ax = plt.subplots(figsize=(3.35, 2.55))
 ax.set_xlim(0, 10)
-ax.set_ylim(0, 9.3)
+ax.set_ylim(0, 8.6)
 ax.axis("off")
 
 
@@ -462,11 +462,9 @@ def draw_arrow(box_from, box_to, point_from=(0.5, 0.0), point_to=(0.5, 1.0)):
                                 shrinkA=4, shrinkB=4))
 
 
-# 1. Two branches: continuous monitoring (left) and machine learning prediction (right)
-ax.text(2.5, 8.95, "Monitoring", ha="center", va="center", fontsize=7, fontweight="bold")
-ax.text(7.5, 8.95, "Machine learning prediction", ha="center", va="center", fontsize=7, fontweight="bold")
-measured = draw_box(2.5, 7.7, "Measured frequencies\n$f_1, f_2, f_3$", MEASURED_COLOR)
-predicted = draw_box(7.5, 7.7, "Predicted frequencies\n$\\hat{f}_1, \\hat{f}_2, \\hat{f}_3$", MODEL_COLOR)
+# 1. Measured frequencies of the continuous monitoring (left) and frequencies predicted by the ML model (right)
+measured = draw_box(2.5, 7.7, "Monitored frequencies\n$f_1, f_2, f_3$", MEASURED_COLOR)
+predicted = draw_box(7.5, 7.7, "ML predicted frequencies\n$\\hat{f}_1, \\hat{f}_2, \\hat{f}_3$", MODEL_COLOR)
 
 # 2. Comparison and alarm (centre)
 residuals = draw_box(5.0, 5.9, "Residuals $r = f - \\hat{f}$", MEASURED_COLOR)
