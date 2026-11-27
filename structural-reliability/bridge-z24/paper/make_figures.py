@@ -434,3 +434,64 @@ fig.legend(handles=shade_handles, loc="upper center", bbox_to_anchor=(0.5, 0.945
 fig.tight_layout(rect=(0, 0, 1, 0.84))
 fig.savefig(os.path.join(FIGURES_FOLDER, "data_split.pdf"))
 plt.close(fig)
+
+
+# ---------------------------------------------------------------
+# 8. Figure: flowchart of the method
+# ---------------------------------------------------------------
+MODEL_COLOR = "#dbe9f6"        # boxes of the model trained with the healthy bridge
+MEASURED_COLOR = "0.92"        # boxes of the measurements
+ALARM_COLOR = "#f6d5d5"        # alarm box
+
+fig, ax = plt.subplots(figsize=(3.35, 4.3))
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 14)
+ax.axis("off")
+
+
+# Draws a box with text centred at (x, y) and returns it, so that arrows can be attached to it
+def draw_box(x, y, text, color):
+    return ax.text(x, y, text, ha="center", va="center", fontsize=6.5, linespacing=1.3,
+                   bbox=dict(boxstyle="round,pad=0.45", facecolor=color, edgecolor="0.3", linewidth=0.6))
+
+
+# Draws an arrow from a point of one box to a point of another (points as fractions of each box)
+def draw_arrow(box_from, box_to, point_from=(0.5, 0.0), point_to=(0.5, 1.0)):
+    ax.annotate("", xy=point_to, xycoords=box_to, xytext=point_from, textcoords=box_from,
+                arrowprops=dict(arrowstyle="-|>", color="0.2", linewidth=0.7, mutation_scale=7,
+                                shrinkA=4, shrinkB=4))
+
+
+# 1. Measured frequencies (left column)
+accelerations = draw_box(2.5, 13.0, "Hourly accelerations", MEASURED_COLOR)
+fdd = draw_box(2.5, 10.4, "Frequency Domain\nDecomposition (FDD)", MEASURED_COLOR)
+measured = draw_box(2.5, 7.8, "Measured frequencies\n$f_1, f_2, f_3$", MEASURED_COLOR)
+
+# 2. Predicted frequencies (right column)
+temperature = draw_box(7.5, 13.0, "Pavement temperature", MEASURED_COLOR)
+variables = draw_box(7.5, 11.25, "Input variables:\ntemperature and its history", MODEL_COLOR)
+model = draw_box(7.5, 9.5, "ML model trained with\nthe healthy bridge", MODEL_COLOR)
+predicted = draw_box(7.5, 7.8, "Predicted frequencies\n$\hat{f}_1, \hat{f}_2, \hat{f}_3$", MODEL_COLOR)
+
+# 3. Comparison and alarm (centre)
+residuals = draw_box(5.0, 5.9, "Residuals $r = f - \hat{f}$", MEASURED_COLOR)
+mahalanobis = draw_box(5.0, 4.3, "Mahalanobis distance\nof the three residuals", MEASURED_COLOR)
+ewma = draw_box(5.0, 2.7, "EWMA (smoothing in time)", MEASURED_COLOR)
+alarm = draw_box(5.0, 0.8, "Damage alarm if the\nEWMA exceeds the limit", ALARM_COLOR)
+limit = draw_box(8.65, 0.8, "Limit from the\nhealthy bridge\n(normal scatter)", MODEL_COLOR)
+
+draw_arrow(accelerations, fdd)
+draw_arrow(fdd, measured)
+draw_arrow(temperature, variables)
+draw_arrow(variables, model)
+draw_arrow(model, predicted)
+draw_arrow(measured, residuals, point_to=(0.3, 1.0))
+draw_arrow(predicted, residuals, point_to=(0.7, 1.0))
+draw_arrow(residuals, mahalanobis)
+draw_arrow(mahalanobis, ewma)
+draw_arrow(ewma, alarm)
+draw_arrow(limit, alarm, point_from=(0.0, 0.5), point_to=(1.0, 0.5))
+
+fig.tight_layout(pad=0.2)
+fig.savefig(os.path.join(FIGURES_FOLDER, "method_flowchart.pdf"))
+plt.close(fig)

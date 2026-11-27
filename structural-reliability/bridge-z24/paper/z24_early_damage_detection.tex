@@ -47,6 +47,15 @@ Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatib
 
 \section{Metodología}
 
+La idea principal de este estudio es que, si un modelo de machine learning es capaz de aprender a predecir las frecuencias naturales del puente sano bajo condiciones ambientales específicas, las mediciones del monitoreo continuo pueden compararse con esa predicción para generar alertas y detectar el daño lo antes posible. Para esto, también se tiene en cuenta la dispersión dada por la estimación de las frecuencias naturales y por la variabilidad del tráfico, que pueden suponerse normales. La Fig.~\ref{fig:method} resume el método utilizado.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/method_flowchart}
+\caption{Esquema del método. En azul, lo que se obtiene con las mediciones del puente sano: el modelo que predice las frecuencias naturales a partir de la temperatura y el límite de alarma. Los residuos entre las frecuencias medidas y las predichas se combinan con la distancia de Mahalanobis y se suavizan en el tiempo con un EWMA; la alarma se genera cuando el EWMA supera el límite.}
+\label{fig:method}
+\end{figure}
+
 \subsection{Datos}
 
 Para este estudio se utilizaron los datos medidos en el puente Z24, en Suiza. Estas mediciones fueron realizadas por el grupo de Mecánica Estructural de la KU Leuven (Bélgica) y los datos se publicaron en \cite{Peeters2001}.
