@@ -189,24 +189,26 @@ Mediciones con las tres frecuencias naturales y las temperaturas del pavimento y
 
 \subsection{Modelo del comportamiento sano}
 
-Se inició probando con un modelo lineal que relacionaba las frecuencias naturales del puente sano con la temperatura del pavimento en cada medición. Los residuos de ese modelo, calculados con la Ec.~\eqref{eq:residual}, se analizaron para decidir si el modelo era capaz de predecir correctamente las frecuencias naturales del puente sano o si había que considerar otras variables o cambiar de modelo.
+Se inició probando con un modelo lineal que relacionaba las frecuencias naturales del puente sano con la temperatura del pavimento en cada medición. Los residuos de ese modelo se analizaron para decidir si el modelo era capaz de predecir correctamente las frecuencias naturales del puente sano o si había que considerar otras variables o cambiar de modelo. En cada medición, el residuo es la diferencia entre la frecuencia natural medida y la frecuencia natural predicha por el modelo:
 \begin{equation}
-r_{m,i} = f_{m,i} - \hat{f}_{m,i}
+r_{m,i} = f_{m,i} - \hat{f}_{m,i},
 \label{eq:residual}
 \end{equation}
-donde $r_{m,i}$ es el residuo del modo $m$ en la medición $i$, $f_{m,i}$ es la frecuencia natural medida y $\hat{f}_{m,i}$ es la frecuencia natural predicha por el modelo.
+donde $r_{m,i}$ es el residuo del modo $m$ en la medición $i$, $f_{m,i}$ es la frecuencia natural medida y $\hat{f}_{m,i}$ es la frecuencia natural predicha.
 
-Después, se agregaron otras variables, como el promedio de la temperatura de las últimas 6, 12 y 24 horas (Ec.~\eqref{eq:moving-average}) y un índice de congelamiento que acumula la temperatura multiplicada por el tiempo (Ec.~\eqref{eq:freezing-index}), para representar el efecto del enfriamiento y del calentamiento progresivo de la estructura. Esto se debe a que no toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior.
+Después, se agregaron otras variables para representar el efecto del enfriamiento y del calentamiento progresivo de la estructura, ya que no toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, que se calculó como
 \begin{equation}
-\bar{T}_{w,i} = \frac{1}{n_{w,i}} \sum_{j\,:\; t_i - w < t_j \le t_i} T_j
+\bar{T}_{w,i} = \frac{1}{n_{w,i}} \sum_{j\,:\; t_i - w < t_j \le t_i} T_j,
 \label{eq:moving-average}
 \end{equation}
-donde $\bar{T}_{w,i}$ es el promedio de la temperatura del pavimento de las últimas $w$ horas en la medición $i$, $T_j$ y $t_j$ son la temperatura y la hora de la medición $j$, y $n_{w,i}$ es el número de mediciones en las últimas $w$ horas.
+donde $\bar{T}_{w,i}$ es el promedio de las últimas $w$ horas en la medición $i$, $T_j$ y $t_j$ son la temperatura y la hora de la medición $j$, y $n_{w,i}$ es el número de mediciones en las últimas $w$ horas.
+
+La segunda fue un índice de congelamiento, que acumula la temperatura multiplicada por el tiempo:
 \begin{equation}
-I_i = \max\left(0,\; I_{i-1} - T_i\,\Delta t_i\right)
+I_i = \max\left(0,\; I_{i-1} - T_i\,\Delta t_i\right),
 \label{eq:freezing-index}
 \end{equation}
-donde $I_i$ es el índice de congelamiento ($^\circ$C$\cdot$h) en la medición $i$ y $\Delta t_i$ son las horas desde la medición anterior. El índice crece mientras la temperatura está bajo $0\,^\circ$C, disminuye con el deshielo y nunca es negativo.
+donde $I_i$ es el índice de congelamiento ($^\circ$C$\cdot$h) en la medición $i$ y $\Delta t_i$ son las horas desde la medición anterior. De esta manera, el índice crece mientras la temperatura está bajo $0\,^\circ$C, disminuye con el deshielo y nunca es negativo.
 
 \subsubsection{Variables de entrada}
 
