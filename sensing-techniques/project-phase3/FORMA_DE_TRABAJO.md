@@ -20,8 +20,8 @@ project-phase3/
 ├── FORMA_DE_TRABAJO.md                                   Este archivo
 └── ProjectPhase3_Group6/        Contenido del ZIP que se entrega
     ├── Main.ipynb               Notebook con todo el análisis (Partes A–C y nota sobre el uso de IA)
-    ├── phase3_modal_data.json   Datos (pendiente de copiar aquí)
-    ├── phase3_kmeans_starter.py Código de inicio del profesor (pendiente de copiar aquí)
+    ├── phase3_modal_data.json   Datos (intact: 200 registros; damage1 y damage2: 50 cada uno)
+    ├── phase3_kmeans_starter.py Código de inicio del profesor
     ├── README.txt               Descripción breve del contenido, en inglés (al final)
     ├── figures/                 Figuras que genera el notebook
     └── results/                 Tablas que genera el notebook (CSV)
