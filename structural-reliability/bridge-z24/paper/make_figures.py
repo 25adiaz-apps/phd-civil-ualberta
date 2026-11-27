@@ -371,38 +371,51 @@ for fold in range(1, N_FOLDS + 1):
 print(f"Healthy test: {len(healthy_test)}, damage preparation (excluded): {len(preparation_block)}, "
       f"damage test: {len(damage_test)}")
 
-# One color per fold and one per block; tests and preparation keep green, gray and red
+# Points coloured by fold; background shaded by block
+from matplotlib.patches import Patch
+
 FOLD_COLORS = ["tab:blue", "tab:orange", "tab:purple", "tab:cyan", "tab:brown"]
-HEALTHY_TEST_COLOR = "tab:green"
-PREPARATION_COLOR = "0.5"
-DAMAGE_TEST_COLOR = "tab:red"
+TEST_POINTS_COLOR = "0.25"
+DATA_END = data["start"].max()
 
 fig, ax = plt.subplots(figsize=(3.35, 2.9))
 
-# Training and validation: each fold with its own color
+# 1. Shaded background of each block (start, end, color, transparency, hatch, label)
+BLOCK_SHADES = [
+    (first_date, TEST_START, "tab:blue", 0.10, None, "Training and validation"),
+    (TEST_START, PREP_START, "tab:green", 0.22, None, "Test, healthy"),
+    (PREP_START, DAMAGE_START, "0.5", 0.30, "////", "Preparation (excluded)"),
+    (DAMAGE_START, DATA_END, "tab:red", 0.18, None, "Test, damaged"),
+]
+shade_handles = []
+for start, end, color, alpha, hatch, label in BLOCK_SHADES:
+    ax.axvspan(start, end, facecolor=color, alpha=alpha, hatch=hatch, edgecolor="0.4", linewidth=0)
+    shade_handles.append(Patch(facecolor=color, alpha=alpha, hatch=hatch, edgecolor="0.4", label=label))
+
+# 2. Training and validation: each fold with its own color
+fold_handles = []
 for fold in range(1, N_FOLDS + 1):
     fold_data = training[training["fold"] == fold]
-    ax.plot(fold_data["start"], fold_data["T"], ".", markersize=0.8, color=FOLD_COLORS[fold - 1],
-            label=f"Fold {fold}")
+    line, = ax.plot(fold_data["start"], fold_data["T"], ".", markersize=0.8, color=FOLD_COLORS[fold - 1],
+                    label=f"Fold {fold}")
+    fold_handles.append(line)
 
-# Test blocks and excluded period
-ax.plot(healthy_test["start"], healthy_test["T"], ".", markersize=0.8, color=HEALTHY_TEST_COLOR,
-        label="Test, healthy")
-ax.plot(preparation_block["start"], preparation_block["T"], ".", markersize=0.8, color=PREPARATION_COLOR,
-        label="Preparation (excluded)")
-ax.plot(damage_test["start"], damage_test["T"], ".", markersize=0.8, color=DAMAGE_TEST_COLOR,
-        label="Test, damaged")
+# 3. Test blocks and excluded period: one dark color, the shading tells them apart
+for block_data in [healthy_test, preparation_block, damage_test]:
+    ax.plot(block_data["start"], block_data["T"], ".", markersize=0.8, color=TEST_POINTS_COLOR)
 
 ax.axhline(0, color="gray", linestyle="--", linewidth=0.6)
 ax.set_ylabel("Pavement temperature (°C)")
-ax.grid(alpha=0.3)
+ax.set_xlim(pd.Timestamp("1997-11-01"), DATA_END + pd.Timedelta(days=5))
 ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=[11, 1, 3, 5, 7, 9]))
 ax.xaxis.set_major_formatter(mdates.DateFormatter("%b\n%Y"))
 
-# Legend above the plot
-fig.legend(loc="upper center", ncol=4, fontsize=6, markerscale=6, frameon=False,
-           handletextpad=0.2, columnspacing=0.8)
+# Legend above the plot: folds in the first row, blocks in the second
+fig.legend(handles=fold_handles, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=5, fontsize=6,
+           markerscale=6, frameon=False, handletextpad=0.1, columnspacing=0.7)
+fig.legend(handles=shade_handles, loc="upper center", bbox_to_anchor=(0.5, 0.945), ncol=2, fontsize=6,
+           frameon=False, handlelength=1.5, handletextpad=0.4, columnspacing=0.8)
 
-fig.tight_layout(rect=(0, 0, 1, 0.89))
+fig.tight_layout(rect=(0, 0, 1, 0.84))
 fig.savefig(os.path.join(FIGURES_FOLDER, "data_split.pdf"))
 plt.close(fig)
