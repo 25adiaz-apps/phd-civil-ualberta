@@ -140,7 +140,7 @@ Durante el estudio hubo un periodo en el que se preparó el puente para aplicarl
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{figures/data_split}
-\caption{División de los datos sobre la temperatura del pavimento. Las áreas sombreadas marcan los bloques: entrenamiento y validación, prueba con el puente sano (15.07 al 04.08.1998), preparación para los daños (excluida, 05.08 al 11.08.1998) y prueba con el puente dañado (desde el 11.08.1998). El color de los puntos indica el fold de cada medición (bloques de una semana repartidos por turnos en 5 folds). La línea discontinua marca $0\,^\circ$C.}
+\caption{División de los datos sobre la temperatura del pavimento. Las áreas sombreadas marcan los bloques: entrenamiento y validación, pruebas con el puente sano en invierno (15.12 al 28.12.1997) y en verano (15.07 al 04.08.1998), preparación para los daños (excluida, 05.08 al 11.08.1998) y prueba con el puente dañado (desde el 11.08.1998). El color de los puntos indica el fold de cada medición (bloques de una semana repartidos por turnos en 5 folds). La línea discontinua marca $0\,^\circ$C.}
 \label{fig:data-split}
 \end{figure}
 
@@ -152,14 +152,15 @@ Durante el estudio hubo un periodo en el que se preparó el puente para aplicarl
 \hline
 Conjunto & Mediciones & Bajo $0\,^\circ$C \\
 \hline
-Fold 1 & 818 & 195 \\
-Fold 2 & 842 & 108 \\
-Fold 3 & 956 & 206 \\
-Fold 4 & 802 & 125 \\
-Fold 5 & 835 & 91 \\
-Entrenamiento y validación & 4253 & 725 \\
+Fold 1 & 677 & 101 \\
+Fold 2 & 650 & 109 \\
+Fold 3 & 955 & 207 \\
+Fold 4 & 833 & 120 \\
+Fold 5 & 818 & 106 \\
+Entrenamiento y validación & 3933 & 643 \\
 \hline
-Prueba, puente sano & 324 & 0 \\
+Prueba, puente sano (invierno) & 320 & 82 \\
+Prueba, puente sano (verano) & 324 & 0 \\
 Preparación (excluida) & 158 & 0 \\
 Prueba, puente dañado & 494 & 0 \\
 \hline
@@ -168,7 +169,7 @@ Prueba, puente dañado & 494 & 0 \\
 
 \smallskip
 \footnotesize
-Mediciones con las tres frecuencias naturales y la temperatura del pavimento; en la preparación se cuentan todas las mediciones. Bajo $0\,^\circ$C: temperatura del pavimento.
+Mediciones con las tres frecuencias naturales y las temperaturas del pavimento y de la losa superior; en la preparación se cuentan todas las mediciones. Bajo $0\,^\circ$C: temperatura del pavimento.
 \end{table}
 
 \subsection{Modelo del comportamiento sano}

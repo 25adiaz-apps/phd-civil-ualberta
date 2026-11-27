@@ -344,32 +344,41 @@ plt.close(fig)
 # ---------------------------------------------------------------
 # 7. Figure: division of the data (weekly folds, tests and excluded period)
 # ---------------------------------------------------------------
-# Same blocks and folds as machine-learning-project/z24_model_selection_v2.ipynb (section 1)
+# Same blocks and folds as machine-learning-project/z24_step_by_step.ipynb (step 3)
 import matplotlib.dates as mdates
 
-TEST_START = pd.Timestamp("1998-07-15")           # start of the healthy test block
+WINTER_TEST_START = pd.Timestamp("1997-12-15")    # healthy test block in winter (two weeks)
+WINTER_TEST_END = pd.Timestamp("1997-12-29")
+TEST_START = pd.Timestamp("1998-07-15")           # start of the healthy test block in summer
 N_FOLDS = 5
 
-# 1. Measurements with the three frequencies and the temperature (the ones the models use)
-complete = data["f1"].notna() & data["f2"].notna() & data["f3"].notna() & data["T"].notna()
+# 1. Valid measurements: the three frequencies and both temperatures (same criterion as the notebook)
+complete = (data["f1"].notna() & data["f2"].notna() & data["f3"].notna()
+            & data["T"].notna() & data["T_slab"].notna())
 
 # 2. Time blocks
-training_block = data[data["start"] < TEST_START].copy()
-healthy_test = data[(data["start"] >= TEST_START) & (data["start"] < PREP_START) & complete]
+in_winter_test = (data["start"] >= WINTER_TEST_START) & (data["start"] < WINTER_TEST_END)
+training = data[(data["start"] < TEST_START) & ~in_winter_test & complete].copy()
+winter_test = data[in_winter_test & complete]
+summer_test = data[(data["start"] >= TEST_START) & (data["start"] < PREP_START) & complete]
 preparation_block = data[(data["start"] >= PREP_START) & (data["start"] < DAMAGE_START)]
 damage_test = data[(data["start"] >= DAMAGE_START) & complete]
 
-# 3. Folds: week counted from the first training measurement, weeks assigned in turn to the 5 folds
-first_date = training_block["start"].min()
-week = (training_block["start"] - first_date).dt.days // 7
-training_block["fold"] = week % N_FOLDS + 1
-training = training_block[complete.loc[training_block.index]]
+# 3. Folds: week counted from midnight of the first training day (Monday 10.11.1997),
+#    weeks assigned in turn to the 5 folds
+first_date = training["start"].min().normalize()
+week = (training["start"] - first_date).dt.days // 7
+training["fold"] = week % N_FOLDS + 1
 
+# Values of the table of the paper
 for fold in range(1, N_FOLDS + 1):
     fold_data = training[training["fold"] == fold]
     print(f"Fold {fold}: {len(fold_data)} measurements, {(fold_data['T'] < 0).sum()} below 0 °C")
-print(f"Healthy test: {len(healthy_test)}, damage preparation (excluded): {len(preparation_block)}, "
-      f"damage test: {len(damage_test)}")
+print(f"Training and validation: {len(training)} measurements, {(training['T'] < 0).sum()} below 0 °C")
+for name, block_data in [("Healthy test, winter", winter_test), ("Healthy test, summer", summer_test),
+                         ("Damage preparation (excluded, all measurements)", preparation_block),
+                         ("Damage test", damage_test)]:
+    print(f"{name}: {len(block_data)} measurements, {(block_data['T'] < 0).sum()} below 0 °C")
 
 # Points coloured by fold; background shaded by block
 from matplotlib.patches import Patch
@@ -381,16 +390,22 @@ DATA_END = data["start"].max()
 fig, ax = plt.subplots(figsize=(3.35, 2.9))
 
 # 1. Shaded background of each block (start, end, color, transparency, hatch, label)
+#    The training block is split in two by the winter test
 BLOCK_SHADES = [
-    (first_date, TEST_START, "tab:blue", 0.10, None, "Training and validation"),
+    (first_date, WINTER_TEST_START, "tab:blue", 0.10, None, "Training and validation"),
+    (WINTER_TEST_START, WINTER_TEST_END, "tab:green", 0.22, None, "Test, healthy"),
+    (WINTER_TEST_END, TEST_START, "tab:blue", 0.10, None, "Training and validation"),
     (TEST_START, PREP_START, "tab:green", 0.22, None, "Test, healthy"),
     (PREP_START, DAMAGE_START, "0.5", 0.30, "////", "Preparation (excluded)"),
     (DAMAGE_START, DATA_END, "tab:red", 0.18, None, "Test, damaged"),
 ]
 shade_handles = []
+labels_in_legend = []
 for start, end, color, alpha, hatch, label in BLOCK_SHADES:
     ax.axvspan(start, end, facecolor=color, alpha=alpha, hatch=hatch, edgecolor="0.4", linewidth=0)
-    shade_handles.append(Patch(facecolor=color, alpha=alpha, hatch=hatch, edgecolor="0.4", label=label))
+    if label not in labels_in_legend:       # one legend entry per block type
+        shade_handles.append(Patch(facecolor=color, alpha=alpha, hatch=hatch, edgecolor="0.4", label=label))
+        labels_in_legend.append(label)
 
 # 2. Training and validation: each fold with its own color
 fold_handles = []
@@ -401,7 +416,7 @@ for fold in range(1, N_FOLDS + 1):
     fold_handles.append(line)
 
 # 3. Test blocks and excluded period: one dark color, the shading tells them apart
-for block_data in [healthy_test, preparation_block, damage_test]:
+for block_data in [winter_test, summer_test, preparation_block, damage_test]:
     ax.plot(block_data["start"], block_data["T"], ".", markersize=0.8, color=TEST_POINTS_COLOR)
 
 ax.axhline(0, color="gray", linestyle="--", linewidth=0.6)
