@@ -610,11 +610,11 @@ La Fig.~\ref{fig:roc} muestra la curva ROC del índice suavizado y del índice s
 \section{Discusión}
 \textbf{PENDIENTE: ideas de cada párrafo.}
 \begin{enumerate}
-\item Qué significa el resultado principal: tiempo hasta la primera alarma y falsas alarmas; qué implica en la práctica (p. ej., detectar el daño en menos de un día de monitoreo).
-\item Por qué funcionó: qué variables explicaron la variabilidad, sobre todo bajo $0\,^\circ$C (promedios de la temperatura de las horas anteriores; el índice de congelamiento no mejoró); relación con Peeters y De Roeck (asfalto congelado, temperaturas de las horas anteriores); un modelo distinto para cada frecuencia natural.
-\item Papel de cada parte del sistema: Mahalanobis frente a cada frecuencia por separado; EWMA frente al índice sin suavizar (episodios de falsa alarma en el entrenamiento y AUC) y elección de $\lambda$ y del percentil; origen de las falsas alarmas (error de identificación del 15.07.1998).
+\item Qué significa el resultado principal: primera alarma 18.75 h después del primer descenso de la pila, pero en la séptima medición con daño (sin mediciones entre las 14:00 del 11.08 y las 02:00 del 12.08), por lo que el retraso depende también de la frecuencia de las mediciones; un episodio de falsa alarma en cada conjunto de prueba sano; qué implica en la práctica (detectar el daño en menos de un día de monitoreo, con alrededor de una inspección innecesaria al mes en invierno).
+\item Por qué funcionó: qué variables explicaron la variabilidad, sobre todo bajo $0\,^\circ$C (promedios de la temperatura de las horas anteriores; el índice de congelamiento no mejoró); relación con Peeters y De Roeck (asfalto congelado, temperaturas de las horas anteriores); los modelos flexibles solo mejoraron $f_1$ y $f_3$ y sobre todo bajo $0\,^\circ$C, mientras que para $f_2$ bastó una regresión lineal con la historia de una semana; con la regla de un error estándar se eligió un modelo distinto para cada frecuencia natural.
+\item Papel de cada parte del sistema: Mahalanobis para no depender de un solo modo ($f_2$ fue el más sensible a este daño, pero en un puente real no se sabe qué modo cambiará) y para tomar en cuenta escalas distintas y residuos correlacionados; EWMA frente al índice sin suavizar (episodios de falsa alarma en el entrenamiento, AUC de 0.992 frente a 0.988) y elección de $\lambda$ y del percentil con un cambio de referencia sin usar los datos del daño; límite por percentil porque los residuos tienen colas más pesadas que la normal; origen de las falsas alarmas: error de identificación del 15.07.1998 en verano y heladas en el entrenamiento y el 17.12 (todas las falsas alarmas del entrenamiento fueron en invierno).
 \item Comparación con otros estudios del Z24 (retraso de detección o AUC; 2 o 3 referencias por buscar).
-\item Limitaciones: daño solo en verano; prueba de invierno con heladas moderadas; residuos de $f_2$ desplazados en la prueba de verano del puente sano; RMSE de validación optimista (hiperparámetros elegidos con los mismos folds); un solo puente y daño provocado; solo la temperatura del pavimento. Cierre: qué haría falta para un clima como el de Edmonton (un año completo de línea base y heladas más fuertes en el entrenamiento).
+\item Limitaciones: daño solo en verano; prueba de invierno con heladas moderadas (hasta $-3\,^\circ$C); los modelos se quedan cortos bajo $-3\,^\circ$C (solo 74 mediciones de entrenamiento) y el random forest no puede predecir fuera del rango del entrenamiento; residuos de $f_2$ desplazados en la prueba de verano del puente sano; RMSE de validación optimista (hiperparámetros elegidos con los mismos folds); un solo puente y daño provocado; solo la temperatura del pavimento. Cierre: qué haría falta para un clima como el de Edmonton (un año completo de línea base y heladas mucho más fuertes en el entrenamiento).
 \end{enumerate}
 
 \section{Conclusiones}
@@ -622,7 +622,7 @@ La Fig.~\ref{fig:roc} muestra la curva ROC del índice suavizado y del índice s
 \begin{enumerate}
 \item El modelo del puente sano: qué modelo y conjunto de variables se eligió para cada frecuencia natural (red neuronal en $f_1$, regresión lineal en $f_2$ y random forest en $f_3$) y con qué error.
 \item El efecto de la temperatura: la historia térmica es necesaria para predecir las frecuencias bajo $0\,^\circ$C; el índice de congelamiento no mejoró la predicción.
-\item La detección: el sistema detectó el daño X h después de su inicio, con Y falsas alarmas con el puente sano.
+\item La detección: el sistema detectó el daño 18.75 h después de su inicio, con un episodio de falsa alarma en cada conjunto de prueba del puente sano (invierno y verano) y un AUC de 0.992.
 \item Trabajo futuro: probar la detección con daño en invierno, en otros puentes y en climas más fríos.
 \end{enumerate}
 
