@@ -323,19 +323,23 @@ El sistema se evaluó una sola vez con los conjuntos de prueba (Tabla~\ref{tab:d
 \subsection{Detección del daño}
 
 \section{Discusión}
-% PENDIENTE: ideas de cada párrafo
-% 1. Qué significa el resultado principal: tiempo hasta la primera alarma y falsas alarmas; qué implica en la práctica (p. ej., detectar el daño en menos de un día de monitoreo).
-% 2. Por qué funcionó: qué variables explicaron la variabilidad (historia térmica, congelamiento), sobre todo bajo 0 °C; relación con Peeters y De Roeck (asfalto congelado, temperaturas de las horas anteriores).
-% 3. Papel de cada parte del sistema: Mahalanobis frente a cada frecuencia por separado; EWMA frente al índice sin suavizar y sensibilidad a lambda; origen de las falsas alarmas (error de identificación del 15-16.07.1998); uno o dos límites.
-% 4. Comparación con otros estudios del Z24 (retraso de detección o AUC; 2-3 referencias por buscar).
-% 5. Limitaciones: daño solo en verano; prueba de invierno con heladas moderadas; RMSE de validación optimista (hiperparámetros elegidos con los mismos folds); un solo puente y daño provocado; solo temperatura del pavimento. Cierre: qué haría falta para un clima como el de Edmonton (un año completo de línea base, heladas más fuertes en el entrenamiento).
+\textbf{PENDIENTE: ideas de cada párrafo.}
+\begin{enumerate}
+\item Qué significa el resultado principal: tiempo hasta la primera alarma y falsas alarmas; qué implica en la práctica (p. ej., detectar el daño en menos de un día de monitoreo).
+\item Por qué funcionó: qué variables explicaron la variabilidad (historia térmica, congelamiento), sobre todo bajo $0\,^\circ$C; relación con Peeters y De Roeck (asfalto congelado, temperaturas de las horas anteriores).
+\item Papel de cada parte del sistema: Mahalanobis frente a cada frecuencia por separado; EWMA frente al índice sin suavizar y sensibilidad a $\lambda$; origen de las falsas alarmas (error de identificación del 15 y 16.07.1998); uno o dos límites.
+\item Comparación con otros estudios del Z24 (retraso de detección o AUC; 2 o 3 referencias por buscar).
+\item Limitaciones: daño solo en verano; prueba de invierno con heladas moderadas; RMSE de validación optimista (hiperparámetros elegidos con los mismos folds); un solo puente y daño provocado; solo la temperatura del pavimento. Cierre: qué haría falta para un clima como el de Edmonton (un año completo de línea base y heladas más fuertes en el entrenamiento).
+\end{enumerate}
 
 \section{Conclusiones}
-% PENDIENTE: 3-5 conclusiones que respondan al propósito del estudio, sin explicaciones ni referencias
-% 1. El modelo del puente sano: qué modelo y conjunto de variables se eligió para cada frecuencia natural y con qué error.
-% 2. El efecto de la temperatura: la historia térmica y el congelamiento son necesarios para predecir las frecuencias bajo 0 °C.
-% 3. La detección: el sistema detectó el daño X h después de su inicio, con Y falsas alarmas con el puente sano.
-% 4. Trabajo futuro: probar la detección con daño en invierno, en otros puentes y en climas más fríos.
+\textbf{PENDIENTE: 3 a 5 conclusiones que respondan al propósito del estudio, sin explicaciones ni referencias.}
+\begin{enumerate}
+\item El modelo del puente sano: qué modelo y conjunto de variables se eligió para cada frecuencia natural y con qué error.
+\item El efecto de la temperatura: la historia térmica y el congelamiento son necesarios para predecir las frecuencias bajo $0\,^\circ$C.
+\item La detección: el sistema detectó el daño X h después de su inicio, con Y falsas alarmas con el puente sano.
+\item Trabajo futuro: probar la detección con daño en invierno, en otros puentes y en climas más fríos.
+\end{enumerate}
 
 \begin{backmatter}
 % PENDIENTE: secciones finales (ver GUIA_TEMPLATE.md)
