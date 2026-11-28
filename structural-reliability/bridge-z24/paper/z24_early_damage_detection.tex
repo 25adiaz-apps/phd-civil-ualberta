@@ -41,7 +41,7 @@
 
 \section{Metodología}
 
-La idea principal de este estudio es que, si un modelo de machine learning es capaz de aprender a predecir las frecuencias naturales del puente sano bajo condiciones ambientales específicas, las mediciones del monitoreo continuo pueden compararse con esa predicción para generar alertas y detectar el daño lo antes posible. Para esto, también se tiene en cuenta la dispersión dada por la estimación de las frecuencias naturales y por la variabilidad del tráfico, que pueden suponerse normales. La Fig.~\ref{fig:method} resume el método utilizado.
+La idea principal de este estudio es que, si un modelo de machine learning es capaz de aprender a predecir las frecuencias naturales del puente sano bajo condiciones ambientales específicas, las mediciones del monitoreo continuo pueden compararse con esa predicción para generar alertas y detectar el daño lo antes posible. Para esto, también se tiene en cuenta la dispersión dada por la estimación de las frecuencias naturales y por la variabilidad del tráfico. La Fig.~\ref{fig:method} resume el método utilizado.
 
 \begin{figure}[H]
 \centering
@@ -71,7 +71,7 @@ A partir de las aceleraciones medidas se obtuvieron las frecuencias naturales de
 
 Como se observa en la Fig.~\ref{fig:frequency-temperature}, los cambios de temperatura pueden afectar significativamente las frecuencias naturales del puente. Por esta razón, en ciudades como Edmonton, Alberta, que cuentan con un rango de temperaturas muy amplio a lo largo del año, no se puede establecer un único umbral de frecuencias naturales para determinar si un puente está sano o dañado. Por ello, es necesario analizar la relación que existe entre las frecuencias naturales y la temperatura de la estructura. Además, en la Fig.~\ref{fig:frequency-temperature} se puede observar que existe una relación aparentemente bilineal entre las frecuencias naturales y la temperatura del pavimento con un quiebre justo en $0\,^\circ$C. Esto refuerza lo encontrado por Peeters y De Roeck \cite{Peeters2001}, quienes atribuyeron este comportamiento al aumento de la rigidez de la capa de asfalto cuando se congela.
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=\linewidth]{figures/frequency_vs_temperature}
 \caption{Frecuencia natural frente a la temperatura del pavimento, puente sano (10.11.1997 al 04.08.1998): (a) modo 1, (b) modo 2 y (c) modo 3. La línea discontinua marca $0\,^\circ$C.}
@@ -184,7 +184,7 @@ Mediciones con las tres frecuencias naturales y las temperaturas del pavimento y
 
 \subsection{Modelo del comportamiento sano}
 
-Debido a la relación bilineal observada en la Fig.~\ref{fig:frequency-temperature}, se inició probando con un modelo lineal con dos pendientes, una sobre $0\,^\circ$C y otra bajo $0\,^\circ$C, que relacionaba las frecuencias naturales del puente sano con la temperatura del pavimento en cada medición. Los residuos de ese modelo se analizaron para decidir si el modelo era capaz de predecir correctamente las frecuencias naturales del puente sano o si había que considerar otras variables o cambiar de modelo. En cada medición, el residuo es la diferencia entre la frecuencia natural medida y la frecuencia natural predicha por el modelo:
+Debido a la relación bilineal observada en la Fig.~\ref{fig:frequency-temperature}, se inició probando con un modelo lineal con dos pendientes, una sobre $0\,^\circ$C y otra bajo $0\,^\circ$C, que relacionaba las frecuencias naturales del puente sano con la temperatura del pavimento en cada medición. Este modelo también se ajustó con la temperatura de la losa superior, para comparar cuál de las dos temperaturas predecía mejor las frecuencias naturales. Los residuos de ese modelo se analizaron para decidir si el modelo era capaz de predecir correctamente las frecuencias naturales del puente sano o si había que considerar otras variables o cambiar de modelo. En cada medición, el residuo es la diferencia entre la frecuencia natural medida y la frecuencia natural predicha por el modelo:
 \begin{equation}
 r_{m,i} = f_{m,i} - \hat{f}_{m,i},
 \label{eq:residual}
@@ -196,19 +196,19 @@ Después, se agregaron otras variables para representar el efecto del enfriamien
 \subsubsection{Variables de entrada}
 \label{sec:input-variables}
 
-Considerando que no toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior, se agregaron variables que representan el enfriamiento y el calentamiento progresivo de la estructura. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12 y 24 horas, ya que Peeters y De Roeck \cite{Peeters2001} encontraron que un modelo que incluye las temperaturas de las horas anteriores predice mejor las frecuencias naturales del Z24 que un modelo que solo usa la temperatura actual. Este promedio se calculó como
+Considerando que no toda la estructura tiene la misma temperatura en todos sus puntos y solamente se contaba con mediciones de temperatura en la superficie del pavimento y en la losa superior, se agregaron variables que representan el enfriamiento y el calentamiento progresivo de la estructura. La primera fue el promedio de la temperatura del pavimento de las últimas 6, 12, 24, 48, 72 y 168 horas, ya que Peeters y De Roeck \cite{Peeters2001} encontraron que un modelo que incluye las temperaturas de las horas anteriores predice mejor las frecuencias naturales del Z24 que un modelo que solo usa la temperatura actual. Este promedio se calculó como
 \begin{equation}
 \bar{T}_{w,i} = \frac{1}{n_{w,i}} \sum_{j\,:\; t_i - w < t_j \le t_i} T_j,
 \label{eq:moving-average}
 \end{equation}
-donde $\bar{T}_{w,i}$ es el promedio de las últimas $w$ horas en la medición $i$, $T_j$ y $t_j$ son la temperatura y la hora de la medición $j$, y $n_{w,i}$ es el número de mediciones en las últimas $w$ horas.
+donde $\bar{T}_{w,i}$ es el promedio de las últimas $w$ horas en la medición $i$, $T_j$ y $t_j$ son la temperatura y la hora de la medición $j$, y $n_{w,i}$ es el número de mediciones en las últimas $w$ horas. En la regresión lineal, cada promedio se agregó junto con su parte bajo cero, $\min(\bar{T}_w,0)$, de la misma forma que $\min(T,0)$ en el modelo con dos pendientes, para que su efecto también pudiera cambiar bajo $0\,^\circ$C.
 
 La segunda fue un índice de congelamiento, que acumula la temperatura multiplicada por el tiempo:
 \begin{equation}
 I_i = \max\left(0,\; I_{i-1} - T_i\,\Delta t_i\right),
 \label{eq:freezing-index}
 \end{equation}
-donde $I_i$ es el índice de congelamiento ($^\circ$C$\cdot$h) en la medición $i$ y $\Delta t_i$ son las horas desde la medición anterior. De esta manera, el índice crece mientras la temperatura está bajo $0\,^\circ$C, disminuye con el deshielo y nunca es negativo.
+donde $I_i$ es el índice de congelamiento ($^\circ$C$\cdot$h) en la medición $i$ y $\Delta t_i$ son las horas desde la medición anterior. De esta manera, el índice crece mientras la temperatura está bajo $0\,^\circ$C, disminuye con el deshielo y nunca es negativo. Como la profundidad congelada crece aproximadamente con $\sqrt{I}$ (ecuación de Stefan), en la regresión lineal se probó agregar $\sqrt{I}$ como variable de entrada.
 
 La Tabla~\ref{tab:feature-sets} resume los conjuntos de variables con los que se probaron los modelos.
 
@@ -221,21 +221,23 @@ La Tabla~\ref{tab:feature-sets} resume los conjuntos de variables con los que se
 Conjunto & Variables \\
 \hline
 Bilineal & $T$, $\min(T,0)$ \\
-Historia térmica & $T$, $\bar{T}_6$, $\bar{T}_{12}$, $\bar{T}_{24}$, $h$ \\
-Físico & $T$, $\bar{T}_{24}$, $\min(T,0)$, $\sqrt{I}$ \\
+Bilineal con historia & $T$, $\min(T,0)$, $\bar{T}_w$, $\min(\bar{T}_w,0)$$^\textit{a}$ \\
+Bilineal con historia & Bilineal con historia, $\sqrt{I}$ \\
+\quad y congelamiento & \\
+Historia térmica & $T$, $\bar{T}_6$, $\bar{T}_{12}$, $\bar{T}_{24}$, $\bar{T}_{48}$, $\bar{T}_{72}$, $\bar{T}_{168}$ \\
 \hline
 \end{tabular}
   \label{tab:feature-sets}
 
 \smallskip
 \footnotesize
-$T$: temperatura del pavimento; $\bar{T}_w$: promedio de las últimas $w$ horas (Ec.~\eqref{eq:moving-average}); $\min(T,0)$: igual a $T$ bajo $0\,^\circ$C e igual a 0 sobre $0\,^\circ$C; $h$: horas seguidas bajo $0\,^\circ$C; $I$: índice de congelamiento (Ec.~\eqref{eq:freezing-index}).
+$T$: temperatura del pavimento; $\bar{T}_w$: promedio de las últimas $w$ horas (Ec.~\eqref{eq:moving-average}); $\min(x,0)$: igual a $x$ bajo $0\,^\circ$C e igual a 0 sobre $0\,^\circ$C; $I$: índice de congelamiento (Ec.~\eqref{eq:freezing-index}). $^\textit{a}$Con una sola ventana $w$ (6, 12, 24, 48, 72 o 168 h) o con las seis.
 \end{table}
 
 \subsubsection{Modelos candidatos}
 \label{sec:candidate-models}
 
-Los modelos se probaron en orden de complejidad, de manera que cada modelo agrega algo que el anterior no puede hacer. La regresión lineal se probó con los tres conjuntos de variables de la Tabla~\ref{tab:feature-sets}, y los demás modelos, con los conjuntos Historia térmica y Físico.
+Los modelos se probaron en orden de complejidad, de manera que cada modelo agrega algo que el anterior no puede hacer. La regresión lineal se probó con los conjuntos Bilineal, Bilineal con historia y Bilineal con historia y congelamiento de la Tabla~\ref{tab:feature-sets}, y la red neuronal y el random forest, con el conjunto Historia térmica.
 
 El primer modelo fue la regresión lineal, en la que la frecuencia natural predicha es una suma ponderada de las variables de entrada:
 \begin{equation}
@@ -244,28 +246,21 @@ El primer modelo fue la regresión lineal, en la que la frecuencia natural predi
 \end{equation}
 donde $x_j$ son las $p$ variables del conjunto y $\theta_j$ son los parámetros, que se ajustan por mínimos cuadrados. Es el modelo más simple y sus parámetros se pueden interpretar directamente. Por ejemplo, con el conjunto Bilineal, el parámetro de $\min(T,0)$ es el cambio de pendiente bajo $0\,^\circ$C.
 
-Sin embargo, cuando las variables de entrada se mueven juntas, como la temperatura del pavimento y sus promedios, los parámetros de la regresión lineal pueden volverse muy grandes e inestables. Por ello, el segundo modelo fue una regresión lineal regularizada (Ridge), que agrega al ajuste una penalización de los parámetros grandes:
+Sin embargo, la regresión lineal solo puede representar la forma que ya tienen sus variables de entrada: el quiebre en $0\,^\circ$C de cada término se tiene que dar a mano y hay que elegir qué promedios usar. Por ello, el segundo modelo fue una red neuronal (perceptrón multicapa), que aprende la forma de la relación a partir de los datos. Cada neurona de la red calcula
 \begin{equation}
-\min_{\boldsymbol{\theta}} \; \sum_{i=1}^{n} \left(f_i - \hat{f}_i\right)^2 + \alpha \sum_{j=1}^{p} \theta_j^2,
-\label{eq:ridge}
+z = g\left(b + \sum_{j} w_j x_j\right), \qquad g(u) = \max(0, u),
+\label{eq:neuron}
 \end{equation}
-donde $n$ es el número de mediciones y el hiperparámetro $\alpha$ controla la penalización. El modelo tiene la misma forma de la Ec.~\eqref{eq:linear}; solo cambia la forma de ajustar sus parámetros.
+donde $x_j$ son las entradas de la neurona, $w_j$ son sus pesos, $b$ es su sesgo y $g$ es la función de activación ReLU (\emph{Rectified Linear Unit}), que deja pasar los valores positivos y convierte los negativos en 0. Así, cada neurona aporta un quiebre, y al combinar muchas neuronas la red forma una curva con quiebres donde los datos lo piden, sin que se le indique dónde está el quiebre ni qué promedios usar. Los pesos se ajustaron con una penalización $\alpha$ de los pesos grandes, para evitar que la red aprendiera el ruido de las mediciones, y con parada temprana: se separó un 10\% de los folds de ajuste y el ajuste se detuvo cuando el error en esa parte dejó de disminuir.
 
-Los dos modelos anteriores solo pueden representar la forma que ya tienen sus variables de entrada. Por ello, el tercer modelo fue una regresión de vectores de soporte con kernel RBF (SVR, \emph{Support Vector Regression}; RBF, \emph{Radial Basis Function}), que ajusta una curva suave sin imponer su forma:
-\begin{equation}
-\hat{f}(\mathbf{x}) = b + \sum_{i} a_i \exp\left(-\gamma \lVert \mathbf{x} - \mathbf{x}_i \rVert^2\right),
-\label{eq:svr}
-\end{equation}
-donde $\mathbf{x}$ es el vector de variables de entrada, $\mathbf{x}_i$ son mediciones del entrenamiento, $a_i$ y $b$ son parámetros que se ajustan y $\gamma$ controla qué tan local es cada término. Además, los errores menores que $\varepsilon$ no se penalizan y $C$ controla cuánto se penalizan los demás.
-
-Finalmente, como la curva del SVR es suave, puede tener dificultad para seguir cambios bruscos como los que produce el congelamiento. Por ello, el cuarto modelo fue un random forest, que promedia las predicciones de $B$ árboles de regresión:
+Finalmente, como la red forma curvas con transiciones suaves entre sus quiebres, puede tener dificultad para seguir cambios bruscos como los que produce el congelamiento. Por ello, el tercer modelo fue un random forest, que promedia las predicciones de $B$ árboles de regresión:
 \begin{equation}
 \hat{f}(\mathbf{x}) = \frac{1}{B} \sum_{b=1}^{B} h_b(\mathbf{x}),
 \label{eq:random-forest}
 \end{equation}
 donde $h_b$ es el árbol $b$, entrenado con una muestra aleatoria de las mediciones, y $B = 200$. Cada árbol divide las mediciones con umbrales sobre las variables, por lo que puede representar cambios bruscos; sin embargo, no puede predecir valores fuera del rango del entrenamiento.
 
-Los hiperparámetros de cada modelo ($\alpha$; $C$, $\gamma$ y $\varepsilon$; y el mínimo de mediciones por hoja y el número de variables por división del random forest) se ajustaron con la validación cruzada de la Sección~\ref{sec:data-split}. En la regresión lineal regularizada y en el SVR, las variables se estandarizaron con la media y la desviación estándar de los folds de ajuste.
+Los hiperparámetros de la red neuronal y del random forest se ajustaron con la validación cruzada de la Sección~\ref{sec:data-split}. En la red neuronal se probaron una capa oculta de 10 o de 30 neuronas, dos capas de 30, 50 o 100 neuronas y tres capas de 30 o 50 neuronas, con $\alpha$ igual a 0.0001, 0.01, 0.1 y 1. En el random forest se probaron un mínimo de 1, 5, 10, 20 y 50 mediciones por hoja y 1, 3, 5 y 7 variables por división. En la red neuronal, las variables de entrada y la frecuencia natural se estandarizaron con la media y la desviación estándar de los folds de ajuste.
 
 \subsubsection{Criterio de selección}
 \label{sec:selection-criterion}
@@ -275,42 +270,46 @@ Para comparar los modelos se utilizó la raíz del error cuadrático medio (RMSE
 \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} r_i^2},
 \label{eq:rmse}
 \end{equation}
-donde $r_i$ es el residuo (Ec.~\eqref{eq:residual}) de la medición $i$, calculado con el modelo entrenado sin el fold de esa medición, y $n$ es el número de mediciones. De esta manera, cada medición se evalúa con un modelo que no vio su semana. El RMSE se calculó por separado para cada frecuencia natural, por lo que se eligió un modelo para cada una.
+donde $r_i$ es el residuo (Ec.~\eqref{eq:residual}) de la medición $i$, calculado con el modelo entrenado sin el fold de esa medición, y $n$ es el número de mediciones. De esta manera, cada medición se evalúa con un modelo que no vio su semana. El RMSE se calculó por separado para cada frecuencia natural, por lo que se eligió un modelo para cada una. Además, el RMSE se calculó por separado para las mediciones bajo y sobre $0\,^\circ$C, ya que las mediciones bajo $0\,^\circ$C son solo el 16\% del entrenamiento y el RMSE total podría esconder los errores de invierno.
 
 Como el RMSE cambia de un fold a otro, un modelo con un RMSE un poco menor no es necesariamente mejor. Por ello, se aplicó la regla de un error estándar: entre los modelos cuyo RMSE no supera al menor RMSE por más de un error estándar, se eligió el más simple. Es decir, se eligió el modelo más simple que cumple
 \begin{equation}
 \text{RMSE}_j \le \text{RMSE}_{\min} + \frac{s_{\min}}{\sqrt{k}},
 \label{eq:one-se}
 \end{equation}
-donde $\text{RMSE}_j$ es el RMSE del modelo $j$, $\text{RMSE}_{\min}$ es el menor RMSE de todos los modelos, $s_{\min}$ es la desviación estándar del RMSE de ese modelo entre los folds y $k = 5$ es el número de folds. El orden de simplicidad sigue la escalera de la Sección~\ref{sec:candidate-models}: regresión lineal, regresión lineal regularizada, SVR y random forest; con el mismo modelo, el conjunto con menos variables se consideró más simple.
+donde $\text{RMSE}_j$ es el RMSE del modelo $j$, $\text{RMSE}_{\min}$ es el menor RMSE de todos los modelos, $s_{\min}$ es la desviación estándar del RMSE de ese modelo entre los folds y $k = 5$ es el número de folds. Los candidatos de cada frecuencia natural fueron la regresión lineal con los conjuntos Bilineal y Bilineal con historia (con cada ventana o con las seis), y todas las combinaciones de hiperparámetros de la red neuronal y del random forest. El orden de simplicidad sigue la escalera de la Sección~\ref{sec:candidate-models}: regresión lineal, red neuronal y random forest. Dentro de la regresión lineal y de la red neuronal, se consideró más simple el modelo con menos parámetros, y dentro del random forest, el de hojas más grandes.
 
 \subsection{Sistema de detección}
 \label{sec:detection-system}
 
 Una vez elegido el modelo de cada frecuencia natural, los residuos (Ec.~\eqref{eq:residual}) se utilizaron para detectar el daño, siguiendo los pasos de la Fig.~\ref{fig:method}. Si el puente está sano, los residuos solo representan la dispersión normal que el modelo no logra explicar; si el puente se daña, las frecuencias medidas se alejan de las predichas y los residuos aumentan.
 
-Como el daño puede afectar a las tres frecuencias naturales de manera distinta, los tres residuos de cada medición se combinaron en un solo índice de daño con la distancia de Mahalanobis:
+Como el daño puede afectar a las tres frecuencias naturales de manera distinta, los tres residuos de cada medición se combinaron en un solo índice de daño con la distancia de Mahalanobis al cuadrado:
 \begin{equation}
-d_i = \sqrt{\left(\mathbf{r}_i - \boldsymbol{\mu}\right)^\top \boldsymbol{\Sigma}^{-1} \left(\mathbf{r}_i - \boldsymbol{\mu}\right)},
+D_i^2 = \left(\mathbf{r}_i - \boldsymbol{\mu}\right)^\top \boldsymbol{\Sigma}^{-1} \left(\mathbf{r}_i - \boldsymbol{\mu}\right),
 \label{eq:mahalanobis}
 \end{equation}
 donde $\mathbf{r}_i = [r_{1,i},\, r_{2,i},\, r_{3,i}]^\top$ son los residuos de las tres frecuencias naturales en la medición $i$, y $\boldsymbol{\mu}$ y $\boldsymbol{\Sigma}$ son la media y la matriz de covarianza de los residuos del entrenamiento. A diferencia de la distancia euclidiana, la distancia de Mahalanobis toma en cuenta que cada residuo tiene una dispersión distinta y que los residuos pueden estar correlacionados entre sí.
 
 Sin embargo, el índice de daño de una sola medición puede ser alto por un error en la identificación de las frecuencias, sin que el puente esté dañado. Por ello, el índice se suavizó en el tiempo con un promedio móvil con pesos exponenciales (EWMA, \emph{Exponentially Weighted Moving Average}):
 \begin{equation}
-z_i = \lambda\, d_i + (1 - \lambda)\, z_{i-1},
+Z_i = \lambda\, D_i^2 + (1 - \lambda)\, Z_{i-1},
 \label{eq:ewma}
 \end{equation}
-donde $z_i$ es el índice suavizado en la medición $i$ y $\lambda = 0.1$ es el peso de la medición actual, que se fijó antes de evaluar el sistema. De esta manera, una medición aislada con un índice alto tiene poco efecto, mientras que un aumento que se mantiene en el tiempo, como el que produce el daño, hace crecer $z_i$. El valor inicial $z_0$ es la media del índice de daño en el entrenamiento.
+donde $Z_i$ es el índice suavizado en la medición $i$ y $\lambda$, entre 0 y 1, es el peso de la medición actual. De esta manera, una medición aislada con un índice alto tiene poco efecto, mientras que un aumento que se mantiene en el tiempo, como el que produce el daño, hace crecer $Z_i$. El índice se calculó en orden de tiempo, empezando con el índice de la primera medición, $Z_1 = D_1^2$.
 
-Finalmente, se activa una alarma de daño cuando $z_i$ supera un límite de control (UCL, \emph{Upper Control Limit}), que se definió como el mayor valor de $z_i$ en el entrenamiento:
+Finalmente, se activa una alarma de daño cuando $Z_i$ supera un límite, $Z_\text{lím}$, que se definió como el percentil $p$ de los valores de $Z$ del entrenamiento. Así, con el puente sano, $Z$ supera el límite en el $(100-p)\%$ de las mediciones. No se usó un límite teórico, como el de la distribución chi-cuadrado, porque supone que los residuos son normales, y los residuos del entrenamiento tienen colas más pesadas que las de una distribución normal.
+
+Los valores de $\lambda$ y de $p$ se eligieron solo con el entrenamiento. Para cada combinación de $\lambda$ (1, 0.3, 0.1 y 0.05) y de $p$ (90, 95, 97.5 y 99) se contaron los episodios de falsa alarma del entrenamiento, donde las alarmas separadas por menos de 24 h cuentan como un solo episodio, porque cada episodio implicaría una inspección. Además, se calcularon las horas necesarias para detectar un cambio sostenido de referencia, en el que $D^2$ pasa de su mediana en el entrenamiento a su percentil 99 y se mantiene ahí. Entre las combinaciones con alrededor de un episodio de falsa alarma al mes, se eligió la que detecta más rápido el cambio de referencia.
+
+Para el entrenamiento se utilizaron los residuos de la validación cruzada, de manera que cada residuo se calculó con un modelo que no vio la semana de esa medición. Para la prueba, el modelo se entrenó con todas las mediciones de entrenamiento y validación.
+
+El sistema se evaluó una sola vez con los conjuntos de prueba (Tabla~\ref{tab:data-split}), a través del número de mediciones y de episodios de falsa alarma con el puente sano, del tiempo entre el inicio del daño (primer descenso de la pila, el 11.08.1998 a las 13:15) y la primera alarma, y de la curva ROC (\emph{Receiver Operating Characteristic}). La curva ROC muestra, para cada límite posible, la fracción de mediciones con daño en alarma frente a la fracción de mediciones sanas de prueba en alarma. El área bajo esta curva (AUC, \emph{Area Under the Curve}) es la probabilidad de que una medición con daño tenga un índice mayor que una medición sana:
 \begin{equation}
-\text{UCL} = \max_{i \,\in\, \text{entrenamiento}} z_i.
-\label{eq:ucl}
+\text{AUC} = P\left(Z_\text{daño} > Z_\text{sano}\right),
+\label{eq:auc}
 \end{equation}
-Así, el límite representa la mayor dispersión que tuvo el puente sano. Para el entrenamiento se utilizaron los residuos de la validación cruzada, de manera que cada residuo se calculó con un modelo que no vio la semana de esa medición. Para la prueba, el modelo se entrenó con todas las mediciones de entrenamiento y validación.
-
-El sistema se evaluó una sola vez con los conjuntos de prueba (Tabla~\ref{tab:data-split}), a través del número de falsas alarmas con el puente sano, del tiempo entre el inicio del daño y la primera alarma, y del área bajo la curva ROC (AUC, \emph{Area Under the Curve}).
+donde $Z_\text{daño}$ y $Z_\text{sano}$ son los índices suavizados de una medición con daño y de una medición sana de prueba, tomadas al azar. El AUC vale 1 si el índice separa perfectamente al puente sano del dañado y 0.5 si no los separa.
 
 \section{Resultados}
 
@@ -326,17 +325,17 @@ El sistema se evaluó una sola vez con los conjuntos de prueba (Tabla~\ref{tab:d
 \textbf{PENDIENTE: ideas de cada párrafo.}
 \begin{enumerate}
 \item Qué significa el resultado principal: tiempo hasta la primera alarma y falsas alarmas; qué implica en la práctica (p. ej., detectar el daño en menos de un día de monitoreo).
-\item Por qué funcionó: qué variables explicaron la variabilidad (historia térmica, congelamiento), sobre todo bajo $0\,^\circ$C; relación con Peeters y De Roeck (asfalto congelado, temperaturas de las horas anteriores).
-\item Papel de cada parte del sistema: Mahalanobis frente a cada frecuencia por separado; EWMA frente al índice sin suavizar y sensibilidad a $\lambda$; origen de las falsas alarmas (error de identificación del 15 y 16.07.1998); uno o dos límites.
+\item Por qué funcionó: qué variables explicaron la variabilidad, sobre todo bajo $0\,^\circ$C (promedios de la temperatura de las horas anteriores; el índice de congelamiento no mejoró); relación con Peeters y De Roeck (asfalto congelado, temperaturas de las horas anteriores); un modelo distinto para cada frecuencia natural.
+\item Papel de cada parte del sistema: Mahalanobis frente a cada frecuencia por separado; EWMA frente al índice sin suavizar (episodios de falsa alarma en el entrenamiento y AUC) y elección de $\lambda$ y del percentil; origen de las falsas alarmas (error de identificación del 15.07.1998).
 \item Comparación con otros estudios del Z24 (retraso de detección o AUC; 2 o 3 referencias por buscar).
-\item Limitaciones: daño solo en verano; prueba de invierno con heladas moderadas; RMSE de validación optimista (hiperparámetros elegidos con los mismos folds); un solo puente y daño provocado; solo la temperatura del pavimento. Cierre: qué haría falta para un clima como el de Edmonton (un año completo de línea base y heladas más fuertes en el entrenamiento).
+\item Limitaciones: daño solo en verano; prueba de invierno con heladas moderadas; residuos de $f_2$ desplazados en la prueba de verano del puente sano; RMSE de validación optimista (hiperparámetros elegidos con los mismos folds); un solo puente y daño provocado; solo la temperatura del pavimento. Cierre: qué haría falta para un clima como el de Edmonton (un año completo de línea base y heladas más fuertes en el entrenamiento).
 \end{enumerate}
 
 \section{Conclusiones}
 \textbf{PENDIENTE: 3 a 5 conclusiones que respondan al propósito del estudio, sin explicaciones ni referencias.}
 \begin{enumerate}
-\item El modelo del puente sano: qué modelo y conjunto de variables se eligió para cada frecuencia natural y con qué error.
-\item El efecto de la temperatura: la historia térmica y el congelamiento son necesarios para predecir las frecuencias bajo $0\,^\circ$C.
+\item El modelo del puente sano: qué modelo y conjunto de variables se eligió para cada frecuencia natural (red neuronal en $f_1$, regresión lineal en $f_2$ y random forest en $f_3$) y con qué error.
+\item El efecto de la temperatura: la historia térmica es necesaria para predecir las frecuencias bajo $0\,^\circ$C; el índice de congelamiento no mejoró la predicción.
 \item La detección: el sistema detectó el daño X h después de su inicio, con Y falsas alarmas con el puente sano.
 \item Trabajo futuro: probar la detección con daño en invierno, en otros puentes y en climas más fríos.
 \end{enumerate}
