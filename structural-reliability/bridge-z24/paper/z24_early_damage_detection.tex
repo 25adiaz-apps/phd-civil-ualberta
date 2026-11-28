@@ -17,6 +17,15 @@
 \raggedbottom % Leave empty space at the bottom of a column instead of stretching the space between paragraphs
 \setlength{\textfloatsep}{8pt plus 2pt minus 2pt} % Space between a float at the top of a column and the text
 \setlength{\intextsep}{8pt plus 2pt minus 2pt}    % Space around a float placed inside the text ([H])
+% More floats per page, so that figures and tables stay close to the text that cites them
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.8}
+\renewcommand{\dbltopfraction}{0.9}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
 
 \title{TITTLE HERE}
 
@@ -314,12 +323,280 @@ donde $Z_\text{daño}$ y $Z_\text{sano}$ son los índices suavizados de una medi
 \section{Resultados}
 
 \subsection{Modelo inicial y análisis de residuos}
+\label{sec:results-initial}
 
-\subsection{Comparación de los conjuntos de variables}
+La Tabla~\ref{tab:two-slope-rmse} muestra el RMSE de la validación cruzada del modelo con dos pendientes. Como referencia, también se muestra el RMSE de un modelo que siempre predice la media de la frecuencia natural en los folds de ajuste. Con la temperatura del pavimento, el modelo con dos pendientes redujo el RMSE en un 59\%, 29\% y 51\% respecto a la media en $f_1$, $f_2$ y $f_3$, respectivamente. Sin embargo, el RMSE bajo $0\,^\circ$C fue entre 2 y 3 veces el RMSE sobre $0\,^\circ$C en las tres frecuencias naturales. Con la temperatura de la losa superior, el RMSE fue apenas menor (entre 0.001 y 0.004~Hz).
+
+\begin{table}[!htb]
+\centering
+\caption{\bf RMSE (Hz) de la validación cruzada: media y modelo con dos pendientes}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\hline
+ & & \multicolumn{3}{c}{Pavimento} & Losa \\
+Modo & Media & Total & $<0\,^\circ$C & $>0\,^\circ$C & Total \\
+\hline
+$f_1$ & 0.099 & 0.041 & 0.081 & 0.026 & 0.038 \\
+$f_2$ & 0.120 & 0.086 & 0.144 & 0.068 & 0.081 \\
+$f_3$ & 0.250 & 0.121 & 0.198 & 0.100 & 0.120 \\
+\hline
+\end{tabular}
+  \label{tab:two-slope-rmse}
+
+\smallskip
+\footnotesize
+Media: modelo que siempre predice la media de la frecuencia natural en los folds de ajuste. $<0\,^\circ$C y $>0\,^\circ$C: mediciones con la temperatura del pavimento bajo y sobre $0\,^\circ$C.
+\end{table}
+
+Al ajustar el modelo con todas las mediciones del entrenamiento, la pendiente bajo $0\,^\circ$C fue mucho mayor que la pendiente sobre $0\,^\circ$C (Tabla~\ref{tab:two-slope-coefficients}). En $f_1$ y $f_3$ fue entre 20 y 23 veces mayor, y en $f_2$ incluso cambió de signo. Por ejemplo, para el modo 1 el modelo ajustado fue
+\begin{equation}
+\hat{f}_1 = 4.025 - 0.0046\,T - 0.0855\,\min(T,0),
+\label{eq:two-slope-f1}
+\end{equation}
+con $\hat{f}_1$ en Hz y $T$ en $^\circ$C. Es decir, sobre $0\,^\circ$C la frecuencia natural del modo 1 disminuye 0.0046~Hz por cada grado que aumenta la temperatura, mientras que bajo $0\,^\circ$C aumenta 0.090~Hz por cada grado que la temperatura disminuye. Esto confirma el quiebre observado en la Fig.~\ref{fig:frequency-temperature}.
+
+\begin{table}[!htb]
+\centering
+\caption{\bf Coeficientes del modelo con dos pendientes ajustado con todo el entrenamiento (temperatura del pavimento)}
+\small
+\begin{tabular}{lccc}
+\hline
+ & $\theta_0$ & Pendiente $>0\,^\circ$C & Pendiente $<0\,^\circ$C \\
+Modo & (Hz) & $\theta_1$ (Hz/$^\circ$C) & $\theta_1+\theta_2$ (Hz/$^\circ$C) \\
+\hline
+$f_1$ & 4.025 & $-0.0046$ & $-0.0901$ \\
+$f_2$ & 5.164 & $+0.0017$ & $-0.1187$ \\
+$f_3$ & 10.184 & $-0.0100$ & $-0.2255$ \\
+\hline
+\end{tabular}
+  \label{tab:two-slope-coefficients}
+
+\smallskip
+\footnotesize
+$\theta_1$ y $\theta_2$: parámetros de $T$ y de $\min(T,0)$ en la Ec.~\eqref{eq:linear}.
+\end{table}
+
+La Fig.~\ref{fig:residuals-two-slope}(a--c) muestra los residuos del modelo con dos pendientes frente a la temperatura del pavimento. Aunque el modelo sigue el quiebre en $0\,^\circ$C, los residuos todavía muestran tres patrones. Primero, entre $-2$ y $3\,^\circ$C quedaron residuos positivos grandes, de hasta 0.15~Hz en $f_1$ y de hasta 0.4~Hz en $f_2$ y $f_3$. Es decir, con una misma temperatura cercana a $0\,^\circ$C, el puente estuvo unas veces mucho más rígido que otras. Segundo, bajo $-3\,^\circ$C los residuos fueron negativos (en promedio $-0.12$~Hz en $f_1$ y $-0.26$~Hz en $f_3$), ya que la recta sigue subiendo con el frío, pero las frecuencias medidas dejan de aumentar. Tercero, en $f_1$ y $f_3$ los residuos aumentaron con temperaturas sobre $25\,^\circ$C, lo que indica que la relación también se curva en ese extremo.
+
+\begin{figure*}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/residuals_two_slope}
+\caption{Residuos de la validación cruzada del modelo con dos pendientes. Arriba, frente a la temperatura del pavimento, con el residuo medio de cada intervalo de $1\,^\circ$C (línea continua): (a) $f_1$, (b) $f_2$ y (c) $f_3$. Abajo, solo las mediciones con la temperatura del pavimento entre $-2$ y $3\,^\circ$C, frente al promedio de la temperatura del pavimento de las últimas 72 horas: (d) $f_1$, (e) $f_2$ y (f) $f_3$. Las líneas discontinuas marcan $0\,^\circ$C.}
+\label{fig:residuals-two-slope}
+\end{figure*}
+
+Para entender el primer patrón, los residuos de las mediciones con temperatura entre $-2$ y $3\,^\circ$C se compararon con el promedio de la temperatura de las horas anteriores (Ec.~\eqref{eq:moving-average}). Como se observa en la Fig.~\ref{fig:residuals-two-slope}(d--f), cuando el promedio de las últimas 72 horas fue negativo, los residuos fueron casi siempre positivos; en cambio, cuando fue positivo, los residuos quedaron alrededor de 0. Es decir, con la misma temperatura actual, un puente que viene de varios días de helada está más rígido que uno que viene de días templados. Además, el efecto no es lineal: los residuos aumentan cuando el promedio baja de $0\,^\circ$C y casi no cambian sobre $0\,^\circ$C.
+
+La Fig.~\ref{fig:history-correlation} muestra la correlación entre estos residuos y el promedio de la temperatura para distintas ventanas $w$. La correlación fue negativa en todos los casos y aumentó, en valor absoluto, con ventanas más largas. En $f_2$ pasó de $-0.13$ con 6 horas a $-0.51$ con 168 horas (una semana), lo que indica que para el modo 2 importa más si el puente viene de varios días de helada que la temperatura del día anterior. Con la temperatura de la losa superior la correlación fue menor (entre $-0.02$ y $-0.46$), posiblemente porque la losa cambia de temperatura con retraso y su valor actual ya contiene parte de esa historia. Estos resultados coinciden con lo encontrado por Peeters y De Roeck \cite{Peeters2001} y justifican agregar la historia de la temperatura como variable de entrada.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/history_correlation}
+\caption{Correlación entre el residuo del modelo con dos pendientes y el promedio de la temperatura de las últimas $w$ horas, en las mediciones con temperatura entre $-2$ y $3\,^\circ$C. Marcadores rellenos y líneas continuas: temperatura del pavimento; marcadores vacíos y líneas discontinuas: temperatura de la losa superior.}
+\label{fig:history-correlation}
+\end{figure}
+
+\subsection{Comparación de variables y modelos}
+\label{sec:results-models}
+
+La Fig.~\ref{fig:linear-history-rmse} muestra el RMSE de la regresión lineal al agregar al modelo con dos pendientes el promedio de cada ventana y su parte bajo cero (conjunto Bilineal con historia). La historia de la temperatura mejoró a la regresión lineal en los tres modos, pero cada modo necesitó una ventana distinta. La mayor mejora fue en $f_2$, donde el RMSE pasó de 0.0856 a 0.0628~Hz con la ventana de una semana y a 0.0622~Hz con las seis ventanas juntas ($-27\%$). En $f_1$ y $f_3$ la mejora fue menor y la mejor ventana fue la de 72 horas: el RMSE pasó de 0.0406 a 0.0367~Hz ($-10\%$) y de 0.1213 a 0.1142~Hz ($-6\%$), respectivamente.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/linear_history_rmse}
+\caption{RMSE de la validación cruzada de la regresión lineal con dos pendientes, sola y con el promedio de cada ventana (o de las seis) y su parte bajo cero, con la temperatura del pavimento (línea continua) y de la losa superior (línea discontinua): (a) $f_1$, (b) $f_2$ y (c) $f_3$.}
+\label{fig:linear-history-rmse}
+\end{figure}
+
+Con la historia de la temperatura, la ventaja de la losa superior desapareció: la mejor regresión con la temperatura del pavimento fue igual o mejor que la mejor con la temperatura de la losa en los tres modos (0.0367 frente a 0.0369~Hz en $f_1$, 0.0622 frente a 0.0634~Hz en $f_2$ y 0.1142 frente a 0.1172~Hz en $f_3$). Por ello, a partir de aquí solo se utilizó la temperatura del pavimento.
+
+Al agregar $\sqrt{I}$ a la mejor regresión de cada modo (conjunto Bilineal con historia y congelamiento), el RMSE aumentó en $f_1$ (de 0.0367 a 0.0388~Hz) y en $f_3$ (de 0.1142 a 0.1166~Hz), y casi no cambió en $f_2$ (de 0.0622 a 0.0619~Hz). Además, los residuos bajo $-3\,^\circ$C siguieron siendo negativos en $f_1$ y $f_3$ ($-0.105$ y $-0.219$~Hz en promedio). Por ello, el índice de congelamiento se descartó y no se incluyó entre los candidatos de la Sección~\ref{sec:selection-criterion}.
+
+La Tabla~\ref{tab:model-types} compara la mejor opción de cada tipo de modelo. La red neuronal y el random forest, con el conjunto Historia térmica, mejoraron a la mejor regresión lineal en $f_1$ y $f_3$, sobre todo bajo $0\,^\circ$C. En $f_1$, la red neuronal redujo el RMSE de 0.0367 a 0.0274~Hz ($-25\%$), y bajo $0\,^\circ$C de 0.0740 a 0.0496~Hz. En $f_3$, el random forest redujo el RMSE de 0.1142 a 0.1002~Hz ($-12\%$), y bajo $0\,^\circ$C de 0.1794 a 0.1323~Hz. En cambio, en $f_2$ la regresión lineal siguió siendo la mejor (0.0622~Hz, frente a 0.0657~Hz de la red neuronal y 0.0658~Hz del random forest), ya que la forma que se le dio, con un quiebre en $0\,^\circ$C en cada promedio, representa bien el comportamiento de este modo.
+
+\begin{table}[!htb]
+\centering
+\caption{\bf Mejor opción de cada tipo de modelo: RMSE de la validación cruzada y residuo medio de las mediciones bajo $-3\,^\circ$C}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llccc}
+\hline
+ & & \multicolumn{2}{c}{RMSE (Hz)} & Residuo medio \\
+Modo & Modelo & Total & $<0\,^\circ$C & $<-3\,^\circ$C (Hz) \\
+\hline
+$f_1$ & Dos pendientes & 0.0406 & 0.0811 & $-0.123$ \\
+ & Lineal, $\bar{T}_{72}$ & 0.0367 & 0.0740 & $-0.102$ \\
+ & Red neuronal$^\textit{a}$ & 0.0274 & 0.0496 & $-0.031$ \\
+ & Random forest$^\textit{b}$ & 0.0268 & 0.0494 & $+0.037$ \\
+\hline
+$f_2$ & Dos pendientes & 0.0856 & 0.1443 & $-0.003$ \\
+ & Lineal, seis ventanas & 0.0622 & 0.0827 & $-0.034$ \\
+ & Red neuronal$^\textit{c}$ & 0.0657 & 0.0893 & $0.000$ \\
+ & Random forest$^\textit{d}$ & 0.0658 & 0.0840 & $+0.092$ \\
+\hline
+$f_3$ & Dos pendientes & 0.1213 & 0.1981 & $-0.262$ \\
+ & Lineal, $\bar{T}_{72}$ & 0.1142 & 0.1794 & $-0.212$ \\
+ & Red neuronal$^\textit{c}$ & 0.1025 & 0.1468 & $-0.101$ \\
+ & Random forest$^\textit{b}$ & 0.1002 & 0.1323 & $+0.086$ \\
+\hline
+\end{tabular}
+  \label{tab:model-types}
+
+\smallskip
+\footnotesize
+Lineal: conjunto Bilineal con historia con la ventana indicada. Red neuronal y random forest: conjunto Historia térmica. $^\textit{a}$Tres capas de 30 neuronas, $\alpha = 0.0001$. $^\textit{b}$Mínimo de 10 mediciones por hoja, 7 variables por división. $^\textit{c}$Dos capas de 100 neuronas, $\alpha = 0.0001$. $^\textit{d}$Mínimo de 5 mediciones por hoja, 5 variables por división. Hay 74 mediciones bajo $-3\,^\circ$C en el entrenamiento.
+\end{table}
+
+La Fig.~\ref{fig:binned-residuals} muestra dónde está la diferencia entre los tres tipos de modelo. La regresión lineal se quedó corta con el frío más intenso, con residuos medios negativos bajo $-3\,^\circ$C, y en $f_1$ y $f_3$ sus residuos aumentaron con el calor. La red neuronal redujo ambos sesgos: bajo $-3\,^\circ$C, el residuo medio pasó de $-0.102$ a $-0.031$~Hz en $f_1$ y de $-0.212$ a $-0.101$~Hz en $f_3$, y la curvatura con el calor desapareció. El random forest, en cambio, tuvo residuos medios positivos bajo $-3\,^\circ$C en los tres modos (entre $+0.037$ y $+0.092$~Hz), ya que cada hoja predice el promedio de varias mediciones y no llega a los valores más altos de la frecuencia natural. Sobre $0\,^\circ$C, la red neuronal y el random forest tuvieron residuos medios cercanos a 0, y cerca de $0\,^\circ$C quedó una dispersión que ningún modelo logró explicar, sobre todo en $f_2$ y $f_3$.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/binned_residuals_models}
+\caption{Residuo medio de la validación cruzada por intervalo de temperatura del pavimento, para la mejor opción de cada tipo de modelo (Tabla~\ref{tab:model-types}): (a) $f_1$, (b) $f_2$ y (c) $f_3$. Cada marcador se ubica en la temperatura media del intervalo. La línea discontinua vertical marca $0\,^\circ$C y la punteada, $-3\,^\circ$C.}
+\label{fig:binned-residuals}
+\end{figure}
+
+En cuanto a los hiperparámetros, en la red neuronal $\alpha = 1$ empeoró el RMSE en todos los casos y los demás valores dieron resultados casi iguales; las redes de dos o tres capas fueron mejores que las de una, y entre las redes grandes las diferencias fueron menores que 0.003~Hz. En el random forest, usar una sola variable por división fue lo peor en los tres modos, usar 5 o 7 fue lo mejor, y el mínimo de 50 mediciones por hoja empeoró el RMSE, mientras que con 5 a 20 se obtuvo casi lo mismo.
 
 \subsection{Selección del modelo}
+\label{sec:results-selection}
+
+Como la red neuronal y el random forest quedaron a milésimas de Hz entre sí, el modelo de cada frecuencia natural se eligió con la regla de un error estándar (Ec.~\eqref{eq:one-se}). La Fig.~\ref{fig:one-se} muestra el RMSE de los 56 candidatos de cada modo, ordenados del más simple al más complejo, y la Tabla~\ref{tab:chosen-models} resume el resultado de la regla.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/one_standard_error_rule}
+\caption{RMSE de la validación cruzada de los 56 candidatos (8 regresiones lineales, 28 redes neuronales y 20 random forest), ordenados del más simple al más complejo según la Sección~\ref{sec:selection-criterion}, umbral de la regla de un error estándar (Ec.~\eqref{eq:one-se}) y modelo elegido: (a) $f_1$, (b) $f_2$ y (c) $f_3$. El eje vertical se limita a la zona del umbral, por lo que algunos candidatos con RMSE alto quedan fuera.}
+\label{fig:one-se}
+\end{figure}
+
+En $f_1$, el menor RMSE fue el de un random forest (0.0268~Hz), pero su RMSE cambió mucho entre los folds ($s_{\min} = 0.0071$~Hz), por lo que el umbral quedó en 0.0299~Hz. Bajo el umbral quedaron 26 candidatos (15 redes neuronales y 11 random forest), pero ninguna regresión lineal. Por ello, se eligió la red neuronal más simple bajo el umbral, de dos capas de 30 neuronas (1201 parámetros). En $f_2$, el menor RMSE fue el de la regresión lineal con las seis ventanas (0.0622~Hz), y bajo el umbral solo quedó también la regresión lineal con la ventana de una semana, que tiene 5 parámetros en lugar de 15, por lo que se eligió esta última. En $f_3$, el menor RMSE fue el de un random forest (0.1002~Hz) y bajo el umbral solo quedaron 4 random forest; la mejor red neuronal (0.1025~Hz) quedó sobre el umbral. Por ello, se eligió el random forest con hojas más grandes (mínimo de 20 mediciones).
+
+\begin{table}[!htb]
+\centering
+\caption{\bf Regla de un error estándar y modelo elegido para cada frecuencia natural}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccll}
+\hline
+ & $\text{RMSE}_{\min}$ & $s_{\min}$ & Umbral & & RMSE \\
+Modo & (Hz) & (Hz) & (Hz) & Modelo elegido & (Hz) \\
+\hline
+$f_1$ & 0.0268 & 0.0071 & 0.0299 & Red neuronal$^\textit{a}$ & 0.0291 \\
+$f_2$ & 0.0622 & 0.0037 & 0.0638 & Regresión lineal$^\textit{b}$ & 0.0628 \\
+$f_3$ & 0.1002 & 0.0031 & 0.1016 & Random forest$^\textit{c}$ & 0.1015 \\
+\hline
+\end{tabular}
+  \label{tab:chosen-models}
+
+\smallskip
+\footnotesize
+$^\textit{a}$Conjunto Historia térmica; dos capas de 30 neuronas, $\alpha = 0.01$. $^\textit{b}$Variables $T$, $\min(T,0)$, $\bar{T}_{168}$ y $\min(\bar{T}_{168},0)$. $^\textit{c}$Conjunto Historia térmica; 200 árboles, mínimo de 20 mediciones por hoja y 7 variables por división.
+\end{table}
 
 \subsection{Detección del daño}
+\label{sec:results-detection}
+
+Los modelos de la Tabla~\ref{tab:chosen-models} se ajustaron con todas las mediciones del entrenamiento y se utilizaron para calcular los residuos de los conjuntos de prueba. La Tabla~\ref{tab:block-residuals} resume los residuos de cada conjunto y la Fig.~\ref{fig:test-residuals} los muestra en el tiempo desde el 1 de julio de 1998.
+
+\begin{table}[!htb]
+\centering
+\caption{\bf Media y desviación estándar (Hz) de los residuos de cada conjunto}
+\small
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lrcccccc}
+\hline
+ & & \multicolumn{2}{c}{$f_1$} & \multicolumn{2}{c}{$f_2$} & \multicolumn{2}{c}{$f_3$} \\
+Conjunto & $n$ & Media & D.E. & Media & D.E. & Media & D.E. \\
+\hline
+Entrenamiento & 3933 & $0.000$ & 0.029 & $0.001$ & 0.063 & $0.003$ & 0.102 \\
+Sano, invierno & 320 & $0.007$ & 0.020 & $0.023$ & 0.044 & $0.010$ & 0.107 \\
+Sano, verano & 324 & $-0.013$ & 0.039 & $-0.063$ & 0.034 & $0.019$ & 0.086 \\
+Dañado & 494 & $-0.055$ & 0.040 & $-0.410$ & 0.108 & $-0.190$ & 0.118 \\
+\hline
+\end{tabular}
+  \label{tab:block-residuals}
+
+\smallskip
+\footnotesize
+D.E.: desviación estándar. Entrenamiento: residuos de la validación cruzada. Conjuntos de prueba: modelos ajustados con todo el entrenamiento.
+\end{table}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/test_residuals}
+\caption{Residuos de los modelos elegidos del 01.07.1998 al 10.09.1998: (a) $f_1$, (b) $f_2$ y (c) $f_3$. Las áreas sombreadas marcan la prueba con el puente sano en verano (puntos), la preparación para los daños (excluida, rayas) y la prueba con el puente dañado (cruces), que empieza con el primer descenso de la pila.}
+\label{fig:test-residuals}
+\end{figure}
+
+Con el puente sano en invierno, los residuos fueron parecidos a los del entrenamiento: sus medias estuvieron cerca de 0 y sus desviaciones estándar fueron iguales o menores, salvo en $f_3$ (0.107 frente a 0.102~Hz). Esto indica que los modelos predijeron bien las frecuencias naturales del puente sano bajo $0\,^\circ$C en semanas que no vieron. Con el puente sano en verano, los residuos de $f_2$ quedaron desplazados hacia abajo, con una media de $-0.063$~Hz, igual a una desviación estándar del entrenamiento. Este desplazamiento ya empezaba en los últimos días del entrenamiento (Fig.~\ref{fig:test-residuals}b) y su causa no se pudo identificar con estos datos. Además, el 15 y el 16 de julio hubo unas pocas horas seguidas con residuos muy negativos en $f_1$ (hasta $-0.33$~Hz) y en $f_3$ (hasta $-0.47$~Hz), que corresponden a errores en la identificación de las frecuencias naturales. Estas horas aumentaron la desviación estándar de $f_1$ en verano a 0.039~Hz, frente a 0.029~Hz en el entrenamiento; sin ellas, habría sido de 0.014~Hz. En $f_2$ y $f_3$ la desviación estándar fue menor que en el entrenamiento.
+
+Con el puente dañado, $f_2$ fue el modo más sensible: su residuo bajó a unos $-0.25$~Hz desde el primer descenso de la pila y después a $-0.35$ y $-0.5$~Hz, por escalones, con cada descenso. En promedio, el residuo de $f_2$ fue de $-0.410$~Hz, unas 6.5 veces su desviación estándar en el entrenamiento. Los residuos de $f_1$ y $f_3$ también disminuyeron, en promedio unas 2 veces su desviación estándar en el entrenamiento.
+
+En el entrenamiento, la desviación estándar del residuo de $f_3$ fue unas 3.5 veces la de $f_1$ (Tabla~\ref{tab:block-residuals}), y la correlación entre los residuos de los tres modos fue positiva, de 0.19 a 0.26. Por ello, la distancia de Mahalanobis (Ec.~\eqref{eq:mahalanobis}) era necesaria para combinar los tres residuos: si se sumaran directamente, $f_3$ dominaría el índice de daño, y si se trataran como independientes, los episodios en que los tres residuos se alejan a la vez pesarían de más. Además, los residuos no siguieron una distribución normal: entre el 1.2 y el 1.8\% de los residuos de cada modo quedaron a más de tres desviaciones estándar de la media, mientras que en una distribución normal serían el 0.27\%. Por ello, el límite se definió con un percentil del entrenamiento y no con la distribución chi-cuadrado.
+
+En el entrenamiento, $D^2$ tuvo una media de 3.00, pero una mediana de solo 1.24 y un máximo de 118, es decir, casi todas las mediciones tuvieron un índice pequeño y unas pocas, uno muy grande. Con el puente sano, la mediana de $D^2$ fue de 1.16 en invierno y de 1.93 en verano, mientras que con el puente dañado fue de 49, unas 40 veces la del entrenamiento. Sin embargo, las horas con errores de identificación del 15 y 16 de julio llegaron a $D^2 = 136$, mientras que en los primeros días después del primer descenso de la pila $D^2$ estuvo entre 10 y 30. Por lo tanto, un límite aplicado a cada hora por separado tendría que superar 136 para no dar una falsa alarma en julio y, con ese límite, los primeros días del daño no se detectarían. Esto justifica el suavizado de la Ec.~\eqref{eq:ewma}: las horas con errores de identificación son pocas y aisladas, mientras que el daño se mantiene en el tiempo.
+
+La Fig.~\ref{fig:trade-off} compara las combinaciones de $\lambda$ y del percentil $p$ evaluadas con el entrenamiento. En el cambio de referencia, $D^2$ pasa de su mediana en el entrenamiento, $D^2_\text{sano} = 1.24$, a su percentil 99, $D^2_\text{ref} = 29.8$. Al aplicar la Ec.~\eqref{eq:ewma} $k$ veces con $D^2_\text{ref}$ constante, el índice suavizado es
+\begin{equation}
+Z_k = D^2_\text{ref} - \left(D^2_\text{ref} - D^2_\text{sano}\right)(1-\lambda)^k,
+\label{eq:reference-change}
+\end{equation}
+por lo que las horas necesarias para detectar el cambio son el menor $k$ con $Z_k > Z_\text{lím}$. Por ejemplo, con $\lambda = 0.1$ y $Z_\text{lím} = 8.46$, $Z_k$ supera el límite en la tercera hora.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/smoothing_limit_trade_off}
+\caption{Episodios de falsa alarma en el entrenamiento frente a las horas necesarias para detectar el cambio sostenido de referencia (Ec.~\eqref{eq:reference-change}), para cada $\lambda$ (Ec.~\eqref{eq:ewma}) y percentil $p$ del límite (número junto a cada marcador). Sin suavizar ($\lambda = 1$), el cambio de referencia no alcanza el límite con $p = 99$, por lo que ese punto no aparece.}
+\label{fig:trade-off}
+\end{figure}
+
+Sin suavizar ($\lambda = 1$), el índice dio entre 24 y 56 episodios de falsa alarma en los 246 días del entrenamiento, es decir, entre 3 y 7 al mes. El suavizado redujo mucho los episodios y casi no retrasó la detección del cambio de referencia: con $\lambda = 0.1$ y $p = 95$ hubo 9 episodios (alrededor de uno al mes) y el cambio se detectó en 3 horas. Con más suavizado ($\lambda = 0.05$) o con un percentil más alto hubo menos episodios, pero la detección tardó más. Por ello, se eligió $\lambda = 0.1$ y $p = 95$, con lo que el límite quedó en $Z_\text{lím} = 8.46$. Todos los episodios de falsa alarma del entrenamiento ocurrieron en invierno: al inicio del monitoreo, durante la helada de diciembre y durante la de principios de febrero (Fig.~\ref{fig:detection-index}a). Desde marzo, $Z$ no superó el límite.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/detection_index}
+\caption{Índice suavizado $Z$ (Ec.~\eqref{eq:ewma}, $\lambda = 0.1$, escala logarítmica) y límite de alarma (percentil 95 del entrenamiento): (a) todo el monitoreo y (b) del 01.07.1998 al 10.09.1998. Las cruces marcan las mediciones en alarma. Las áreas sombreadas marcan los conjuntos de prueba y la preparación para los daños, como en la Fig.~\ref{fig:test-residuals}.}
+\label{fig:detection-index}
+\end{figure}
+
+Finalmente, el sistema se evaluó una sola vez con los conjuntos de prueba. La Tabla~\ref{tab:evaluation} resume los resultados. Con el puente sano en invierno, solo 4 mediciones (1.2\%) quedaron en alarma, en un solo episodio el 17 de diciembre, con un $Z$ máximo de 9.3, apenas sobre el límite. Con el puente sano en verano, 40 mediciones (12.3\%) quedaron en alarma, también en un solo episodio, del 15 al 17 de julio. Este episodio se debió a los errores de identificación del 15 de julio: $Z$ llegó a 45.5 y tardó unos dos días en volver bajo el límite (Fig.~\ref{fig:detection-index}b). Es decir, el suavizado convirtió unas pocas horas con errores en un episodio más largo, pero siguió siendo uno solo.
+
+\begin{table}[!htb]
+\centering
+\caption{\bf Evaluación del sistema de detección con los conjuntos de prueba}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrc}
+\hline
+Conjunto & $n$ & En alarma & Episodios \\
+\hline
+Sano, invierno & 320 & 4 (1.2\%) & 1 (17.12) \\
+Sano, verano & 324 & 40 (12.3\%) & 1 (15.07 al 17.07) \\
+Dañado & 494 & 488 (98.8\%) & -- \\
+\hline
+\multicolumn{4}{l}{Retraso de la primera alarma: 18.75 h (12.08.1998, 08:00)} \\
+\multicolumn{4}{l}{AUC: 0.992 con $Z$ y 0.988 con $D^2$ sin suavizar} \\
+\hline
+\end{tabular}
+  \label{tab:evaluation}
+
+\smallskip
+\footnotesize
+$n$: número de mediciones. Un episodio agrupa las alarmas separadas por menos de 24 h. Retraso: desde el primer descenso de la pila (11.08.1998, 13:15).
+\end{table}
+
+Con el puente dañado, la primera alarma se activó el 12 de agosto a las 08:00, 18.75 horas después del primer descenso de la pila. Sin embargo, en ese tiempo solo hubo 6 mediciones válidas, ya que entre las 14:00 del 11 de agosto y las 02:00 del 12 de agosto no hubo ninguna; es decir, la alarma se activó en la séptima medición con daño. Desde la primera alarma, el 100\% de las mediciones con daño quedaron en alarma, y $Z$ siguió aumentando con cada descenso de la pila (Fig.~\ref{fig:detection-index}b).
+
+La Fig.~\ref{fig:roc} muestra la curva ROC del índice suavizado y del índice sin suavizar. Ambos separaron casi perfectamente al puente sano del dañado, con un AUC de 0.992 con $Z$ y de 0.988 con $D^2$. Con el límite elegido, el sistema detectó el 98.8\% de las mediciones con daño, con el 6.8\% de las mediciones sanas de prueba en alarma (44 de 644), casi todas del episodio del 15 al 17 de julio.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/roc_curve}
+\caption{Curva ROC de los conjuntos de prueba con el índice suavizado $Z$ (Ec.~\eqref{eq:ewma}) y con el índice sin suavizar $D^2$ (Ec.~\eqref{eq:mahalanobis}), su AUC (Ec.~\eqref{eq:auc}) y el punto del límite elegido. El recuadro amplía la esquina superior izquierda.}
+\label{fig:roc}
+\end{figure}
 
 \section{Discusión}
 \textbf{PENDIENTE: ideas de cada párrafo.}
