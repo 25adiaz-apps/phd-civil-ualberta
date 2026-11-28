@@ -46,7 +46,16 @@
 \maketitle
 
 \section{Introducción}
-% PENDIENTE: introducción
+\textbf{PENDIENTE: ideas de cada párrafo.}
+\begin{enumerate}
+\item Contexto: los puentes se deterioran y una falla tardía es costosa o peligrosa; el monitoreo de la salud estructural (SHM) busca detectar el daño temprano. Las frecuencias naturales son un buen indicador global: se miden con pocos acelerómetros, de forma continua y sin interrumpir el tráfico.
+\item Problema: las condiciones ambientales, sobre todo la temperatura, cambian las frecuencias naturales tanto o más que un daño moderado. En climas fríos como el de Edmonton, el congelamiento del asfalto rigidiza el tablero y produce una relación bilineal con un quiebre en $0\,^\circ$C. Sin corregir este efecto, el sistema da falsas alarmas en invierno o esconde el daño.
+\item Cómo se ha abordado (referencias por buscar): normalización de los datos con modelos de regresión entre la temperatura y las frecuencias (Peeters y De Roeck, modelos ARX con temperaturas de horas anteriores), métodos sin medir la temperatura (PCA, cointegración), modelos de machine learning (redes neuronales, SVR, random forest, procesos gaussianos) y cartas de control (distancia de Mahalanobis, EWMA) para decidir cuándo hay daño.
+\item Vacío: los modelos con solo la temperatura actual fallan cerca y bajo $0\,^\circ$C; la validación con folds aleatorios sobrestima la precisión porque las mediciones horarias consecutivas son casi iguales; y muchos estudios evalúan la clasificación sano/dañado, pero no cuánto tarda la primera alarma ni cuántas falsas alarmas hay con el puente sano en invierno. En un puente real solo se conoce el puente sano (enfoque no supervisado).
+\item Objetivo y aporte: predecir las tres primeras frecuencias naturales del Z24 sano con la temperatura del pavimento y su historia; comparar regresión lineal, red neuronal y random forest con validación cruzada por semanas y la regla de un error estándar; combinar los residuos con la distancia de Mahalanobis y la EWMA; y evaluar el retraso de detección y las falsas alarmas con conjuntos de prueba que el modelo no vio.
+\item Por qué el Z24: casi un año de monitoreo con heladas, temperaturas de $-7$ a $40\,^\circ$C y daños progresivos aplicados al final, por lo que es un caso de referencia para comparar métodos.
+\item Organización del artículo: Metodología (Sección~2), Resultados (Sección~3), Discusión (Sección~4) y Conclusiones (Sección~5).
+\end{enumerate}
 
 \section{Metodología}
 
