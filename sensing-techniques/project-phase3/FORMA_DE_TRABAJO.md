@@ -17,6 +17,8 @@ Este archivo guarda cómo trabajamos en el proyecto. Las instrucciones nuevas qu
 project-phase3/
 ├── ProjectPhase3_KMeans_Anomaly_Detection_Fall2026.pdf   Enunciado de la Phase 3
 ├── ProjectPhase1_*.pdf, ProjectPhase2_*.pdf              Enunciados y entregas de las phases anteriores
+├── LEC05_MTalebi_Fall2026 (1).pdf                        Diapositivas de clase: z-score, Mahalanobis, MAC, PCA
+├── LEC06B_MTalebi_Fall2026.pdf                           Diapositivas de clase: métricas, ROC/AUC, k-means
 ├── FORMA_DE_TRABAJO.md                                   Este archivo
 └── ProjectPhase3_Group6/        Contenido del ZIP que se entrega
     ├── Main.ipynb               Notebook con todo el análisis (Partes A–C y nota sobre el uso de IA)
@@ -57,10 +59,13 @@ Cada forma modal es una lista de 24 valores ordenados de S1 a S24, así que el s
 
 - **Poco a poco.** El proyecto no se desarrolla de inicio a fin de una vez. Agrego una sección (o la parte que pidas), explico qué hace el código y qué muestran los resultados, y espero tu revisión antes de seguir.
 - **Solo lo que se pide.** Se hace exactamente lo que se pide, sin secciones, tablas, funciones ni sugerencias adicionales. Respuestas cortas.
-- **Código lo más simple posible.** Legible para alguien que empieza en Python: pasos comentados, bucles e `if` sencillos, sin trucos.
+- **Código lo más simple posible.** Legible para alguien que empieza en Python: pasos comentados, bucles e `if` sencillos, sin estructuras complejas, aunque el código quede más largo.
+- **Referencia: las clases del profesor.** Las ecuaciones y los conceptos se toman de las diapositivas (LEC05 y LEC06B), y se cita la diapositiva cuando ayuda (p. ej. "Lecture 6, *Choose k and the threshold using healthy records only*"). Si algo no está en las diapositivas (p. ej. la silueta), se define en el notebook.
+- **Explicaciones directas.** En español, cortas y sin rodeos, pero explicando con claridad cada concepto y cada decisión que se toma (por qué se hace así).
+- **Ejecución.** Antes de cada commit se ejecuta `Main.ipynb` completo (`jupyter nbconvert --execute --inplace`), para que en GitHub se vean las tablas y figuras. Las discusiones se escriben con los valores que salen de esa ejecución.
 - **Estructura del notebook.** Se sigue la de la Phase 2: encabezado (título, curso, profesor, grupo, datos, integrantes e índice), sección 0 de Setup, una sección por parte (`## Part X`) y una subsección por tarea (`### X1. ...`), y al final la nota sobre IA.
 - **Idioma.** El código (variables y comentarios) va en inglés. El texto explicativo del notebook lo trabajamos primero en español; cuando digas que una parte está lista, la traduzco al inglés conservando tu voz. Tablas, figuras, pies de tabla y figura, rótulos de ejes y ecuaciones van en inglés desde el principio. Las explicaciones en el chat siguen en español.
-- **Numeración académica.** Todas las figuras, tablas y ecuaciones se numeran en orden de aparición. El título de cada tabla va arriba ("**Table N.** ..."), el pie de cada figura va abajo ("**Figure N.** ..."), ambos fuera del objeto, y las ecuaciones llevan `\tag{N}`. En el texto se citan como "Table N", "Figure N" y "Eq. N".
+- **Numeración académica.** Todas las figuras, tablas y ecuaciones se numeran en orden de aparición. El título de cada tabla va arriba ("**Table N.** ..."), el pie de cada figura va abajo ("**Figure N.** ..."), ambos fuera del objeto, y las ecuaciones llevan `\tag{N}`. En el texto se citan como "Table N", "Figure N" y "Ec. N" (en el borrador en español; "Eq. N" al traducir). Como la Parte A va antes de la B, cuando se agreguen tablas o ecuaciones en A se renumeran las de B (texto, títulos y `show_table`/`show_figure`).
 - **Fórmulas.** En LaTeX, con el significado de cada símbolo.
 - **Semilla fija** para cualquier dato aleatorio (la división de los datos y KMeans).
 
